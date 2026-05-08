@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梅花易数</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
+  --paper:#f5f0e8;--paper2:#ede7d8;--paper3:#e0d8c8;
+  --gold:#b8912a;--gold2:#d4aa4a;--red:#8b2020;--jade:#2d6e5a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 12% 15%,rgba(184,145,42,.07) 0%,transparent 45%),radial-gradient(ellipse at 88% 85%,rgba(139,32,32,.05) 0%,transparent 45%);pointer-events:none;z-index:0;}
+.app{max-width:780px;margin:0 auto;position:relative;z-index:1;min-height:100vh;}
+
+/* ── 顶部导航 ── */
+.header{padding:18px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
+.logo{display:flex;align-items:baseline;gap:10px;}
+.logo-zh{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
+.logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 4px;display:inline-block;}
+.logo-sub{font-size:11px;color:var(--ink4);letter-spacing:.15em;}
+.nav{display:flex;gap:4px;}
+.nav-btn{background:none;border:1px solid transparent;border-radius:5px;padding:6px 14px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;letter-spacing:.05em;}
+.nav-btn:hover{color:var(--ink);border-color:var(--paper3);}
+.nav-btn.active{color:var(--gold);border-color:var(--gold2);background:rgba(184,145,42,.06);}
+
+/* ── 视图切换 ── */
+.view{display:none;}.view.active{display:block;}
+
+/* ══════════════════════════════
+   起卦视图
+══════════════════════════════ */
+.qigua-wrap{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:560px){.qigua-wrap{grid-template-columns:1fr;}}
+
+.panel{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
+.panel-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.panel-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+
+.input-field{width:100%;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:10px 12px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:16px;resize:none;line-height:1.7;}
+.input-field:focus{border-color:var(--gold2);}
+.input-field::placeholder{color:var(--ink4);}
+
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.method-btn{background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:10px 8px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink2);cursor:pointer;transition:all .2s;text-align:center;line-height:1.5;}
+.method-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.method-btn.selected{border-color:var(--gold);background:rgba(184,145,42,.08);color:var(--gold);}
+.method-icon{font-size:16px;display:block;margin-bottom:3px;}
+
+.num-input-row{display:flex;gap:8px;margin-bottom:8px;}
+.num-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.num-input{width:100%;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:8px;font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s;text-align:center;}
+.num-input:focus{border-color:var(--gold2);}
+.num-label{font-size:11px;color:var(--ink4);}
+
+.time-display{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink3);text-align:center;padding:10px;background:rgba(245,240,232,.6);border-radius:6px;margin-bottom:8px;letter-spacing:.08em;line-height:1.9;}
+.divider{height:1px;background:var(--paper3);margin:14px 0;}
+.desc-text{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink3);line-height:2.2;margin-bottom:14px;}
+.tips-list{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
+.tip-item{font-size:12px;color:var(--ink3);display:flex;align-items:flex-start;gap:6px;line-height:1.6;}
+.tip-dot{color:var(--gold);flex-shrink:0;}
+
+.qigua-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:14px;font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;cursor:pointer;letter-spacing:.25em;transition:all .2s;}
+.qigua-btn:hover{background:var(--ink2);transform:translateY(-1px);}
+.qigua-btn:active{transform:scale(.98);}
+
+/* ══════════════════════════════
+   结果视图
+══════════════════════════════ */
+.result-wrap{padding:20px;display:flex;flex-direction:column;gap:18px;}
+
+.topbar-result{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--paper3);background:rgba(245,240,232,.96);position:sticky;top:60px;z-index:40;backdrop-filter:blur(6px);}
+.back-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;}
+.back-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.topbar-ttl{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink2);letter-spacing:.08em;}
+.topbar-meta{margin-left:auto;font-size:11px;color:var(--ink4);}
+
+/* 问题条 */
+.question-bar{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;}
+.q-label{font-size:11px;color:var(--ink4);letter-spacing:.1em;flex-shrink:0;padding-top:2px;}
+.q-text{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink);line-height:1.7;flex:1;}
+.q-tag{flex-shrink:0;font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(184,145,42,.1);color:var(--gold);border:1px solid rgba(184,145,42,.25);align-self:flex-start;}
+
+/* 三卦 */
+.trigrams-section{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch;}
+@media(max-width:480px){.trigrams-section{grid-template-columns:1fr;}.arrow-col{display:none!important;}}
+.arrow-col{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;}
+.arrow-vline{width:1px;height:36px;background:var(--paper3);}
+.arrow-icon-r{font-size:13px;color:var(--ink4);}
+
+.trigram-block{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:border-color .2s,box-shadow .2s;}
+.trigram-block:hover{border-color:var(--gold2);}
+.trigram-block.main{border-color:var(--gold2);background:rgba(184,145,42,.05);}
+.trigram-block.bian{border-color:rgba(139,32,32,.25);}
+.trigram-block.selected{box-shadow:0 0 0 2px var(--gold);}
+.tb-label{font-size:10px;color:var(--ink4);letter-spacing:.12em;margin-bottom:8px;}
+.tb-label span{padding:2px 7px;border-radius:20px;}
+.trigram-block.main .tb-label span{background:rgba(184,145,42,.12);color:var(--gold);}
+.trigram-block.bian .tb-label span{background:rgba(139,32,32,.08);color:var(--red);}
+
+/* 爻线 */
+.yao-lines{display:flex;flex-direction:column-reverse;gap:4px;align-items:center;margin:4px 0;}
+.yao-row{display:flex;align-items:center;justify-content:center;gap:4px;}
+.yao-num{font-size:9px;color:var(--ink4);width:10px;text-align:right;font-family:'Noto Serif SC',serif;}
+.yao-line-wrap{display:flex;align-items:center;gap:5px;width:60px;}
+.yao-yang{width:44px;height:5px;border-radius:2px;background:var(--ink2);flex-shrink:0;}
+.yao-yin{width:44px;height:5px;display:flex;gap:6px;flex-shrink:0;}
+.yao-yin-seg{flex:1;height:5px;background:var(--ink2);border-radius:2px;}
+.yao-yang.dong{background:var(--red);box-shadow:0 0 4px rgba(139,32,32,.3);}
+.yao-yin.dong .yao-yin-seg{background:var(--red);}
+.dong-mark{font-size:9px;color:var(--red);width:10px;flex-shrink:0;}
+.tb-name{font-family:'Noto Serif SC',serif;font-size:19px;font-weight:700;color:var(--ink);margin-top:4px;}
+.trigram-block.bian .tb-name{color:var(--red);}
+.tb-sub{font-size:11px;color:var(--ink4);margin-top:3px;text-align:center;line-height:1.7;}
+.bagua-tags{display:flex;gap:5px;margin-top:7px;}
+.bagua-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(237,231,216,.9);color:var(--ink3);border:1px solid var(--paper3);}
+
+/* 详情面板 */
+.detail-panel{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.detail-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--paper3);}
+.dtab{background:none;border:none;border-bottom:2px solid transparent;padding:6px 16px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink4);cursor:pointer;transition:all .2s;margin-bottom:-1px;letter-spacing:.04em;}
+.dtab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.detail-content{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.2;}
+
+/* 五行 */
+.wuxing-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
+.section-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+.wx-flow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.wx-node{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.wx-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;border:1.5px solid;}
+.wx-lbl{font-size:11px;color:var(--ink4);}
+.wx-arr{font-size:18px;color:var(--ink4);margin-bottom:14px;}
+.wx-jin{background:rgba(184,145,42,.1);border-color:rgba(184,145,42,.4);color:var(--gold);}
+.wx-mu{background:rgba(45,110,90,.1);border-color:rgba(45,110,90,.35);color:var(--jade);}
+.wx-shui{background:rgba(30,60,100,.08);border-color:rgba(30,60,100,.3);color:#1e3c64;}
+.wx-huo{background:rgba(139,32,32,.08);border-color:rgba(139,32,32,.3);color:var(--red);}
+.wx-tu{background:rgba(100,80,40,.08);border-color:rgba(100,80,40,.28);color:#64501f;}
+.relation-card{flex:1;min-width:160px;background:rgba(245,240,232,.8);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--ink2);line-height:1.9;font-family:'Noto Serif SC',serif;}
+.rel-good{color:var(--jade);}
+.rel-bad{color:var(--red);}
+
+/* 解卦 */
+.jiegua-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
+.jiegua-body{border-left:3px solid var(--gold2);padding-left:16px;}
+.jiegua-text{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);line-height:2.5;letter-spacing:.04em;margin-bottom:14px;}
+.verdict-row{display:flex;align-items:center;gap:10px;}
+.verdict-lbl{font-size:12px;color:var(--ink4);}
+.verdict-badge{font-family:'Noto Serif SC',serif;font-size:13px;padding:4px 16px;border-radius:20px;font-weight:500;}
+.v-good{background:rgba(45,110,90,.1);color:var(--jade);border:1px solid rgba(45,110,90,.3);}
+.v-mid{background:rgba(184,145,42,.1);color:var(--gold);border:1px solid rgba(184,145,42,.3);}
+.v-bad{background:rgba(139,32,32,.08);color:var(--red);border:1px solid rgba(139,32,32,.25);}
+
+/* 操作行 */
+.action-row{display:flex;gap:10px;}
+.act-btn{flex:1;background:none;border:1px solid var(--paper3);border-radius:8px;padding:11px;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;letter-spacing:.06em;}
+.act-btn:hover{border-color:var(--ink3);color:var(--ink);}
+.act-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.act-btn.primary:hover{background:var(--ink2);}
+
+/* ══════════════════════════════
+   卦师见解
+══════════════════════════════ */
+.insight-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
+.insight-saved{background:rgba(45,110,90,.04);border:1px solid rgba(45,110,90,.2);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+.insight-saved-label{font-size:11px;color:var(--jade);letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.insight-saved-text{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.2;white-space:pre-wrap;}
+.insight-edit-btn{margin-top:10px;background:none;border:1px solid var(--paper3);border-radius:6px;padding:5px 14px;font-size:12px;color:var(--ink4);cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .2s;}
+.insight-edit-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.voice-area{background:rgba(245,240,232,.7);border:1px dashed var(--paper3);border-radius:10px;padding:16px;margin-bottom:12px;transition:border-color .3s,background .3s;}
+.voice-area.listening{border-color:var(--red);background:rgba(139,32,32,.03);animation:breathe 2s ease-in-out infinite;}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(139,32,32,.08)}50%{box-shadow:0 0 0 6px rgba(139,32,32,.0)}}
+.voice-controls{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.mic-btn{width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;flex-shrink:0;background:var(--ink);color:var(--paper);}
+.mic-btn:hover{background:var(--ink2);transform:scale(1.05);}
+.mic-btn.active{background:var(--red);animation:micpulse 1.5s ease-in-out infinite;}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(139,32,32,.4)}70%{box-shadow:0 0 0 8px rgba(139,32,32,0)}}
+.mic-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+.voice-status{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink4);}
+.voice-status .rdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red);margin-right:5px;animation:rblink 1s step-end infinite;}
+@keyframes rblink{50%{opacity:0}}
+.transcript-box{min-height:72px;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.2;background:rgba(245,240,232,.7);border-radius:6px;padding:10px 12px;white-space:pre-wrap;cursor:text;outline:none;border:1px solid transparent;transition:border-color .2s;}
+.transcript-box:focus{border-color:var(--gold2);}
+.transcript-box:empty::before{content:'点击麦克风语音输入，或直接在此打字…';color:var(--ink4);}
+.insight-btn-row{display:flex;gap:8px;}
+.insight-save-btn{flex:1;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:11px;font-family:'Noto Serif SC',serif;font-size:13px;cursor:pointer;letter-spacing:.1em;transition:all .2s;}
+.insight-save-btn:hover{background:var(--ink2);}
+.insight-clear-btn{background:none;border:1px solid var(--paper3);border-radius:8px;padding:11px 16px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink4);cursor:pointer;transition:all .2s;}
+.insight-clear-btn:hover{border-color:var(--ink4);color:var(--ink);}
+.no-speech-tip{font-size:11px;color:var(--ink4);background:rgba(184,145,42,.06);border:1px solid rgba(184,145,42,.15);border-radius:6px;padding:7px 12px;margin-bottom:10px;display:none;}
+
+/* 折叠参考面板 */
+.ref-group{background:rgba(237,231,216,.4);border:1px solid var(--paper3);border-radius:10px;overflow:hidden;}
+.ref-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);transition:color .2s;user-select:none;}
+.ref-toggle:hover{color:var(--ink);}
+.ref-arr{font-size:16px;transition:transform .25s;}
+.ref-arr.open{transform:rotate(90deg);}
+.ref-body{padding:0 18px 16px;border-top:1px solid var(--paper3);}
+
+/* 见解主体强化 */
+.insight-section--main{background:rgba(245,240,232,.8);border:1.5px solid var(--gold2);box-shadow:0 2px 12px rgba(184,145,42,.08);}
+.insight-label-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.insight-label-text{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:8px;}
+.insight-label-text::before{content:'';display:block;width:3px;height:13px;background:var(--gold);border-radius:2px;}
+.insight-input-row{margin-bottom:10px;}
+.transcript-box--large{min-height:90px;font-size:14px;line-height:2.3;}
+.insight-saved-text{font-size:14px;line-height:2.4;color:var(--ink);}
+.mic-toggle-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--paper3);border-radius:20px;padding:7px 16px;cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
+.mic-toggle-btn:hover{border-color:var(--gold2);}
+.mic-toggle-btn.active{border-color:var(--red);background:rgba(139,32,32,.04);}
+.mic-toggle-btn:disabled{opacity:.4;cursor:not-allowed;}
+.mic-toggle-icon{font-size:14px;}
+.mic-toggle-label{font-size:12px;color:var(--ink3);}
+.mic-toggle-btn.active .mic-toggle-label{color:var(--red);}
+.rdot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red);margin-right:4px;animation:rblink 1s step-end infinite;}
+@keyframes rblink{50%{opacity:0}}
+/* ══════════════════════════════
+   卦典视图
+══════════════════════════════ */
+.page-title{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink2);margin-bottom:18px;letter-spacing:.06em;}
+.guadian-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;}
+.gua-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:8px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;}
+.gua-card:hover{border-color:var(--gold2);background:rgba(184,145,42,.06);transform:translateY(-1px);}
+.gua-card-num{font-size:10px;color:var(--ink4);margin-bottom:5px;}
+.gua-card-name{font-family:'Noto Serif SC',serif;font-size:11px;font-weight:500;color:var(--ink);}
+.gua-mini-lines{display:flex;flex-direction:column;gap:3px;align-items:center;margin:6px 0;}
+.gml-yang{width:30px;height:3px;background:var(--ink2);border-radius:2px;}
+.gml-yin{width:30px;height:3px;display:flex;gap:4px;}
+.gml-yin-seg{flex:1;height:3px;background:var(--ink2);border-radius:2px;}
+
+/* 卦典详情弹窗 */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-card{background:var(--paper);border:1px solid var(--paper3);border-radius:12px;padding:28px;max-width:420px;width:100%;animation:fadeUp .3s ease;max-height:85vh;overflow-y:auto;}
+.modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.modal-name{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;color:var(--ink);}
+.close-btn{background:none;border:1px solid var(--paper3);border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer;color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.close-btn:hover{border-color:var(--ink3);color:var(--ink);}
+.modal-lines{display:flex;flex-direction:column;gap:6px;align-items:center;margin:12px 0;}
+.gdl-yang{width:58px;height:6px;background:var(--ink2);border-radius:3px;}
+.gdl-yin{width:58px;height:6px;display:flex;gap:8px;}
+.gdl-yin-seg{flex:1;height:6px;background:var(--ink2);border-radius:3px;}
+.modal-label{font-size:11px;color:var(--ink4);letter-spacing:.1em;margin-top:14px;margin-bottom:5px;}
+.modal-text{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.1;}
+
+/* ══════════════════════════════
+   记录视图
+══════════════════════════════ */
+.records-wrap{padding:24px;}
+.records-list{display:flex;flex-direction:column;gap:10px;}
+.record-item{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;overflow:hidden;transition:border-color .2s;}
+.record-item:hover{border-color:var(--gold2);}
+.record-head{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;}
+.record-badge{width:48px;height:48px;background:rgba(184,145,42,.08);border:1px solid rgba(184,145,42,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.record-info{flex:1;min-width:0;}
+.record-q{font-size:14px;color:var(--ink);margin-bottom:4px;font-family:'Noto Serif SC',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.record-meta{font-size:12px;color:var(--ink4);}
+.record-arr{color:var(--ink4);font-size:18px;flex-shrink:0;transition:transform .2s;}
+.record-item.open .record-arr{transform:rotate(90deg);}
+.record-body{display:none;padding:0 18px 16px;border-top:1px solid var(--paper3);}
+.record-item.open .record-body{display:block;}
+.record-guas{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 10px;}
+.record-gua-tag{font-size:12px;padding:3px 10px;border-radius:4px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);font-family:'Noto Serif SC',serif;}
+.record-insight{margin-top:10px;}
+.record-insight-label{font-size:11px;color:var(--jade);letter-spacing:.08em;margin-bottom:6px;}
+.record-insight-text{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.1;white-space:pre-wrap;border-left:2px solid var(--gold2);padding-left:12px;}
+.record-insight-main{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink);line-height:2.3;white-space:pre-wrap;padding:14px 0 10px;}
+.record-guas{display:flex;gap:8px;flex-wrap:wrap;padding-top:6px;border-top:1px solid var(--paper3);}
+.record-gua-tag{font-size:11px;padding:2px 9px;border-radius:4px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink4);font-family:'Noto Serif SC',serif;}
+.record-del-btn{margin-top:12px;background:none;border:1px solid rgba(139,32,32,.2);border-radius:6px;padding:5px 14px;font-size:12px;color:var(--red);cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
+.record-del-btn:hover{background:rgba(139,32,32,.05);border-color:var(--red);}
+.record-no-insight{font-size:12px;color:var(--ink4);padding:10px 0;font-style:italic;}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 22px;border-radius:20px;font-family:'Noto Serif SC',serif;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:300;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── 全局顶部 ── -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-zh">梅花易数</span>
+      <span class="logo-dot"></span>
+      <span class="logo-sub">PLUM BLOSSOM ORACLE</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="showView('qigua',this)">起卦</button>
+      <button class="nav-btn" onclick="showView('guadian',this)">卦典</button>
+      <button class="nav-btn" onclick="showView('records',this)">记录</button>
+    </nav>
+  </header>
+
+  <!-- ══════════════════ 起卦视图 ══════════════════ -->
+  <div class="view active" id="view-qigua">
+    <div class="qigua-wrap">
+
+      <!-- 左：问题 + 起卦方式 -->
+      <div class="panel">
+        <div class="panel-title">所问之事</div>
+        <textarea class="input-field" id="question" rows="3" placeholder="请输入所问之事，如：此次求职是否顺利？"></textarea>
+
+        <div class="panel-title">起卦方式</div>
+        <div class="method-grid">
+          <button class="method-btn selected" onclick="selectMethod('time',this)"><span class="method-icon">⏱</span>时间起卦</button>
+          <button class="method-btn" onclick="selectMethod('number',this)"><span class="method-icon">🔢</span>数字起卦</button>
+          <button class="method-btn" onclick="selectMethod('random',this)"><span class="method-icon">🌸</span>万物起卦</button>
+          <button class="method-btn" onclick="selectMethod('word',this)"><span class="method-icon">✍️</span>字数起卦</button>
+        </div>
+
+        <div id="method-time">
+          <div class="time-display" id="time-display">正在读取当前时间…</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:8px;">
+            <div class="num-col">
+              <select class="num-input" id="lunar-year" style="font-size:12px;padding:6px 4px;"></select>
+              <div class="num-label">年支</div>
+            </div>
+            <div class="num-col">
+              <input class="num-input" type="number" id="lunar-month" min="1" max="12" style="font-size:13px;">
+              <div class="num-label">农历月</div>
+            </div>
+            <div class="num-col">
+              <input class="num-input" type="number" id="lunar-day" min="1" max="30" style="font-size:13px;">
+              <div class="num-label">农历日</div>
+            </div>
+            <div class="num-col">
+              <select class="num-input" id="lunar-hour" style="font-size:12px;padding:6px 4px;"></select>
+              <div class="num-label">时辰</div>
+            </div>
+          </div>
+          <div class="num-label" style="text-align:center;margin-top:6px;color:var(--ink4);">请核对农历日期后再起卦，月日默认取公历仅供参考</div>
+        </div>
+        <div id="method-number" style="display:none">
+          <div class="num-input-row">
+            <div class="num-col"><input class="num-input" type="number" id="num1" placeholder="数" min="1"><div class="num-label">上卦数</div></div>
+            <div class="num-col"><input class="num-input" type="number" id="num2" placeholder="数" min="1"><div class="num-label">下卦数</div></div>
+            <div class="num-col"><input class="num-input" type="number" id="num3" placeholder="数" min="1"><div class="num-label">动爻数</div></div>
+          </div>
+          <div class="num-label" style="text-align:center;margin-top:2px;">上下卦数取余8，动爻数取余6</div>
+        </div>
+        <div id="method-random" style="display:none">
+          <div class="time-display">诚心一念，点击起卦即可感应天机</div>
+        </div>
+        <div id="method-word" style="display:none">
+          <div class="time-display" id="word-display">在上方输入所问之事，自动统计字数</div>
+        </div>
+      </div>
+
+      <!-- 右：说明 + 按钮 -->
+      <div class="panel" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div class="panel-title">起卦简述</div>
+          <div class="desc-text">梅花易数，北宋邵雍所创。<br>以先天八卦数理，观天地万物之变化。<br><br>起卦时，心存所问之事，<br>万物皆可为卦，时间即是天机。</div>
+          <div class="divider"></div>
+          <div class="tips-list">
+            <div class="tip-item"><span class="tip-dot">◆</span><span>本卦：观当前整体形势</span></div>
+            <div class="tip-item"><span class="tip-dot">◆</span><span>互卦：察事物内在因缘</span></div>
+            <div class="tip-item"><span class="tip-dot">◆</span><span>变卦：知未来发展趋势</span></div>
+            <div class="tip-item"><span class="tip-dot">◆</span><span>用生体：有利；用克体：不利</span></div>
+          </div>
+        </div>
+        <button class="qigua-btn" onclick="doQigua()">立 即 起 卦</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════ 结果视图 ══════════════════ -->
+  <div class="view" id="view-result">
+    <div class="topbar-result">
+      <button class="back-btn" onclick="backToQigua()">← 重新起卦</button>
+      <div class="topbar-ttl" id="result-title">卦象解读</div>
+      <div class="topbar-meta" id="result-meta"></div>
+    </div>
+    <div class="result-wrap">
+      <!-- 问题条 -->
+      <div class="question-bar">
+        <div class="q-label">所问</div>
+        <div class="q-text" id="q-text"></div>
+        <div class="q-tag" id="q-tag"></div>
+      </div>
+      <!-- 三卦图 -->
+      <div class="trigrams-section" id="trigrams-section"></div>
+
+      <!-- 卦师见解 -->
+      <div class="insight-section insight-section--main" id="insight-section">
+        <div class="insight-label-row">
+          <div class="insight-label-text">卦师见解</div>
+        </div>
+        <!-- 已保存状态 -->
+        <div class="insight-saved" id="insight-saved" style="display:none">
+          <div class="insight-saved-label">✓ 已记录见解</div>
+          <div class="insight-saved-text" id="insight-saved-text"></div>
+          <button class="insight-edit-btn" onclick="editInsight()">修改见解</button>
+        </div>
+        <!-- 录入状态 -->
+        <div id="insight-input">
+          <div class="no-speech-tip" id="no-speech-tip">⚠ 当前环境不支持语音，请直接在下方文字框输入</div>
+          <div class="insight-input-row">
+            <div class="transcript-box transcript-box--large" id="insight-transcript" contenteditable="true"></div>
+          </div>
+          <button class="mic-toggle-btn" id="insight-mic-btn" onclick="toggleInsightMic()">
+            <span class="mic-toggle-icon">🎤</span>
+            <span class="mic-toggle-label" id="mic-toggle-label">点击语音输入</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 参考资料（折叠） -->
+      <div class="ref-group">
+        <div class="ref-toggle" onclick="toggleRef('ref-detail')">
+          <span>卦象详解</span><span class="ref-arr" id="arr-ref-detail">›</span>
+        </div>
+        <div class="ref-body" id="ref-detail" style="display:none">
+          <div class="detail-panel" style="border:none;border-radius:0;padding:16px 0 0;background:none;">
+            <div class="detail-tabs">
+              <button class="dtab active" onclick="switchTab('benGua',this)">本卦</button>
+              <button class="dtab" onclick="switchTab('huGua',this)">互卦</button>
+              <button class="dtab" onclick="switchTab('bianGua',this)">变卦</button>
+            </div>
+            <div class="detail-content" id="detail-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ref-group">
+        <div class="ref-toggle" onclick="toggleRef('ref-wuxing')">
+          <span>五行体用</span><span class="ref-arr" id="arr-ref-wuxing">›</span>
+        </div>
+        <div class="ref-body" id="ref-wuxing" style="display:none">
+          <div class="wuxing-section" style="border:none;border-radius:0;padding:14px 0 0;background:none;" id="wuxing-section"></div>
+        </div>
+      </div>
+
+      <div class="ref-group">
+        <div class="ref-toggle" onclick="toggleRef('ref-jiegua')">
+          <span>综合解卦</span><span class="ref-arr" id="arr-ref-jiegua">›</span>
+        </div>
+        <div class="ref-body" id="ref-jiegua" style="display:none">
+          <div class="jiegua-section" style="border:none;border-radius:0;padding:14px 0 0;background:none;">
+            <div class="jiegua-body">
+              <div class="jiegua-text" id="jiegua-text"></div>
+              <div class="verdict-row">
+                <div class="verdict-lbl">吉凶论断</div>
+                <div class="verdict-badge" id="verdict-badge"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="act-btn primary" onclick="saveCase()">保存案例</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ 卦典视图 ══════════════════ -->
+  <div class="view" id="view-guadian">
+    <div class="guadian-wrap">
+      <div class="page-title">六十四卦典</div>
+      <div class="guadian-grid" id="guadian-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ 记录视图 ══════════════════ -->
+  <div class="view" id="view-records">
+    <div class="records-wrap">
+      <div class="page-title">起卦记录</div>
+      <div class="records-list" id="records-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 卦典弹窗 -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── 数据 ─── */
+const BL={1:['y','y','y'],2:['y','y','n'],3:['y','n','y'],4:['n','n','y'],5:['y','n','n'],6:['n','y','n'],7:['n','y','y'],8:['n','n','n']};
+const BI={1:{name:'乾',attr:'天',wx:'金',nat:'刚健'},2:{name:'兑',attr:'泽',wx:'金',nat:'喜悦'},3:{name:'离',attr:'火',wx:'火',nat:'文明'},4:{name:'震',attr:'雷',wx:'木',nat:'震动'},5:{name:'巽',attr:'风',wx:'木',nat:'顺入'},6:{name:'坎',attr:'水',wx:'水',nat:'险陷'},7:{name:'艮',attr:'山',wx:'土',nat:'止静'},8:{name:'坤',attr:'地',wx:'土',nat:'柔顺'}};
+const WX_CLS={金:'wx-jin',木:'wx-mu',水:'wx-shui',火:'wx-huo',土:'wx-tu'};
+const WX_SHENG={金:'水',水:'木',木:'火',火:'土',土:'金'};
+const WX_KE={金:'木',木:'土',土:'水',水:'火',火:'金'};
+
+const GUA64=[
+  {u:1,d:1,n:'乾为天',dc:'元亨利贞，刚健中正',jg:'纯阳至刚，诸事亨通。所问之事刚健有力，可大可久。然刚极易折，宜持中正，勿过于强进，以柔济刚方得善果。',vd:'大吉'},
+  {u:1,d:2,n:'天泽履',dc:'履虎尾，不咥人，亨',jg:'行走于险境之中，然能化险为夷。小心谨慎，礼节周全，可平安渡过。',vd:'吉'},
+  {u:1,d:3,n:'天火同人',dc:'同人于野，亨，利涉大川',jg:'与人和同，志同道合，合作共事可成。宜广结善缘，团结众人，大事可成。',vd:'吉'},
+  {u:1,d:4,n:'天雷无妄',dc:'元亨利贞，其匪正有眚',jg:'顺天而行，不可妄为。守正诚信，自然吉祥。若有非分之想，则有灾咎。',vd:'平'},
+  {u:1,d:5,n:'天风姤',dc:'女壮，勿用取女',jg:'阴阳相遇，机会偶然而至。宜把握时机，然需防小人。',vd:'平'},
+  {u:1,d:6,n:'天水讼',dc:'有孚，窒惕，中吉，终凶',jg:'争讼之象，有理有据可得中吉，然终究不宜诉讼。宜和解，勿争强好胜。',vd:'险'},
+  {u:1,d:7,n:'天山遁',dc:'亨，小利贞',jg:'退隐之时，宜退守，不宜进取。暂避锋芒，蓄力待时，方为上策。',vd:'平'},
+  {u:1,d:8,n:'天地否',dc:'否之匪人，不利君子贞',jg:'天地不交，万物不通，现处闭塞之境。宜守勿进，静待时机转化。韬光养晦，蓄势待发。',vd:'凶'},
+  {u:2,d:1,n:'泽天夬',dc:'扬于王庭，孚号有厉',jg:'决断之时，需当机立断。以正胜邪，然需防反扑，稳步推进方可成功。',vd:'吉'},
+  {u:2,d:2,n:'兑为泽',dc:'亨，利贞',jg:'喜悦和谐，人缘极佳。口才出众，善于交际，合作共事大吉。防口舌是非。',vd:'吉'},
+  {u:2,d:3,n:'泽火革',dc:'己日乃孚，元亨利贞',jg:'变革之时，除旧布新。改革创新，顺势而行，必获成功。',vd:'吉'},
+  {u:2,d:4,n:'泽雷随',dc:'元亨利贞，无咎',jg:'顺势而随，灵活应变。随时机而动，顺从大势，诸事顺遂。',vd:'吉'},
+  {u:2,d:5,n:'泽风大过',dc:'栋桡，利有攸往，亨',jg:'超越常规之象，大事过于常理。宜大胆行事，然需防过激，适可而止。',vd:'平'},
+  {u:2,d:6,n:'泽水困',dc:'亨，贞大人吉，无咎',jg:'身处困境，资源匮乏。坚守正道，静待时机，困境终将过去。',vd:'险'},
+  {u:2,d:7,n:'泽山咸',dc:'亨，利贞，取女吉',jg:'感应相通，情感融洽。感情之事大吉，合作感应灵敏，心有灵犀。',vd:'吉'},
+  {u:2,d:8,n:'泽地萃',dc:'亨，王假有庙，利见大人',jg:'聚合之象，人才汇聚。宜广纳贤才，联合众人，大事可成。',vd:'吉'},
+  {u:3,d:1,n:'火天大有',dc:'元亨',jg:'大有所获，丰衣足食。才华横溢，光明磊落，诸事大吉。宜发挥所长，广施恩惠。',vd:'大吉'},
+  {u:3,d:2,n:'火泽睽',dc:'小事吉',jg:'相互背离，小事可成大事难。求同存异，在分歧中寻找共识，小步推进。',vd:'平'},
+  {u:3,d:3,n:'离为火',dc:'利贞，亨，畜牝牛吉',jg:'光明照耀，文明昌盛。前途光明，才华得展，宜积极进取，必获认可。',vd:'吉'},
+  {u:3,d:4,n:'火雷噬嗑',dc:'亨，利用狱',jg:'咬合贯通，排除障碍。有阻碍需克服，果断行动，清除障碍则事可成。',vd:'平'},
+  {u:3,d:5,n:'火风鼎',dc:'元吉，亨',jg:'鼎新革故，功德圆满。事业有成，人才辈出，宜创新求变，大有可为。',vd:'大吉'},
+  {u:3,d:6,n:'火水未济',dc:'亨，小狐汔济，濡其尾',jg:'事尚未成，需继续努力。虽处困局，前途光明，坚持正道终可渡过难关。',vd:'平'},
+  {u:3,d:7,n:'火山旅',dc:'小亨，旅贞吉',jg:'旅途之象，漂泊在外。谨慎处事，低调行事，守正则吉，勿贪大求全。',vd:'平'},
+  {u:3,d:8,n:'火地晋',dc:'康侯用锡马蕃庶',jg:'晋升进步，前途光明。事业上升，宜积极进取，获上级赏识，仕途顺遂。',vd:'吉'},
+  {u:4,d:1,n:'雷天大壮',dc:'利贞',jg:'阳气旺盛，势头强劲。力量充沛，宜大胆进取，然需守正，勿恃强凌弱。',vd:'吉'},
+  {u:4,d:2,n:'雷泽归妹',dc:'征凶，无攸利',jg:'嫁娶之象，然时机不对，强行为之则凶。宜顺其自然，勿强求。',vd:'凶'},
+  {u:4,d:3,n:'雷火丰',dc:'亨，王假之，勿忧',jg:'丰盛之极，光明正大。事业鼎盛，然盛极必衰，宜居安思危。',vd:'吉'},
+  {u:4,d:4,n:'震为雷',dc:'亨，震来虩虩，笑言哑哑',jg:'雷声震动，变动突然。处变不惊，冷静应对，震惊过后归于平静。',vd:'平'},
+  {u:4,d:5,n:'雷风恒',dc:'亨，无咎，利贞，利有攸往',jg:'恒久持续，坚持不懈。坚守正道，持之以恒，事业可成，婚姻美满。',vd:'吉'},
+  {u:4,d:6,n:'雷水解',dc:'利西南，无所往，其来复吉',jg:'解除困难，危机化解。困境得以解脱，宜把握时机，乘势而起。',vd:'吉'},
+  {u:4,d:7,n:'雷山小过',dc:'亨，利贞，可小事，不可大事',jg:'小事可成，大事难为。宜低调行事，稳扎稳打，小步前进。',vd:'平'},
+  {u:4,d:8,n:'雷地豫',dc:'利建侯行师',jg:'欢乐豫悦，顺势而为。时机成熟，大展宏图，号令四方。',vd:'吉'},
+  {u:5,d:1,n:'风天小畜',dc:'亨，密云不雨，自我西郊',jg:'小有积蓄，蓄势待发。时机尚未成熟，宜积累力量，等待良机。',vd:'平'},
+  {u:5,d:2,n:'风泽中孚',dc:'豚鱼吉，利涉大川，利贞',jg:'诚信感人，信义为本。以诚信待人，感化他人，大事可成。',vd:'吉'},
+  {u:5,d:3,n:'风火家人',dc:'利女贞',jg:'家庭和睦，各司其职。家和万事兴，处理好家庭关系，事业自然顺遂。',vd:'吉'},
+  {u:5,d:4,n:'风雷益',dc:'利有攸往，利涉大川',jg:'增益之象，获得帮助。贵人相助，事业进益，宜把握机遇，大胆前进。',vd:'吉'},
+  {u:5,d:5,n:'巽为风',dc:'小亨，利有攸往，利见大人',jg:'柔顺随风，灵活变通。顺势而为，低调进取，贵人相助，事可成就。',vd:'吉'},
+  {u:5,d:6,n:'风水涣',dc:'亨，王假有庙，利涉大川，利贞',jg:'涣散聚合，化解隔阂。消除分歧，重新聚合，联合众力可成大事。',vd:'吉'},
+  {u:5,d:7,n:'风山渐',dc:'女归吉，利贞',jg:'循序渐进，稳步前行。急不得，慢慢来，一步一个脚印，终可达到目标。',vd:'吉'},
+  {u:5,d:8,n:'风地观',dc:'盥而不荐，有孚颙若',jg:'观察审视，冷静分析。先观察后行动，深思熟虑，方可做出正确决策。',vd:'平'},
+  {u:6,d:1,n:'水天需',dc:'有孚，光亨，贞吉，利涉大川',jg:'等待时机，耐心守候。时机未到，宜耐心等待，诚信为本，吉祥可期。',vd:'吉'},
+  {u:6,d:2,n:'水泽节',dc:'亨，苦节不可贞',jg:'节制有度，适可而止。凡事有节制，不可过分，守度则吉，过苦则凶。',vd:'平'},
+  {u:6,d:3,n:'水火既济',dc:'亨，小利贞，初吉终乱',jg:'事已成就，功德圆满。然物极必反，须防盛极而衰，守成固基方能持久。',vd:'吉'},
+  {u:6,d:4,n:'水雷屯',dc:'元亨利贞，勿用有攸往',jg:'创业维艰，万事开头难。虽处困难之初，坚持正道，终可突破，有所成就。',vd:'平'},
+  {u:6,d:5,n:'水风井',dc:'改邑不改井，无丧无得',jg:'养民利众，源源不断。默默奉献，恒久不变，利于众人，自身也将获益。',vd:'平'},
+  {u:6,d:6,n:'坎为水',dc:'有孚，维心亨，行有尚',jg:'坎陷重重，险中求通。坚守诚信，心志坚定，险境终可渡过，有志者事竟成。',vd:'险'},
+  {u:6,d:7,n:'水山蹇',dc:'利西南，不利东北，利见大人',jg:'行路艰难，步履维艰。正面难行，宜另辟蹊径，寻求贵人相助，曲折中前进。',vd:'险'},
+  {u:6,d:8,n:'水地比',dc:'吉，原筮元永贞，无咎',jg:'亲比相辅，团结互助。联合盟友，相互扶持，众志成城，大事可成。',vd:'吉'},
+  {u:7,d:1,n:'山天大畜',dc:'利贞，不家食，吉，利涉大川',jg:'大量积蓄，厚积薄发。积累充分，时机一到必大有作为，宜广纳博学。',vd:'吉'},
+  {u:7,d:2,n:'山泽损',dc:'有孚，元吉，无咎，可贞',jg:'有所损失，然损之有益。减损自我，奉献他人，终将得到更大的回报。',vd:'平'},
+  {u:7,d:3,n:'山火贲',dc:'亨，小利有攸往',jg:'文饰华美，注重外表。形象良好，小事顺利，然需注重内涵，不可华而不实。',vd:'平'},
+  {u:7,d:4,n:'山雷颐',dc:'贞吉，观颐，自求口实',jg:'颐养之道，养正则吉。注重修身养性，饮食起居，自力更生，方得正道。',vd:'平'},
+  {u:7,d:5,n:'山风蛊',dc:'元亨，利涉大川，先甲三日',jg:'整治腐败，革故鼎新。面对积弊，大胆整改，除旧迎新，必获成功。',vd:'吉'},
+  {u:7,d:6,n:'山水蒙',dc:'亨，匪我求童蒙，童蒙求我',jg:'启蒙教化，循循善诱。处于学习成长阶段，虚心求教，必有所得。',vd:'平'},
+  {u:7,d:7,n:'艮为山',dc:'艮其背，不获其身，无咎',jg:'止而不动，厚重如山。当知进退，该止则止，静观其变，待机而动。',vd:'平'},
+  {u:7,d:8,n:'山地剥',dc:'不利有攸往',jg:'剥落之象，损耗严重。时运不济，宜守不宜进，静待时机转变，保存实力。',vd:'凶'},
+  {u:8,d:1,n:'地天泰',dc:'小往大来，吉亨',jg:'天地交泰，上下相通，吉祥亨通。内外和合，诸事顺遂，此乃最吉之象，宜积极进取。',vd:'大吉'},
+  {u:8,d:2,n:'地泽临',dc:'元亨利贞，至于八月有凶',jg:'临近之象，居高临下。主动出击，广施恩惠，然需注意时限，把握时机。',vd:'吉'},
+  {u:8,d:3,n:'地火明夷',dc:'利艰贞',jg:'光明受损，黑暗中坚守。处境艰难，韬光养晦，坚守内心光明，终将重见天日。',vd:'险'},
+  {u:8,d:4,n:'地雷复',dc:'亨，出入无疾，朋来无咎',jg:'回复正道，返本归源。事情出现转机，否极泰来，重新出发，前途光明。',vd:'吉'},
+  {u:8,d:5,n:'地风升',dc:'元亨，用见大人，勿恤，南征吉',jg:'上升之象，步步高升。稳步上升，宜拜见贵人，大胆南进，仕途顺遂。',vd:'吉'},
+  {u:8,d:6,n:'地水师',dc:'贞，大人吉，无咎',jg:'统帅之象，纪律严明。宜以正道领导众人，统一号令，可成大事。',vd:'吉'},
+  {u:8,d:7,n:'地山谦',dc:'亨，君子有终',jg:'谦逊有礼，终将获益。保持谦逊，低调务实，君子之道，终有善果。',vd:'吉'},
+  {u:8,d:8,n:'坤为地',dc:'元亨，利牝马之贞',jg:'纯阴柔顺，厚德载物。以柔克刚，顺势而为，宽厚包容，万物滋生。',vd:'吉'}
+];
+
+function guaName(u,d){const g=GUA64.find(x=>x.u===u&&x.d===d);return g?g.n:'未知卦';}
+function l2n(ls){const m={'y,y,y':1,'y,y,n':2,'y,n,y':3,'n,n,y':4,'y,n,n':5,'n,y,n':6,'n,y,y':7,'n,n,n':8};return m[ls.join(',')]||1;}
+function guaInfo(u,d){return GUA64.find(x=>x.u===u&&x.d===d)||{n:'',dc:'',jg:'',vd:'平'};}
+
+/* ─── 状态 ─── */
+let currentMethod='time';
+let activeGuaKey='benGua';
+let guaData=[];
+let currentQuestion='';
+let records=[];
+
+/* ─── JSONBin 配置 ─── */
+const BIN_ID='69fda580c0954111d8f3b511';
+const BIN_KEY='$2a$10$9geHq.Sn80oCwtKE1Zz6suVH7LkrUicD8ZiZ/sd3UP/rAmga2BRQy';
+const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+async function loadRecords(){
+  try{
+    const res=await fetch(BIN_URL+'/latest',{
+      headers:{'X-Master-Key':BIN_KEY}
+    });
+    const data=await res.json();
+    records=data.record.records||[];
+  }catch(e){
+    console.error('读取云端记录失败',e);
+    records=[];
+  }
+}
+
+async function saveRecordsToCloud(){
+  await fetch(BIN_URL,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-Master-Key':BIN_KEY},
+    body:JSON.stringify({records})
+  });
+}
+
+/* ─── 视图切换 ─── */
+function showView(v,btn){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(v==='guadian')renderGuadian();
+  if(v==='records'){
+    document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
+    loadRecords().then(()=>renderRecords());
+  }
+}
+
+function backToQigua(){
+  showView('qigua',document.querySelector('.nav-btn'));
+  document.querySelectorAll('.nav-btn')[0].classList.add('active');
+}
+
+/* ─── 起卦页逻辑 ─── */
+function selectMethod(m,btn){
+  currentMethod=m;
+  document.querySelectorAll('.method-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  ['time','number','random','word'].forEach(id=>{
+    document.getElementById('method-'+id).style.display=id===m?'block':'none';
+  });
+}
+
+/* ── 干支工具 ── */
+// 地支：子=1 丑=2 … 亥=12
+const ZHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ZHI_NUM={子:1,丑:2,寅:3,卯:4,辰:5,巳:6,午:7,未:8,申:9,酉:10,戌:11,亥:12};
+// 时辰：子时(23-1)=1, 丑时(1-3)=2 … 亥时(21-23)=12
+function getShichen(hour){
+  // 子时跨夜：23,0点算子时
+  if(hour===23||hour===0)return 1;
+  return Math.floor((hour+1)/2)+1; // 1-3丑=2, 3-5寅=3, ...
+}
+// 公历年推算地支（近似，立春前后有一天误差，可手动修正）
+function yearToZhi(year){
+  // 甲子年为1984，地支子=1
+  // (year - 1984) % 12 得到偏移，加1得子=1起的地支序号
+  return((year-1984)%12+12)%12+1;
+}
+
+function initTimeSelects(){
+  const yearSel=document.getElementById('lunar-year');
+  const hourSel=document.getElementById('lunar-hour');
+  if(!yearSel)return;
+  // 年支选项
+  ZHI.forEach((z,i)=>{
+    const opt=document.createElement('option');
+    opt.value=i+1; opt.textContent=z+'年（'+(i+1)+'）';
+    yearSel.appendChild(opt);
+  });
+  // 时辰选项
+  const shichenNames=['子（23-1时）','丑（1-3时）','寅（3-5时）','卯（5-7时）','辰（7-9时）','巳（9-11时）','午（11-13时）','未（13-15时）','申（15-17时）','酉（17-19时）','戌（19-21时）','亥（21-23时）'];
+  shichenNames.forEach((s,i)=>{
+    const opt=document.createElement('option');
+    opt.value=i+1; opt.textContent=s;
+    hourSel.appendChild(opt);
+  });
+  // 默认值
+  const now=new Date();
+  yearSel.value=yearToZhi(now.getFullYear());
+  document.getElementById('lunar-month').value=now.getMonth()+1;
+  document.getElementById('lunar-day').value=now.getDate();
+  hourSel.value=getShichen(now.getHours());
+}
+
+function updateTime(){
+  const n=new Date();
+  const sc=ZHI[Math.floor(n.getHours()===23?0:((n.getHours()+1)/2))];
+  const zhiName=ZHI[yearToZhi(n.getFullYear())-1];
+  const s=`${n.getFullYear()}年（${zhiName}年）${n.getMonth()+1}月${n.getDate()}日 ${n.getHours()}时`;
+  const el=document.getElementById('time-display');
+  if(el)el.textContent=s;
+  // 同步更新时辰选择
+  const hourSel=document.getElementById('lunar-hour');
+  if(hourSel)hourSel.value=getShichen(n.getHours());
+}
+
+function getNums(){
+  if(currentMethod==='time'){
+    const yearNum=parseInt(document.getElementById('lunar-year').value)||yearToZhi(new Date().getFullYear());
+    const mo=parseInt(document.getElementById('lunar-month').value)||new Date().getMonth()+1;
+    const d=parseInt(document.getElementById('lunar-day').value)||new Date().getDate();
+    const h=parseInt(document.getElementById('lunar-hour').value)||getShichen(new Date().getHours());
+    const sum3=yearNum+mo+d;
+    const sum4=sum3+h;
+    return{upper:sum3%8||8, lower:sum4%8||8, dong:sum4%6||6,
+      detail:`年支${ZHI[yearNum-1]}=${yearNum}，月=${mo}，日=${d}，时辰${ZHI[h-1]}=${h}`};
+  }
+  if(currentMethod==='number'){
+    const n1=parseInt(document.getElementById('num1').value);
+    const n2=parseInt(document.getElementById('num2').value);
+    const n3=parseInt(document.getElementById('num3').value);
+    if(!n1||!n2||!n3)return null;
+    return{upper:n1%8||8,lower:n2%8||8,dong:n3%6||6};
+  }
+  if(currentMethod==='random'){
+    return{upper:Math.floor(Math.random()*8)+1,lower:Math.floor(Math.random()*8)+1,dong:Math.floor(Math.random()*6)+1};
+  }
+  // word
+  const q=document.getElementById('question').value.replace(/\s/g,'');
+  const len=q.length||1;
+  return{upper:len%8||8,lower:(len+1)%8||8,dong:len%6||6};
+}
+
+function doQigua(){
+  const q=document.getElementById('question').value.trim();
+  if(!q){alert('请先输入所问之事');return;}
+  const nums=getNums();
+  if(!nums){alert('请输入三个数字');return;}
+
+  const{upper,lower,dong}=nums;
+  const uL=BL[upper],dL=BL[lower];
+  const all6=[...dL,...uL];
+
+  // 互卦
+  const huUL=[all6[2],all6[3],all6[4]];
+  const huDL=[all6[1],all6[2],all6[3]];
+  const huU=l2n(huUL),huD=l2n(huDL);
+
+  // 变卦
+  const bAll=all6.map((l,i)=>i===dong-1?(l==='y'?'n':'y'):l);
+  const bDL=bAll.slice(0,3),bUL=bAll.slice(3);
+  const bU=l2n(bUL),bD=l2n(bDL);
+
+  guaData=[
+    {key:'benGua',label:'本 卦',uN:upper,dN:lower,uL:uL,dL:dL,dongIdx:dong-1,cls:'main'},
+    {key:'huGua',label:'互 卦',uN:huU,dN:huD,uL:huUL,dL:huDL,dongIdx:-1,cls:''},
+    {key:'bianGua',label:'变 卦',uN:bU,dN:bD,uL:bUL,dL:bDL,dongIdx:-1,cls:'bian'},
+  ];
+  currentQuestion=q;
+  activeGuaKey='benGua';
+
+  // 填充结果页
+  const methodLabel={time:'时间起卦',number:'数字起卦',random:'万物起卦',word:'字数起卦'};
+  document.getElementById('result-title').textContent=`${guaName(upper,lower)} · 第${dong}爻动`;
+  document.getElementById('result-meta').textContent=new Date().toLocaleDateString('zh-CN')+' · '+methodLabel[currentMethod];
+  // 如果是时间起卦，在meta里显示推算依据
+  if(currentMethod==='time'&&nums.detail){
+    document.getElementById('result-meta').textContent+=` · ${nums.detail}`;
+  }
+  document.getElementById('q-text').textContent=q;
+  document.getElementById('q-tag').textContent=methodLabel[currentMethod];
+
+  renderTrigrams();
+  renderDetail();
+  renderWuxing();
+  renderJiegua();
+
+  // 暂存记录到内存（点保存案例时才写云端）
+  const rec={id:Date.now(),question:q,benGua:guaName(upper,lower),huGua:guaName(huU,huD),bianGua:guaName(bU,bD),dong,method:currentMethod,time:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),insight:''};
+  records.unshift(rec);
+  if(records.length>100)records=records.slice(0,100);
+
+  // 重置见解区
+  resetInsight();
+
+  // 跳转结果页
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-result').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─── 爻线渲染 ─── */
+function yaoLines(uL,dL,dongIdx,showNum){
+  const all=[...dL,...uL];
+  const names=['初','二','三','四','五','上'];
+  return`<div class="yao-lines">${all.map((l,i)=>{
+    const isDong=i===dongIdx;
+    const lineHtml=l==='y'
+      ?`<div class="yao-yang${isDong?' dong':''}"></div>`
+      :`<div class="yao-yin${isDong?' dong':''}"><div class="yao-yin-seg"></div><div class="yao-yin-seg"></div></div>`;
+    return`<div class="yao-row">
+      ${showNum?`<div class="yao-num">${names[i]}</div>`:''}
+      <div class="yao-line-wrap">
+        ${lineHtml}
+        ${isDong?`<div class="dong-mark">●</div>`:'<div class="dong-mark" style="opacity:0">●</div>'}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ─── 三卦渲染 ─── */
+function renderTrigrams(){
+  let html='';
+  guaData.forEach((g,i)=>{
+    const ui=BI[g.uN],di=BI[g.dN];
+    const sel=g.key===activeGuaKey?' selected':'';
+    html+=`<div class="trigram-block ${g.cls}${sel}" onclick="selectGua('${g.key}')">
+      <div class="tb-label"><span>${g.label}</span></div>
+      ${yaoLines(g.uL,g.dL,g.dongIdx,false)}
+      <div class="tb-name">${guaName(g.uN,g.dN)}</div>
+      <div class="tb-sub">${ui.name}${ui.attr}／${di.name}${di.attr}</div>
+      <div class="bagua-tags"><span class="bagua-tag">${ui.wx}</span><span class="bagua-tag">${di.wx}</span></div>
+    </div>`;
+    if(i<2)html+=`<div class="arrow-col"><div class="arrow-vline"></div><div class="arrow-icon-r">→</div><div class="arrow-vline"></div></div>`;
+  });
+  document.getElementById('trigrams-section').innerHTML=html;
+}
+
+function selectGua(key){
+  activeGuaKey=key;
+  renderTrigrams();
+  renderDetail();
+  // 同步tab
+  document.querySelectorAll('.dtab').forEach((b,i)=>{
+    const keys=['benGua','huGua','bianGua'];
+    b.classList.toggle('active',keys[i]===key);
+  });
+}
+
+/* ─── 详情渲染 ─── */
+function switchTab(key,btn){
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeGuaKey=key;
+  renderTrigrams();
+  renderDetail();
+}
+
+function renderDetail(){
+  const g=guaData.find(x=>x.key===activeGuaKey);
+  if(!g)return;
+  const ui=BI[g.uN],di=BI[g.dN];
+  const info=guaInfo(g.uN,g.dN);
+  const tipMap={
+    benGua:'本卦由起卦数直接推得，反映当前整体形势，是解读的核心主体。',
+    huGua:'互卦取本卦二三四五爻组成，揭示事物发展的内在原因与过程。',
+    bianGua:'变卦为动爻变化后所得之卦，预示事物未来的发展方向与结果。'
+  };
+  document.getElementById('detail-content').innerHTML=`
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;">
+      ${yaoLines(g.uL,g.dL,g.dongIdx,true)}
+      <div style="flex:1;">
+        <div style="font-size:19px;font-weight:700;font-family:'Noto Serif SC',serif;margin-bottom:4px;">${guaName(g.uN,g.dN)}</div>
+        <div style="font-size:12px;color:var(--ink4);margin-bottom:10px;">${info.dc}</div>
+        <div style="font-size:12px;color:var(--ink3);line-height:1.9;background:rgba(245,240,232,.7);padding:10px 12px;border-radius:6px;">${tipMap[activeGuaKey]}</div>
+        <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;">
+          <span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);">上 ${ui.name}（${ui.attr}·${ui.wx}·${ui.nat}）</span>
+          <span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);">下 ${di.name}（${di.attr}·${di.wx}·${di.nat}）</span>
+          ${g.dongIdx>=0?`<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(139,32,32,.07);border:1px solid rgba(139,32,32,.2);color:var(--red);">第${g.dongIdx+1}爻动</span>`:''}
+        </div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--ink2);line-height:2.3;border-top:1px solid var(--paper3);padding-top:12px;">${info.jg||`此卦${ui.attr}在上、${di.attr}在下，${ui.wx}与${di.wx}相合，当审时度势，顺势而为。`}</div>
+  `;
+}
+
+/* ─── 五行渲染 ─── */
+function renderWuxing(){
+  const ben=guaData[0],bian=guaData[2];
+  const tiI=BI[ben.uN],yongI=BI[ben.dN];
+  const tiWx=tiI.wx,yongWx=yongI.wx;
+  let rel='',relCls='';
+  if(WX_SHENG[yongWx]===tiWx){rel=`用生体：${yongI.name}（${yongWx}）生${tiI.name}（${tiWx}），用卦生助体卦，事较有利，多有贵人相助。`;relCls='rel-good';}
+  else if(WX_SHENG[tiWx]===yongWx){rel=`体生用：${tiI.name}（${tiWx}）生${yongI.name}（${yongWx}），体卦耗泄于用卦，付出较多，收获相对较少。`;}
+  else if(WX_KE[yongWx]===tiWx){rel=`用克体：${yongI.name}（${yongWx}）克${tiI.name}（${tiWx}），用卦克制体卦，事不顺遂，需格外谨慎应对。`;relCls='rel-bad';}
+  else if(WX_KE[tiWx]===yongWx){rel=`体克用：${tiI.name}（${tiWx}）克${yongI.name}（${yongWx}），体卦克制用卦，主动有力，所问之事可成。`;relCls='rel-good';}
+  else{rel=`体用比和：${tiWx}与${yongWx}同类，两者平衡，事情平稳发展，无大起伏。`;}
+
+  const bUI=BI[bian.uN],bDI=BI[bian.dN];
+  const bianNote=WX_SHENG[bUI.wx]===tiWx||WX_SHENG[bDI.wx]===tiWx?'变卦有生助体卦之象，未来趋势向好，前景可期。':'变卦与体卦关系一般，未来仍需持续努力，把握变化。';
+
+  document.getElementById('wuxing-section').innerHTML=`
+    <div class="section-title">体用五行分析</div>
+    <div class="wx-flow">
+      <div class="wx-node">
+        <div class="wx-circle ${WX_CLS[tiWx]}">${tiI.name}</div>
+        <div class="wx-lbl">体卦·${tiWx}</div>
+      </div>
+      <div class="wx-arr">⇌</div>
+      <div class="wx-node">
+        <div class="wx-circle ${WX_CLS[yongWx]}">${yongI.name}</div>
+        <div class="wx-lbl">用卦·${yongWx}</div>
+      </div>
+      <div class="relation-card"><span class="${relCls}">${rel}</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--ink4);line-height:1.9;background:rgba(245,240,232,.6);padding:10px 12px;border-radius:6px;">
+      变卦五行：${bUI.name}（${bUI.wx}）·${bDI.name}（${bDI.wx}），${bianNote}
+    </div>
+  `;
+}
+
+/* ─── 综合解卦渲染 ─── */
+function renderJiegua(){
+  const g=guaData[0];
+  const info=guaInfo(g.uN,g.dN);
+  const ui=BI[g.uN],di=BI[g.dN];
+  const huG=guaData[1],bianG=guaData[2];
+  document.getElementById('jiegua-text').textContent=info.jg||
+    `所得${guaName(g.uN,g.dN)}，${ui.attr}在上，${di.attr}在下。互卦为${guaName(huG.uN,huG.dN)}，揭示内在缘由；变卦为${guaName(bianG.uN,bianG.dN)}，示未来走向。动爻在第${g.dongIdx+1}爻，此为变动之机，宜顺势而为，把握时机。`;
+  const vd=info.vd||'平';
+  const vcls={'大吉':'v-good','吉':'v-good','平':'v-mid','险':'v-bad','凶':'v-bad'};
+  const vb=document.getElementById('verdict-badge');
+  vb.textContent=vd;
+  vb.className='verdict-badge '+(vcls[vd]||'v-mid');
+}
+
+function copyResult(){
+  const g=guaData[0],h=guaData[1],b=guaData[2];
+  const text=`【梅花易数起卦结果】\n所问：${currentQuestion}\n本卦：${guaName(g.uN,g.dN)}\n互卦：${guaName(h.uN,h.dN)}\n变卦：${guaName(b.uN,b.dN)}\n第${g.dongIdx+1}爻动`;
+  navigator.clipboard?navigator.clipboard.writeText(text).then(()=>alert('已复制到剪贴板')):alert(text);
+}
+
+/* ─── 卦典渲染 ─── */
+function miniLines(u,d){
+  return [...BL[u],...BL[d]].map(l=>l==='y'
+    ?`<div class="gml-yang"></div>`
+    :`<div class="gml-yin"><div class="gml-yin-seg"></div><div class="gml-yin-seg"></div></div>`
+  ).join('');
+}
+function modalLines(u,d){
+  return [...BL[u],...BL[d]].map(l=>l==='y'
+    ?`<div class="gdl-yang"></div>`
+    :`<div class="gdl-yin"><div class="gdl-yin-seg"></div><div class="gdl-yin-seg"></div></div>`
+  ).join('');
+}
+
+function renderGuadian(){
+  document.getElementById('guadian-grid').innerHTML=GUA64.map((g,i)=>{
+    return`<div class="gua-card" onclick="showModal(${i})">
+      <div class="gua-card-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="gua-mini-lines">${miniLines(g.u,g.d)}</div>
+      <div class="gua-card-name">${g.n}</div>
+    </div>`;
+  }).join('');
+}
+
+function showModal(i){
+  const g=GUA64[i];
+  const ui=BI[g.u],di=BI[g.d];
+  document.getElementById('modal-card').innerHTML=`
+    <div class="modal-header">
+      <div><div style="font-size:11px;color:var(--ink4);margin-bottom:4px;">${String(i+1).padStart(2,'0')}</div><div class="modal-name">${g.n}</div></div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-lines">${modalLines(g.u,g.d)}</div>
+    <div class="modal-label">上卦 · 下卦</div>
+    <div class="modal-text">${ui.name}（${ui.attr}·${ui.wx}·${ui.nat}）／ ${di.name}（${di.attr}·${di.wx}·${di.nat}）</div>
+    <div class="modal-label">卦辞</div>
+    <div class="modal-text">${g.dc}</div>
+    <div class="modal-label">解读</div>
+    <div class="modal-text">${g.jg}</div>
+    <div class="modal-label">吉凶</div>
+    <div style="margin-top:6px;"><span class="verdict-badge ${'大吉吉'.includes(g.vd)?'v-good':'凶险'.includes(g.vd)?'v-bad':'v-mid'}">${g.vd}</span></div>
+    <div style="margin-top:16px;">
+      <div class="wuxing-row" style="display:flex;gap:8px;">
+        <span class="bagua-tag" style="font-size:12px;padding:3px 10px;">${ui.wx}</span>
+        <span class="bagua-tag" style="font-size:12px;padding:3px 10px;">${di.wx}</span>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal'))
+    document.getElementById('modal').classList.remove('show');
+}
+
+/* ─── 记录渲染 ─── */
+function renderRecords(){
+  const el=document.getElementById('records-list');
+  if(!records.length){
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">🌸</span>尚无起卦记录<br>起卦后将自动保存于此</div>';
+    return;
+  }
+  el.innerHTML=records.map(r=>`
+    <div class="record-item" id="rec-${r.id}">
+      <div class="record-head" onclick="toggleRecord(${r.id})">
+        <div class="record-badge">${r.benGua.slice(-2)}</div>
+        <div class="record-info">
+          <div class="record-q">${r.question}</div>
+          <div class="record-meta">${r.benGua} · ${r.time}${r.insight?' · 有见解':''}</div>
+        </div>
+        <div class="record-arr">›</div>
+      </div>
+      <div class="record-body">
+        ${r.insight
+          ?`<div class="record-insight-main">${r.insight}</div>
+            <div class="record-guas">
+              <span class="record-gua-tag">本 ${r.benGua}</span>
+              <span class="record-gua-tag">互 ${r.huGua}</span>
+              <span class="record-gua-tag">变 ${r.bianGua}</span>
+              <span class="record-gua-tag">第${r.dong}爻动</span>
+            </div>`
+          :`<div class="record-guas" style="margin-top:12px;">
+              <span class="record-gua-tag">本 ${r.benGua}</span>
+              <span class="record-gua-tag">互 ${r.huGua}</span>
+              <span class="record-gua-tag">变 ${r.bianGua}</span>
+              <span class="record-gua-tag">第${r.dong}爻动</span>
+            </div>
+            <div class="record-no-insight">暂无见解记录</div>`
+        }
+        <button class="record-del-btn" onclick="event.stopPropagation();deleteRecord(${r.id})">删除此条记录</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleRecord(id){
+  const el=document.getElementById('rec-'+id);
+  if(el)el.classList.toggle('open');
+}
+
+async function deleteRecord(id){
+  if(!confirm('确定删除这条记录？'))return;
+  records=records.filter(r=>r.id!==id);
+  try{
+    await saveRecordsToCloud();
+    renderRecords();
+    showToast('已删除');
+  }catch(e){
+    showToast('删除失败，请检查网络');
+  }
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ─── 折叠参考面板 ─── */
+function toggleRef(id){
+  const body=document.getElementById(id);
+  const arr=document.getElementById('arr-'+id);
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  arr.classList.toggle('open',!isOpen);
+}
+
+/* ─── 卦师见解 ─── */
+let insightRecognition=null;
+let insightListening=false;
+let insightFinal='';
+
+function initInsightSpeech(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    document.getElementById('no-speech-tip').style.display='block';
+    document.getElementById('insight-mic-btn').disabled=true;
+    return;
+  }
+  insightRecognition=new SR();
+  insightRecognition.lang='zh-CN';
+  insightRecognition.continuous=true;
+  insightRecognition.interimResults=true;
+  insightRecognition.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)insightFinal+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('insight-transcript').textContent=insightFinal+interim;
+  };
+  insightRecognition.onerror=(e)=>{
+    if(e.error==='not-allowed')alert('请允许麦克风权限后重试');
+    stopInsightListening();
+  };
+  insightRecognition.onend=()=>{
+    if(insightListening){try{insightRecognition.start();}catch(e){}}
+  };
+}
+
+function toggleInsightMic(){
+  if(insightListening)stopInsightListening();
+  else startInsightListening();
+}
+
+function startInsightListening(){
+  if(!insightRecognition)return;
+  insightFinal=document.getElementById('insight-transcript').textContent;
+  insightListening=true;
+  insightRecognition.start();
+  const btn=document.getElementById('insight-mic-btn');
+  btn.classList.add('active');
+  document.getElementById('mic-toggle-label').innerHTML='<span class="rdot"></span>正在聆听，点击停止';
+}
+
+function stopInsightListening(){
+  insightListening=false;
+  if(insightRecognition){try{insightRecognition.stop();}catch(e){}}
+  const btn=document.getElementById('insight-mic-btn');
+  btn.classList.remove('active');
+  document.getElementById('mic-toggle-label').textContent='点击语音输入';
+  insightFinal=document.getElementById('insight-transcript').textContent;
+}
+
+function resetInsight(){
+  if(insightListening)stopInsightListening();
+  document.getElementById('insight-transcript').textContent='';
+  insightFinal='';
+  document.getElementById('insight-saved').style.display='none';
+  document.getElementById('insight-input').style.display='block';
+}
+
+async function saveCase(){
+  if(insightListening)stopInsightListening();
+  const insight=document.getElementById('insight-transcript').textContent.trim();
+  if(!records.length)return;
+  records[0].insight=insight;
+  // 显示保存中状态
+  const btn=document.querySelector('.act-btn.primary');
+  btn.textContent='保存中…';
+  btn.disabled=true;
+  try{
+    await saveRecordsToCloud();
+    if(insight){
+      document.getElementById('insight-saved-text').textContent=insight;
+      document.getElementById('insight-saved').style.display='block';
+      document.getElementById('insight-input').style.display='none';
+    }
+    showToast('✓ 案例已保存到云端');
+  }catch(e){
+    showToast('保存失败，请检查网络');
+  }finally{
+    btn.textContent='保存案例';
+    btn.disabled=false;
+  }
+}
+
+function editInsight(){
+  const text=records.length?records[0].insight:'';
+  document.getElementById('insight-transcript').textContent=text;
+  insightFinal=text;
+  document.getElementById('insight-saved').style.display='none';
+  document.getElementById('insight-input').style.display='block';
+}
+
+/* ─── 初始化 ─── */
+initTimeSelects();
+updateTime();
+setInterval(updateTime,30000);
+initInsightSpeech();
+loadRecords(); // 预加载云端记录
+document.getElementById('question').addEventListener('input',function(){
+  if(currentMethod==='word'){
+    const len=this.value.replace(/\s/g,'').length;
+    document.getElementById('word-display').textContent=`问题共 ${len} 字，将以此数起卦`;
+  }
+});
+</script>
+</body>
+</html>
