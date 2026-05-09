@@ -1458,25 +1458,11 @@ async function aiAutoCategory(question){
   if(badge){badge.classList.add('loading');text.textContent='分类中…';}
 
   try{
-    const res=await fetch(PROXY_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'deepseek-chat',
-        max_tokens:20,
-        stream:false,
-        messages:[{
-          role:'user',
-          content:`请将以下问题归类到：事业、财运、感情、婚姻、健康、家宅、学业、其他 之一。只回复分类名称，不要其他内容。\n问题：${question}`
-        }]
-      })
-    });
-    if(res.ok){
-      const data=await res.json();
-      const result=(data.choices?.[0]?.message?.content||'').trim();
-      const valid=['事业','财运','感情','婚姻','健康','家宅','学业','其他'];
-      if(valid.includes(result))currentCategory=result;
-    }
+    const res=await callAI([{role:'user',content:`请将以下问题归类到：事业、财运、感情、婚姻、健康、家宅、学业、其他 之一。只回复分类名称，不要其他内容。\n问题：${question}`}],20,false);
+    const data=await res.json();
+    const result=(data.choices?.[0]?.message?.content||'').trim();
+    const valid=['事业','财运','感情','婚姻','健康','家宅','学业','其他'];
+    if(valid.includes(result))currentCategory=result;
   }catch(e){}
 
   // 更新显示
@@ -1551,8 +1537,19 @@ function stopQuestionListening(){
   if(btn){btn.classList.remove('active');btn.textContent='🎤';}
 }
 
-/* ─── AI 功能 ─── */
-const PROXY_URL='https://meihua-proxy.vercel.app/api/proxy';
+/* ─── AI 配置（硅基流动，国内直连）─── */
+const SF_URL='https://api.siliconflow.cn/v1/chat/completions';
+const SF_KEY='sk-xkpnmyggpwveikqbizhaclvcnjfaqkuedzrgcxydwnrsrxwr';
+
+async function callAI(messages, maxTokens=800, stream=false){
+  const res=await fetch(SF_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+SF_KEY},
+    body:JSON.stringify({model:'deepseek-ai/DeepSeek-V3',max_tokens:maxTokens,stream,messages})
+  });
+  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.message||`请求失败(${res.status})`);}
+  return res;
+}
 
 /* ─── 体用拆解 ─── */
 let tiyongSwapped=false;
@@ -1560,17 +1557,7 @@ let tiyongSwapped=false;
 // 问题关键词拆解（用AI）
 async function parseTiyong(question){
   try{
-    const res=await fetch(PROXY_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'deepseek-chat',
-        max_tokens:80,
-        stream:false,
-        messages:[{role:'user',content:`从梅花易数角度，将问题拆成"体"（问卦者/主体）和"用"（所问之事/客体）。用完整短语表述，不要缩写。只输出JSON，格式：{"ti":"完整体描述","yong":"完整用描述"}，不要其他内容。\n示例：问题"我今年会发财吗" → {"ti":"问卦者（我）","yong":"今年能否发财"}\n问题：${question}`}]
-      })
-    });
-    if(!res.ok)return null;
+    const res=await callAI([{role:'user',content:`从梅花易数角度，将问题拆成"体"（问卦者/主体）和"用"（所问之事/客体）。用完整短语表述，不要缩写。只输出JSON，格式：{"ti":"完整体描述","yong":"完整用描述"}，不要其他内容。\n示例：问题"我今年会发财吗" → {"ti":"问卦者（我）","yong":"今年能否发财"}\n问题：${question}`}],80,false);
     const data=await res.json();
     const text=data.choices?.[0]?.message?.content||'';
     const clean=text.replace(/```json|```/g,'').trim();
@@ -1757,20 +1744,7 @@ ${raw}`;
   actionsDiv.style.display='none';
 
   try{
-    const res=await fetch(PROXY_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'deepseek-chat',
-        max_tokens:800,
-        stream:false,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    if(!res.ok){
-      const err=await res.json().catch(()=>({}));
-      throw new Error(err.error?.message||`请求失败 (${res.status})`);
-    }
+    const res=await callAI([{role:'user',content:prompt}],800,false);
     const data=await res.json();
     const polished=data.choices?.[0]?.message?.content||'';
     loadingDiv.style.display='none';
