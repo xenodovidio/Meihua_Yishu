@@ -2,7 +2,7 @@
   "name": "梅花易数",
   "short_name": "梅花易数",
   "description": "梅花易数起卦工具",
-  "start_url": "/Meihua_Yishu/",
+  "start_url": "/Meihua_Yishu/index.html",
   "scope": "/Meihua_Yishu/",
   "display": "standalone",
   "background_color": "#1a1410",
@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://xenodovidio.github.io/Meihua_Yishu/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://xenodovidio.github.io/Meihua_Yishu/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
