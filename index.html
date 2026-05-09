@@ -105,11 +105,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* 三卦 */
 .trigrams-section{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch;}
-@media(max-width:480px){.trigrams-section{grid-template-columns:1fr;}.arrow-col{display:none!important;}}
 .arrow-col{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;}
 .arrow-vline{width:1px;height:36px;background:var(--paper3);}
 .arrow-icon-r{font-size:13px;color:var(--ink4);}
-
 .trigram-block{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:border-color .2s,box-shadow .2s;}
 .trigram-block:hover{border-color:var(--gold2);}
 .trigram-block.main{border-color:var(--gold2);background:rgba(184,145,42,.05);}
@@ -119,8 +117,53 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .tb-label span{padding:2px 7px;border-radius:20px;}
 .trigram-block.main .tb-label span{background:rgba(184,145,42,.12);color:var(--gold);}
 .trigram-block.bian .tb-label span{background:rgba(139,32,32,.08);color:var(--red);}
+.tb-name{font-family:'Noto Serif SC',serif;font-size:19px;font-weight:700;color:var(--ink);margin-top:4px;}
+.trigram-block.bian .tb-name{color:var(--red);}
+.tb-sub{font-size:11px;color:var(--ink4);margin-top:3px;text-align:center;line-height:1.7;}
+.bagua-tags{display:flex;gap:5px;margin-top:7px;}
+.bagua-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(237,231,216,.9);color:var(--ink3);border:1px solid var(--paper3);}
 
-/* 爻线 */
+.tb-label-mobile{display:none;}
+.tb-label-desktop{display:inline;}
+@media(max-width:560px){
+  .tb-label-mobile{display:inline;font-size:11px;color:var(--ink3);font-family:'Noto Serif SC',serif;}
+  .tb-label-desktop{display:none;}
+}
+@media(max-width:560px){
+  .trigrams-section{
+    grid-template-columns:1fr 1fr 1fr;
+    gap:0;
+    background:rgba(237,231,216,.4);
+    border:1px solid var(--paper3);
+    border-radius:12px;
+    overflow:hidden;
+    padding:0;
+  }
+  .arrow-col{display:none;}
+  .trigram-block{
+    border:none;
+    border-radius:0;
+    padding:12px 4px 14px;
+    background:transparent;
+    gap:0;
+  }
+  .trigram-block:not(:last-child){border-right:1px solid var(--paper3);}
+  .trigram-block.main{background:rgba(184,145,42,.05);}
+  .trigram-block.bian{background:rgba(139,32,32,.03);}
+  .trigram-block.selected{box-shadow:none;outline:2px solid var(--gold);outline-offset:-1px;border-radius:0;}
+  .tb-label{font-size:11px;font-weight:500;margin-bottom:8px;letter-spacing:.04em;}
+  .tb-label span{padding:1px 6px;border-radius:4px;font-size:11px;}
+  .yao-lines{gap:5px;margin:6px 0 8px;}
+  .yao-yang{width:34px;height:6px;border-radius:3px;}
+  .yao-yin{width:34px;height:6px;}
+  .yao-yin-seg{height:6px;border-radius:3px;}
+  .yao-line-wrap{width:46px;}
+  .dong-mark{font-size:8px;}
+  .tb-name{font-size:14px;margin-top:6px;font-weight:700;}
+  .tb-sub{font-size:10px;display:none;}
+  .bagua-tags{gap:3px;margin-top:5px;}
+  .bagua-tag{font-size:9px;padding:1px 5px;}
+}
 .yao-lines{display:flex;flex-direction:column-reverse;gap:4px;align-items:center;margin:4px 0;}
 .yao-row{display:flex;align-items:center;justify-content:center;gap:4px;}
 .yao-num{font-size:9px;color:var(--ink4);width:10px;text-align:right;font-family:'Noto Serif SC',serif;}
@@ -156,6 +199,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .wang-status-grid{display:flex;gap:14px;flex:1;flex-wrap:wrap;}
 .wang-status-item{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .wang-status-label{font-size:12px;color:var(--ink3);font-family:'Noto Serif SC',serif;margin-right:2px;}
+
+@media(max-width:560px){
+  .wang-inline{flex-direction:column;gap:10px;padding:12px;}
+  .wang-inline-sep{display:none;}
+  .wang-status-grid{gap:10px;width:100%;}
+  .wang-status-item{background:rgba(245,240,232,.7);border-radius:6px;padding:6px 10px;flex:1;min-width:120px;}
+  .wang-status-label{font-size:12px;margin-right:4px;}
+}
 
 /* 旺相条（五行折叠内） */
 .wang-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.7);border-radius:8px;padding:12px 14px;margin-bottom:14px;gap:12px;flex-wrap:wrap;}
@@ -899,13 +950,15 @@ function yaoLines(uL,dL,dongIdx,showNum){
 }
 
 /* ─── 三卦渲染 ─── */
+const GUA_MOBILE_LABELS={benGua:'主',huGua:'互',bianGua:'变'};
 function renderTrigrams(){
   let html='';
   guaData.forEach((g,i)=>{
     const ui=BI[g.uN],di=BI[g.dN];
     const sel=g.key===activeGuaKey?' selected':'';
+    const mobileLabel=GUA_MOBILE_LABELS[g.key]||'';
     html+=`<div class="trigram-block ${g.cls}${sel}" onclick="selectGua('${g.key}')">
-      <div class="tb-label"><span>${g.label}</span></div>
+      <div class="tb-label"><span class="tb-label-desktop">${g.label}</span><span class="tb-label-mobile">[${mobileLabel}]</span></div>
       ${yaoLines(g.uL,g.dL,g.dongIdx,false)}
       <div class="tb-name">${guaName(g.uN,g.dN)}</div>
       <div class="tb-sub">${ui.name}${ui.attr}／${di.name}${di.attr}</div>
