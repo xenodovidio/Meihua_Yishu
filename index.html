@@ -41,6 +41,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .panel-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .panel-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0;}
 
+.question-input-wrap{position:relative;margin-bottom:16px;}
+.question-input-wrap .input-field{margin-bottom:0;padding-right:48px;}
+.q-mic-btn{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;border:none;background:var(--ink);color:var(--paper);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.q-mic-btn:hover{background:var(--ink2);transform:scale(1.05);}
+.q-mic-btn.active{background:var(--red);animation:micpulse 1.5s ease-in-out infinite;}
+.q-mic-btn:disabled{opacity:.4;cursor:not-allowed;}
 .input-field{width:100%;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:10px 12px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:16px;resize:none;line-height:1.7;}
 .input-field:focus{border-color:var(--gold2);}
 .input-field::placeholder{color:var(--ink4);}
@@ -82,6 +88,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* 问题条 */
 .question-bar{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;}
 .q-label{font-size:11px;color:var(--ink4);letter-spacing:.1em;flex-shrink:0;padding-top:2px;}
+.q-category-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.q-category-dropdown{position:relative;}
+.q-category-badge{display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(45,110,90,.08);color:var(--jade);border:1px solid rgba(45,110,90,.2);cursor:pointer;transition:all .2s;font-family:'Noto Serif SC',serif;white-space:nowrap;}
+.q-category-badge:hover{background:rgba(45,110,90,.14);}
+.q-category-badge.loading{background:rgba(184,145,42,.08);color:var(--gold);border-color:rgba(184,145,42,.2);}
+.q-category-arrow{font-size:9px;opacity:.7;}
+.category-picker{position:absolute;right:0;top:calc(100% + 6px);background:var(--paper);border:1px solid var(--paper3);border-radius:10px;padding:12px;box-shadow:0 4px 16px rgba(26,20,16,.12);z-index:100;min-width:180px;animation:fadeUp .15s ease;}
+.category-picker-title{font-family:'Noto Serif SC',serif;font-size:11px;color:var(--ink4);margin-bottom:8px;letter-spacing:.06em;}
+.category-picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.category-picker-btn{background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:6px 10px;font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink2);cursor:pointer;transition:all .2s;text-align:center;}
+.category-picker-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(184,145,42,.08);}
+.category-picker-btn.active{border-color:var(--jade);color:var(--jade);background:rgba(45,110,90,.08);}
 .q-text{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink);line-height:1.7;flex:1;}
 .q-tag{flex-shrink:0;font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(184,145,42,.1);color:var(--gold);border:1px solid rgba(184,145,42,.25);align-self:flex-start;}
 
@@ -127,7 +145,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .dtab.active{color:var(--gold);border-bottom-color:var(--gold);}
 .detail-content{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.2;}
 
-/* 五行 */
+/* 旺相内联条 */
+.wang-inline{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:8px;flex-wrap:wrap;}
+.wang-inline-badge{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.wang-inline-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;border:1.5px solid;flex-shrink:0;}
+.wang-inline-info{display:flex;flex-direction:column;gap:2px;}
+.wang-inline-name{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink2);}
+.wang-inline-subdesc{font-size:11px;color:var(--ink4);line-height:1.5;}
+.wang-inline-sep{width:1px;height:40px;background:var(--paper3);flex-shrink:0;align-self:center;}
+.wang-status-grid{display:flex;gap:14px;flex:1;flex-wrap:wrap;}
+.wang-status-item{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.wang-status-label{font-size:12px;color:var(--ink3);font-family:'Noto Serif SC',serif;margin-right:2px;}
+
+/* 旺相条（五行折叠内） */
+.wang-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.7);border-radius:8px;padding:12px 14px;margin-bottom:14px;gap:12px;flex-wrap:wrap;}
+.wang-left{display:flex;align-items:center;gap:10px;}
+.wang-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;border:1.5px solid;flex-shrink:0;}
+.wang-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink2);}
+.wang-desc{font-size:11px;color:var(--ink4);margin-top:2px;line-height:1.6;}
+.wang-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.wang-tag{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);font-family:'Noto Serif SC',serif;}
+.wang-tag.rel-good{background:rgba(45,110,90,.06);border-color:rgba(45,110,90,.25);color:var(--jade);}
+.wang-tag.rel-bad{background:rgba(139,32,32,.05);border-color:rgba(139,32,32,.2);color:var(--red);}
 .wuxing-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
 .section-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .section-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0;}
@@ -194,7 +233,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .insight-clear-btn:hover{border-color:var(--ink4);color:var(--ink);}
 .no-speech-tip{font-size:11px;color:var(--ink4);background:rgba(184,145,42,.06);border:1px solid rgba(184,145,42,.15);border-radius:6px;padding:7px 12px;margin-bottom:10px;display:none;}
 
-/* 折叠参考面板 */
+/* 分类筛选 */
+.category-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.cat-tab{background:rgba(237,231,216,.7);border:1px solid var(--paper3);border-radius:20px;padding:5px 14px;font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;}
+.cat-tab:hover{border-color:var(--gold2);color:var(--gold);}
+.cat-tab.active{background:rgba(184,145,42,.1);border-color:var(--gold);color:var(--gold);}
+.record-category{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(184,145,42,.08);color:var(--gold);border:1px solid rgba(184,145,42,.2);font-family:'Noto Sans SC',sans-serif;flex-shrink:0;}
 .ref-group{background:rgba(237,231,216,.4);border:1px solid var(--paper3);border-radius:10px;overflow:hidden;}
 .ref-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);transition:color .2s;user-select:none;}
 .ref-toggle:hover{color:var(--ink);}
@@ -207,7 +251,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .insight-label-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 .insight-label-text{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:8px;}
 .insight-label-text::before{content:'';display:block;width:3px;height:13px;background:var(--gold);border-radius:2px;}
-.insight-input-row{margin-bottom:10px;}
+.insight-tools-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.ai-polish-btn{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:20px;padding:7px 16px;font-family:'Noto Serif SC',serif;font-size:12px;color:var(--paper);cursor:pointer;transition:all .2s;letter-spacing:.06em;}
+.ai-polish-btn:hover{opacity:.9;transform:translateY(-1px);}
+.ai-polish-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.ai-polish-result{margin-top:14px;border-top:1px solid var(--paper3);padding-top:14px;}
+.ai-polish-text{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.3;border-left:3px solid var(--gold2);padding-left:12px;white-space:pre-wrap;margin-bottom:12px;}
+.ai-polish-actions{display:flex;gap:8px;}
+.ai-polish-use{flex:1;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:10px;font-family:'Noto Serif SC',serif;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.08em;}
+.ai-polish-use:hover{background:var(--ink2);}
+.ai-polish-keep{background:none;border:1px solid var(--paper3);border-radius:8px;padding:10px 16px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink4);cursor:pointer;transition:all .2s;}
+.ai-polish-keep:hover{border-color:var(--ink4);color:var(--ink);}
 .transcript-box--large{min-height:90px;font-size:14px;line-height:2.3;}
 .insight-saved-text{font-size:14px;line-height:2.4;color:var(--ink);}
 .mic-toggle-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--paper3);border-radius:20px;padding:7px 16px;cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
@@ -303,7 +357,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <!-- 左：问题 + 起卦方式 -->
       <div class="panel">
         <div class="panel-title">所问之事</div>
-        <textarea class="input-field" id="question" rows="3" placeholder="请输入所问之事，如：此次求职是否顺利？"></textarea>
+        <div class="question-input-wrap">
+          <textarea class="input-field" id="question" rows="3" placeholder="请输入所问之事，如：此次求职是否顺利？"></textarea>
+          <button class="q-mic-btn" id="q-mic-btn" onclick="toggleQuestionMic()" title="语音输入问题">🎤</button>
+        </div>
 
         <div class="panel-title">起卦方式</div>
         <div class="method-grid">
@@ -333,7 +390,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               <div class="num-label">时辰</div>
             </div>
           </div>
-          <div class="num-label" style="text-align:center;margin-top:6px;color:var(--ink4);">请核对农历日期后再起卦，月日默认取公历仅供参考</div>
+          <div class="num-label" style="text-align:center;margin-top:6px;color:var(--ink4);">月日已自动换算为农历，如有误差请手动修正</div>
         </div>
         <div id="method-number" style="display:none">
           <div class="num-input-row">
@@ -382,10 +439,33 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="question-bar">
         <div class="q-label">所问</div>
         <div class="q-text" id="q-text"></div>
-        <div class="q-tag" id="q-tag"></div>
+        <div class="q-category-wrap">
+          <div class="q-tag" id="q-tag"></div>
+          <div class="q-category-dropdown">
+            <div class="q-category-badge" id="q-category-badge" onclick="openCategoryPicker()">
+              <span id="q-category-text">分类中…</span>
+              <span class="q-category-arrow">▾</span>
+            </div>
+            <div class="category-picker" id="category-picker" style="display:none">
+              <div class="category-picker-title">选择分类</div>
+              <div class="category-picker-grid">
+                <button class="category-picker-btn" onclick="setCategory('事业')">事业</button>
+                <button class="category-picker-btn" onclick="setCategory('财运')">财运</button>
+                <button class="category-picker-btn" onclick="setCategory('感情')">感情</button>
+                <button class="category-picker-btn" onclick="setCategory('婚姻')">婚姻</button>
+                <button class="category-picker-btn" onclick="setCategory('健康')">健康</button>
+                <button class="category-picker-btn" onclick="setCategory('家宅')">家宅</button>
+                <button class="category-picker-btn" onclick="setCategory('学业')">学业</button>
+                <button class="category-picker-btn" onclick="setCategory('其他')">其他</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- 三卦图 -->
       <div class="trigrams-section" id="trigrams-section"></div>
+      <!-- 旺相信息条 -->
+      <div class="wang-inline" id="wang-inline"></div>
 
       <!-- 卦师见解 -->
       <div class="insight-section insight-section--main" id="insight-section">
@@ -402,12 +482,29 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div id="insight-input">
           <div class="no-speech-tip" id="no-speech-tip">⚠ 当前环境不支持语音，请直接在下方文字框输入</div>
           <div class="insight-input-row">
-            <div class="transcript-box transcript-box--large" id="insight-transcript" contenteditable="true"></div>
+            <div class="transcript-box transcript-box--large" id="insight-transcript" contenteditable="true" oninput="onInsightInput()"></div>
           </div>
-          <button class="mic-toggle-btn" id="insight-mic-btn" onclick="toggleInsightMic()">
-            <span class="mic-toggle-icon">🎤</span>
-            <span class="mic-toggle-label" id="mic-toggle-label">点击语音输入</span>
-          </button>
+          <div class="insight-tools-row" id="insight-tools-row">
+            <button class="mic-toggle-btn" id="insight-mic-btn" onclick="toggleInsightMic()">
+              <span class="mic-toggle-icon">🎤</span>
+              <span class="mic-toggle-label" id="mic-toggle-label">点击语音输入</span>
+            </button>
+            <button class="ai-polish-btn" id="ai-polish-btn" onclick="doAiPolish()" style="display:none">
+              <span>✦</span> AI 优化表达
+            </button>
+          </div>
+          <!-- AI 优化结果 -->
+          <div class="ai-polish-result" id="ai-polish-result" style="display:none">
+            <div class="ai-polish-loading" id="ai-polish-loading" style="display:none">
+              <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+              <div class="ai-loading-text">正在润色见解…</div>
+            </div>
+            <div class="ai-polish-text" id="ai-polish-text"></div>
+            <div class="ai-polish-actions" id="ai-polish-actions" style="display:none">
+              <button class="ai-polish-use" onclick="usePolished()">使用优化版本</button>
+              <button class="ai-polish-keep" onclick="keepOriginal()">保留原文</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -472,6 +569,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="view" id="view-records">
     <div class="records-wrap">
       <div class="page-title">起卦记录</div>
+      <div class="category-tabs" id="category-tabs">
+        <button class="cat-tab active" onclick="filterRecords('全部',this)">全部</button>
+        <button class="cat-tab" onclick="filterRecords('事业',this)">事业</button>
+        <button class="cat-tab" onclick="filterRecords('财运',this)">财运</button>
+        <button class="cat-tab" onclick="filterRecords('感情',this)">感情</button>
+        <button class="cat-tab" onclick="filterRecords('婚姻',this)">婚姻</button>
+        <button class="cat-tab" onclick="filterRecords('健康',this)">健康</button>
+        <button class="cat-tab" onclick="filterRecords('家宅',this)">家宅</button>
+        <button class="cat-tab" onclick="filterRecords('学业',this)">学业</button>
+        <button class="cat-tab" onclick="filterRecords('其他',this)">其他</button>
+      </div>
       <div class="records-list" id="records-list"></div>
     </div>
   </div>
@@ -658,11 +766,12 @@ function initTimeSelects(){
     opt.value=i+1; opt.textContent=s;
     hourSel.appendChild(opt);
   });
-  // 默认值
+  // 默认值：直接读取农历
   const now=new Date();
-  yearSel.value=yearToZhi(now.getFullYear());
-  document.getElementById('lunar-month').value=now.getMonth()+1;
-  document.getElementById('lunar-day').value=now.getDate();
+  const lunar=getLunarDate(now);
+  yearSel.value=lunar.yearZhi;
+  document.getElementById('lunar-month').value=lunar.month;
+  document.getElementById('lunar-day').value=lunar.day;
   hourSel.value=getShichen(now.getHours());
 }
 
@@ -680,10 +789,12 @@ function updateTime(){
 
 function getNums(){
   if(currentMethod==='time'){
-    const yearNum=parseInt(document.getElementById('lunar-year').value)||yearToZhi(new Date().getFullYear());
-    const mo=parseInt(document.getElementById('lunar-month').value)||new Date().getMonth()+1;
-    const d=parseInt(document.getElementById('lunar-day').value)||new Date().getDate();
-    const h=parseInt(document.getElementById('lunar-hour').value)||getShichen(new Date().getHours());
+    const now=new Date();
+    const lunar=getLunarDate(now);
+    const yearNum=parseInt(document.getElementById('lunar-year').value)||lunar.yearZhi;
+    const mo=parseInt(document.getElementById('lunar-month').value)||lunar.month;
+    const d=parseInt(document.getElementById('lunar-day').value)||lunar.day;
+    const h=parseInt(document.getElementById('lunar-hour').value)||getShichen(now.getHours());
     const sum3=yearNum+mo+d;
     const sum4=sum3+h;
     return{upper:sum3%8||8, lower:sum4%8||8, dong:sum4%6||6,
@@ -745,12 +856,14 @@ function doQigua(){
   document.getElementById('q-tag').textContent=methodLabel[currentMethod];
 
   renderTrigrams();
+  renderWangInline();
   renderDetail();
   renderWuxing();
   renderJiegua();
 
   // 暂存记录到内存（点保存案例时才写云端）
-  const rec={id:Date.now(),question:q,benGua:guaName(upper,lower),huGua:guaName(huU,huD),bianGua:guaName(bU,bD),dong,method:currentMethod,time:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),insight:''};
+  const category=autoCategory(q); // 先用关键词占位
+  const rec={id:Date.now(),question:q,benGua:guaName(upper,lower),huGua:guaName(huU,huD),bianGua:guaName(bU,bD),dong,method:currentMethod,time:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),insight:'',category};
   records.unshift(rec);
   if(records.length>100)records=records.slice(0,100);
 
@@ -762,6 +875,8 @@ function doQigua(){
   document.getElementById('view-result').classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
   window.scrollTo({top:0,behavior:'smooth'});
+  // AI 自动分类（异步，不阻塞页面）
+  aiAutoCategory(q);
 }
 
 /* ─── 爻线渲染 ─── */
@@ -846,6 +961,173 @@ function renderDetail(){
       </div>
     </div>
     <div style="font-size:13px;color:var(--ink2);line-height:2.3;border-top:1px solid var(--paper3);padding-top:12px;">${info.jg||`此卦${ui.attr}在上、${di.attr}在下，${ui.wx}与${di.wx}相合，当审时度势，顺势而为。`}</div>
+  `;
+}
+
+/* ─── 八卦旺衰表 ─── */
+// 按农历月份对应季节，给出各卦旺衰状态
+const BAGUA_WANG={
+  // 春（1-2月）：震巽旺，离次之；坤艮死衰，乾兑坎休囚
+  spring:{旺:['震','巽'],相:['离'],休:['乾','兑','坎'],囚:[],死:['坤','艮']},
+  // 夏（4-5月）：离旺，坤艮次之；乾兑死衰，震巽坎休囚
+  summer:{旺:['离'],相:['坤','艮'],休:['震','巽','坎'],囚:[],死:['乾','兑']},
+  // 秋（7-8月）：乾兑旺，坎次之；震巽死衰，坤艮离休囚
+  autumn:{旺:['乾','兑'],相:['坎'],休:['坤','艮','离'],囚:[],死:['震','巽']},
+  // 冬（10-11月）：坎旺，震巽次之；乾兑坤艮休囚，离死衰
+  winter:{旺:['坎'],相:['震','巽'],休:['乾','兑','坤','艮'],囚:[],死:['离']},
+  // 季月（3/6/9/12月）：坤艮旺，乾兑次之；离震巽休囚，坎死衰
+  seasonal:{旺:['坤','艮'],相:['乾','兑'],休:['离','震','巽'],囚:[],死:['坎']},
+};
+
+function getBaguaStatus(season, baguaName){
+  const table=BAGUA_WANG[season];
+  if(!table)return '';
+  if(table.旺.includes(baguaName))return '旺';
+  if(table.相.includes(baguaName))return '相';
+  if(table.休.includes(baguaName))return '休';
+  if(table.囚.includes(baguaName))return '囚';
+  if(table.死.includes(baguaName))return '死';
+  return '';
+}
+
+function getStatusCls(status){
+  if(status==='旺'||status==='相')return 'rel-good';
+  if(status==='死'||status==='囚')return 'rel-bad';
+  return '';
+}
+/* ─── 农历获取（原生 Intl API）─── */
+function getLunarDate(date){
+  date=date||new Date();
+  try{
+    // 用完整格式一次性获取，更可靠
+    const fmt=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{
+      year:'numeric',month:'numeric',day:'numeric'
+    }).format(date);
+    // fmt 类似 "丙午年三月廿三" 或 "2026三23"
+    // 提取年支
+    const zhiInYear=ZHI.find(z=>fmt.includes(z+'年'));
+    const lunarYearZhi=zhiInYear?ZHI.indexOf(zhiInYear)+1:yearToZhi(date.getFullYear());
+    // 提取月：找汉字月份
+    const hanMonths={'正':1,'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'冬':11,'腊':12,'十一':11,'十二':12};
+    let lunarMo=date.getMonth()+1;
+    // 匹配"X月"模式，X为汉字
+    const moMatch=fmt.match(/([正一二三四五六七八九十冬腊]|十[一二])月/);
+    if(moMatch){
+      lunarMo=hanMonths[moMatch[1]]||lunarMo;
+    }
+    // 提取日：汉字日期
+    const hanDays={'初一':1,'初二':2,'初三':3,'初四':4,'初五':5,'初六':6,'初七':7,'初八':8,'初九':9,'初十':10,
+      '十一':11,'十二':12,'十三':13,'十四':14,'十五':15,'十六':16,'十七':17,'十八':18,'十九':19,'二十':20,
+      '廿一':21,'廿二':22,'廿三':23,'廿四':24,'廿五':25,'廿六':26,'廿七':27,'廿八':28,'廿九':29,'三十':30};
+    let lunarD=date.getDate();
+    for(const[k,v] of Object.entries(hanDays)){
+      if(fmt.includes(k)){lunarD=v;break;}
+    }
+    return{month:lunarMo,day:lunarD,yearZhi:lunarYearZhi};
+  }catch(e){
+    // 降级：用估算
+    const y=date.getFullYear(),m=date.getMonth()+1,d=date.getDate();
+    return{month:solarToLunarMonth(y,m,d),day:d,yearZhi:yearToZhi(y)};
+  }
+}
+// 每年春节（农历正月初一）的公历日期
+const CHUNJIE={
+  2020:[1,25],2021:[2,12],2022:[2,1],2023:[1,22],2024:[2,10],
+  2025:[1,29],2026:[2,17],2027:[2,6],2028:[1,26],2029:[2,13],2030:[2,3]
+};
+function solarToLunarDay(year,month,day){
+  const cj=CHUNJIE[year];
+  if(!cj)return day;
+  const cjDate=new Date(year,cj[0]-1,cj[1]);
+  const today=new Date(year,month-1,day);
+  const diffDays=Math.floor((today-cjDate)/(1000*60*60*24));
+  if(diffDays<0){
+    // 春节前，算上一年农历
+    const cjPrev=CHUNJIE[year-1];
+    if(!cjPrev)return day;
+    const cjPrevDate=new Date(year-1,cjPrev[0]-1,cjPrev[1]);
+    const diffPrev=Math.floor((today-cjPrevDate)/(1000*60*60*24));
+    return(diffPrev%30)+1||1;
+  }
+  return(diffDays%30)+1;
+}
+
+function solarToLunarMonth(year,month,day){
+  const cj=CHUNJIE[year];
+  if(!cj)return month; // 超出范围用公历月近似
+  const cjDate=new Date(year,cj[0]-1,cj[1]);
+  const today=new Date(year,month-1,day);
+  const diffDays=Math.floor((today-cjDate)/(1000*60*60*24));
+  if(diffDays<0){
+    // 春节前，还在上一年农历
+    const cjPrev=CHUNJIE[year-1];
+    if(!cjPrev)return month;
+    const cjPrevDate=new Date(year-1,cjPrev[0]-1,cjPrev[1]);
+    const diffPrev=Math.floor((today-cjPrevDate)/(1000*60*60*24));
+    return Math.min(12,Math.floor(diffPrev/30)+1);
+  }
+  return Math.min(12,Math.floor(diffDays/30)+1);
+}
+
+function getWangXiang(){
+  const lunar=getLunarDate(new Date());
+  const lunarMo=parseInt(document.getElementById('lunar-month')?.value)||lunar.month;
+
+  const tuMonths=[3,6,9,12];
+  if(tuMonths.includes(lunarMo)) return {wx:'土',season:`农历${lunarMo}月·季月`,desc:'土旺，厚德载物，稳健持中，不宜冒进',key:'seasonal'};
+  if(lunarMo===1||lunarMo===2) return {wx:'木',season:`农历${lunarMo}月·春`,desc:'木旺，生机勃发，宜进取开创，把握时机',key:'spring'};
+  if(lunarMo===4||lunarMo===5) return {wx:'火',season:`农历${lunarMo}月·夏`,desc:'火旺，阳气充沛，热情旺盛，宜积极行动',key:'summer'};
+  if(lunarMo===7||lunarMo===8) return {wx:'金',season:`农历${lunarMo}月·秋`,desc:'金旺，肃杀收敛，宜谨慎决断，收获成果',key:'autumn'};
+  if(lunarMo===10||lunarMo===11) return {wx:'水',season:`农历${lunarMo}月·冬`,desc:'水旺，蓄势潜藏，宜静待时机，积累内力',key:'winter'};
+  return {wx:'土',season:`农历${lunarMo}月·季月`,desc:'土旺，厚德载物，稳健为宜',key:'seasonal'};
+}
+
+function getWxRelation(wangWx, targetWx){
+  if(wangWx===targetWx) return {text:'当令旺相',cls:'rel-good'};
+  if(WX_SHENG[wangWx]===targetWx) return {text:'受生相扶',cls:'rel-good'};
+  if(WX_SHENG[targetWx]===wangWx) return {text:'泄气休囚',cls:''};
+  if(WX_KE[wangWx]===targetWx) return {text:'受克囚废',cls:'rel-bad'};
+  if(WX_KE[targetWx]===wangWx) return {text:'耗气克泄',cls:''};
+  return {text:'',cls:''};
+}
+
+/* ─── 旺相内联条渲染 ─── */
+function renderWangInline(){
+  const wang=getWangXiang();
+  const ben=guaData[0];
+  const tiI=BI[ben.uN],yongI=BI[ben.dN];
+
+  // 五行旺衰
+  const tiRelWx=getWxRelation(wang.wx,tiI.wx);
+  const yongRelWx=getWxRelation(wang.wx,yongI.wx);
+
+  // 八卦旺衰
+  const tiStatus=getBaguaStatus(wang.key,tiI.name);
+  const yongStatus=getBaguaStatus(wang.key,yongI.name);
+  const tiStatusCls=getStatusCls(tiStatus);
+  const yongStatusCls=getStatusCls(yongStatus);
+
+  document.getElementById('wang-inline').innerHTML=`
+    <div class="wang-inline-badge">
+      <div class="wang-inline-circle ${WX_CLS[wang.wx]}">${wang.wx}</div>
+      <div class="wang-inline-info">
+        <div class="wang-inline-name">${wang.season}</div>
+        <div class="wang-inline-subdesc">${wang.desc}</div>
+      </div>
+    </div>
+    <div class="wang-inline-sep"></div>
+    <div class="wang-status-grid">
+      <div class="wang-status-item">
+        <span class="wang-status-label">体卦·${tiI.name}</span>
+        <span class="wang-tag ${tiStatusCls}">${tiStatus||'—'}</span>
+        <span class="wang-tag ${tiRelWx.cls}" style="font-size:10px;">${tiRelWx.text||'比和'}</span>
+      </div>
+      <div class="wang-status-item">
+        <span class="wang-status-label">用卦·${yongI.name}</span>
+        <span class="wang-tag ${yongStatusCls}">${yongStatus||'—'}</span>
+        <span class="wang-tag ${yongRelWx.cls}" style="font-size:10px;">${yongRelWx.text||'比和'}</span>
+      </div>
+    </div>
   `;
 }
 
@@ -964,11 +1246,12 @@ function closeModal(e){
 /* ─── 记录渲染 ─── */
 function renderRecords(){
   const el=document.getElementById('records-list');
-  if(!records.length){
-    el.innerHTML='<div class="empty-state"><span class="empty-icon">🌸</span>尚无起卦记录<br>起卦后将自动保存于此</div>';
+  const filtered=currentFilter==='全部'?records:records.filter(r=>(r.category||'其他')===currentFilter);
+  if(!filtered.length){
+    el.innerHTML='<div class="empty-state"><span class="empty-icon">🌸</span>'+(records.length?'该分类暂无记录':'尚无起卦记录，起卦后保存案例即可')+'</div>';
     return;
   }
-  el.innerHTML=records.map(r=>`
+  el.innerHTML=filtered.map(r=>`
     <div class="record-item" id="rec-${r.id}">
       <div class="record-head" onclick="toggleRecord(${r.id})">
         <div class="record-badge">${r.benGua.slice(-2)}</div>
@@ -976,6 +1259,7 @@ function renderRecords(){
           <div class="record-q">${r.question}</div>
           <div class="record-meta">${r.benGua} · ${r.time}${r.insight?' · 有见解':''}</div>
         </div>
+        ${r.category?`<div class="record-category">${r.category}</div>`:''}
         <div class="record-arr">›</div>
       </div>
       <div class="record-body">
@@ -1024,6 +1308,140 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+/* ─── 自动分类 ─── */
+const CATEGORY_RULES=[
+  {cat:'事业',keys:['工作','事业','职位','升职','晋升','跳槽','求职','面试','创业','合伙','合作','生意','公司','老板','同事','项目','业务','职场','辞职','离职']},
+  {cat:'财运',keys:['钱','财','投资','股票','基金','借钱','贷款','收入','薪资','工资','财运','理财','还款','债','生意','买卖','交易','资金']},
+  {cat:'感情',keys:['感情','恋爱','男友','女友','男朋友','女朋友','喜欢','暗恋','追求','分手','复合','表白','约会','相亲','桃花']},
+  {cat:'婚姻',keys:['婚姻','结婚','嫁','娶','婚','离婚','夫妻','老公','老婆','丈夫','妻子','家庭','孩子','生育','怀孕']},
+  {cat:'健康',keys:['健康','身体','病','手术','治疗','医院','检查','疾病','康复','受伤','症状','药']},
+  {cat:'家宅',keys:['房子','买房','搬家','装修','家宅','风水','租房','住','宅','家里','纠纷','邻居']},
+  {cat:'学业',keys:['学习','考试','成绩','升学','考研','高考','留学','毕业','论文','学校','录取','专业']},
+];
+
+function autoCategory(question){
+  for(const rule of CATEGORY_RULES){
+    if(rule.keys.some(k=>question.includes(k)))return rule.cat;
+  }
+  return '其他';
+}
+
+let currentFilter='全部';
+
+function filterRecords(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRecords();
+}
+/* ─── AI 自动分类 ─── */
+let currentCategory='其他';
+
+async function aiAutoCategory(question){
+  // 先用关键词快速匹配作为默认值
+  currentCategory=autoCategory(question);
+  // 更新显示为加载中
+  const badge=document.getElementById('q-category-badge');
+  const text=document.getElementById('q-category-text');
+  if(badge){badge.classList.add('loading');text.textContent='分类中…';}
+
+  try{
+    const res=await fetch(PROXY_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'deepseek-chat',
+        max_tokens:20,
+        stream:false,
+        messages:[{
+          role:'user',
+          content:`请将以下问题归类到：事业、财运、感情、婚姻、健康、家宅、学业、其他 之一。只回复分类名称，不要其他内容。\n问题：${question}`
+        }]
+      })
+    });
+    if(res.ok){
+      const data=await res.json();
+      const result=(data.choices?.[0]?.message?.content||'').trim();
+      const valid=['事业','财运','感情','婚姻','健康','家宅','学业','其他'];
+      if(valid.includes(result))currentCategory=result;
+    }
+  }catch(e){}
+
+  // 更新显示
+  if(badge){
+    badge.classList.remove('loading');
+    text.textContent=currentCategory;
+  }
+  // 同步更新记录
+  if(records.length)records[0].category=currentCategory;
+}
+
+function openCategoryPicker(){
+  const picker=document.getElementById('category-picker');
+  const isOpen=picker.style.display!=='none';
+  picker.style.display=isOpen?'none':'block';
+  document.querySelectorAll('.category-picker-btn').forEach(btn=>{
+    btn.classList.toggle('active',btn.textContent===currentCategory);
+  });
+}
+
+// 点击外部关闭
+document.addEventListener('click',function(e){
+  const dropdown=document.querySelector('.q-category-dropdown');
+  if(dropdown&&!dropdown.contains(e.target)){
+    const picker=document.getElementById('category-picker');
+    if(picker)picker.style.display='none';
+  }
+});
+
+function setCategory(cat){
+  currentCategory=cat;
+  document.getElementById('q-category-text').textContent=cat;
+  document.getElementById('category-picker').style.display='none';
+  if(records.length)records[0].category=cat;
+}
+let qRecognition=null;
+let qListening=false;
+
+function initQuestionSpeech(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('q-mic-btn').disabled=true;return;}
+  qRecognition=new SR();
+  qRecognition.lang='zh-CN';
+  qRecognition.continuous=false;
+  qRecognition.interimResults=false;
+  qRecognition.onresult=(e)=>{
+    const text=e.results[0][0].transcript;
+    document.getElementById('question').value=text;
+    stopQuestionListening();
+  };
+  qRecognition.onerror=()=>stopQuestionListening();
+  qRecognition.onend=()=>stopQuestionListening();
+}
+
+function toggleQuestionMic(){
+  if(qListening)stopQuestionListening();
+  else startQuestionListening();
+}
+
+function startQuestionListening(){
+  if(!qRecognition)return;
+  qListening=true;
+  qRecognition.start();
+  document.getElementById('q-mic-btn').classList.add('active');
+  document.getElementById('q-mic-btn').textContent='⏹';
+}
+
+function stopQuestionListening(){
+  qListening=false;
+  if(qRecognition){try{qRecognition.stop();}catch(e){}}
+  const btn=document.getElementById('q-mic-btn');
+  if(btn){btn.classList.remove('active');btn.textContent='🎤';}
+}
+
+/* ─── AI 功能 ─── */
+const PROXY_URL='https://meihua-proxy.vercel.app/api/proxy';
+
 /* ─── 折叠参考面板 ─── */
 function toggleRef(id){
   const body=document.getElementById(id);
@@ -1066,7 +1484,104 @@ function initInsightSpeech(){
   };
 }
 
-function toggleInsightMic(){
+function onInsightInput(){
+  const text=document.getElementById('insight-transcript').textContent.trim();
+  const btn=document.getElementById('ai-polish-btn');
+  btn.style.display=text.length>10?'flex':'none';
+}
+
+async function doAiPolish(){
+  const raw=document.getElementById('insight-transcript').textContent.trim();
+  if(!raw){showToast('请先输入见解内容');return;}
+
+  // 检测无意义内容
+  const cleaned=raw.replace(/\s/g,'');
+  const meaningless=
+    /^[\d]+$/.test(cleaned)||
+    /^[a-zA-Z]+$/.test(cleaned)||
+    (cleaned.length>0&&new Set(cleaned).size<=2&&cleaned.length>4)||
+    cleaned.length<8;
+  if(meaningless){
+    const resultDiv=document.getElementById('ai-polish-result');
+    const textDiv=document.getElementById('ai-polish-text');
+    resultDiv.style.display='block';
+    document.getElementById('ai-polish-loading').style.display='none';
+    textDiv.textContent='⚠ 未检测到有效的卦象见解，请输入您对此卦的分析与解读后再使用 AI 优化功能。';
+    document.getElementById('ai-polish-actions').style.display='none';
+    return;
+  }
+
+  const g=guaData[0];
+  const prompt=`你是一位专业的文字编辑，任务是整理润色卦师的口述内容。
+
+【核心规则】
+- 严格只处理卦师已说出的内容，绝对禁止添加任何原文未提及的观点、分析或建议
+- 原文说了什么，整理后就写什么；原文没说的，一个字也不加
+- 去除口语化重复、语气词（"那个""就是""然后"等）
+- 调整为通顺的书面表达，文言白话相融
+- 直接输出结果，不加任何标题、说明或前缀
+
+【背景（仅供语境参考，不据此补充）】
+卦名：${guaName(g.uN,g.dN)}，所问：${currentQuestion}
+
+【口述原文】
+${raw}`;
+
+  const polishBtn=document.getElementById('ai-polish-btn');
+  const resultDiv=document.getElementById('ai-polish-result');
+  const loadingDiv=document.getElementById('ai-polish-loading');
+  const textDiv=document.getElementById('ai-polish-text');
+  const actionsDiv=document.getElementById('ai-polish-actions');
+
+  polishBtn.disabled=true;
+  resultDiv.style.display='block';
+  loadingDiv.style.display='flex';
+  textDiv.textContent='';
+  actionsDiv.style.display='none';
+
+  try{
+    const res=await fetch(PROXY_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'deepseek-chat',
+        max_tokens:800,
+        stream:false,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error?.message||`请求失败 (${res.status})`);
+    }
+    const data=await res.json();
+    const polished=data.choices?.[0]?.message?.content||'';
+    loadingDiv.style.display='none';
+    textDiv.textContent=polished;
+    actionsDiv.style.display='flex';
+    window._polishedText=polished;
+  }catch(err){
+    loadingDiv.style.display='none';
+    textDiv.textContent=`优化失败：${err.message}`;
+    polishBtn.disabled=false;
+  }
+}
+
+function usePolished(){
+  const text=window._polishedText||'';
+  document.getElementById('insight-transcript').textContent=text;
+  insightFinal=text;
+  document.getElementById('ai-polish-result').style.display='none';
+  document.getElementById('ai-polish-btn').style.display='none';
+  showToast('✓ 已使用优化版本');
+}
+
+function keepOriginal(){
+  document.getElementById('ai-polish-result').style.display='none';
+  document.getElementById('ai-polish-btn').disabled=false;
+  showToast('已保留原文');
+}
+  function toggleInsightMic(){
   if(insightListening)stopInsightListening();
   else startInsightListening();
 }
@@ -1096,6 +1611,10 @@ function resetInsight(){
   insightFinal='';
   document.getElementById('insight-saved').style.display='none';
   document.getElementById('insight-input').style.display='block';
+  document.getElementById('ai-polish-btn').style.display='none';
+  document.getElementById('ai-polish-result').style.display='none';
+  document.getElementById('ai-polish-btn').disabled=false;
+  window._polishedText='';
 }
 
 async function saveCase(){
@@ -1132,11 +1651,19 @@ function editInsight(){
 }
 
 /* ─── 初始化 ─── */
-initTimeSelects();
-updateTime();
-setInterval(updateTime,30000);
-initInsightSpeech();
-loadRecords(); // 预加载云端记录
+function init(){
+  initTimeSelects();
+  updateTime();
+  setInterval(updateTime,30000);
+  initInsightSpeech();
+  initQuestionSpeech();
+  loadRecords();
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+}else{
+  init();
+}
 document.getElementById('question').addEventListener('input',function(){
   if(currentMethod==='word'){
     const len=this.value.replace(/\s/g,'').length;
