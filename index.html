@@ -15,7 +15,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 12% 15%,rgba(184,145,42,.07) 0%,transparent 45%),radial-gradient(ellipse at 88% 85%,rgba(139,32,32,.05) 0%,transparent 45%);pointer-events:none;z-index:0;}
-.app{max-width:780px;margin:0 auto;position:relative;z-index:1;min-height:100vh;}
+.app{max-width:780px;margin:0 auto;position:relative;z-index:1;}
 
 /* ── 顶部导航 ── */
 .header{padding:18px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
@@ -30,6 +30,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* ── 视图切换 ── */
 .view{display:none;}.view.active{display:block;}
+/* 防止隐藏视图影响布局 */
+#view-result:not(.active),#view-guadian:not(.active),#view-records:not(.active),#view-qigua:not(.active){
+  position:absolute;visibility:hidden;height:0;overflow:hidden;pointer-events:none;
+}
 
 /* ══════════════════════════════
    起卦视图
@@ -85,7 +89,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 ══════════════════════════════ */
 .result-wrap{padding:20px;display:flex;flex-direction:column;gap:18px;}
 
-.topbar-result{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--paper3);background:rgba(245,240,232,.96);position:sticky;top:60px;z-index:40;backdrop-filter:blur(6px);}
+.topbar-result{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--paper3);background:rgba(245,240,232,.96);position:sticky;top:61px;z-index:40;backdrop-filter:blur(6px);}
 .back-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;}
 .back-btn:hover{border-color:var(--gold2);color:var(--gold);}
 .topbar-ttl{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink2);letter-spacing:.08em;}
@@ -649,6 +653,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       <div class="action-row">
+        <button class="act-btn" onclick="saveAsImage()">📷 保存图片</button>
         <button class="act-btn primary" onclick="saveCase()">保存案例</button>
       </div>
     </div>
@@ -689,6 +694,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 /* ─── 数据 ─── */
 // BL爻线从下到上（初爻→上爻）：y=阳爻 n=阴爻
@@ -808,6 +814,7 @@ function showView(v,btn){
   document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   if(btn)btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
   if(v==='guadian')renderGuadian();
   if(v==='records'){
     document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
@@ -1643,6 +1650,88 @@ async function initTiyong(question){
     window._tiKeyword=result.ti||'';
     window._yongKeyword=result.yong||'';
     renderTiyong(window._tiKeyword,window._yongKeyword);
+  }
+}
+
+/* ─── 保存图片 ─── */
+async function saveAsImage(){
+  const btn=document.querySelector('.act-btn');
+  btn.textContent='生成中…';
+  btn.disabled=true;
+
+  try{
+    // 创建临时卡片
+    const g=guaData[0],h=guaData[1],b=guaData[2];
+    const info=guaInfo(g.uN,g.dN);
+    const wang=getWangXiang();
+    const insightText=document.getElementById('insight-saved').style.display!=='none'
+      ?document.getElementById('insight-saved-text').textContent
+      :document.getElementById('insight-transcript').textContent.trim();
+
+    const card=document.createElement('div');
+    card.style.cssText=`
+      position:fixed;left:-9999px;top:0;
+      width:375px;background:#f5f0e8;
+      font-family:'Noto Serif SC',serif;
+      padding:28px 24px 32px;box-sizing:border-box;
+    `;
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+        <div style="font-size:18px;font-weight:700;color:#1a1410;letter-spacing:.1em;">梅花易数</div>
+        <div style="width:5px;height:5px;background:#b8912a;border-radius:50%;"></div>
+        <div style="font-size:10px;color:#b0a89e;letter-spacing:.15em;">PLUM BLOSSOM ORACLE</div>
+      </div>
+      <div style="background:rgba(237,231,216,.6);border:1px solid #e0d8c8;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+        <div style="font-size:11px;color:#b0a89e;margin-bottom:6px;">所问之事</div>
+        <div style="font-size:15px;color:#1a1410;line-height:1.6;">${currentQuestion}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+        ${[g,h,b].map((gua,i)=>{
+          const ui=BI[gua.uN],di=BI[gua.dN];
+          const labels=['本卦','互卦','变卦'];
+          const colors=['#b8912a','#7a6e63','#8b2020'];
+          return `<div style="background:rgba(237,231,216,.5);border:1px solid #e0d8c8;border-radius:8px;padding:10px 6px;text-align:center;">
+            <div style="font-size:10px;color:${colors[i]};margin-bottom:6px;">${labels[i]}</div>
+            <div style="font-size:14px;font-weight:700;color:${i===2?'#8b2020':'#1a1410'};">${guaName(gua.uN,gua.dN)}</div>
+            <div style="font-size:10px;color:#b0a89e;margin-top:3px;">${ui.wx}·${di.wx}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="background:rgba(237,231,216,.4);border:1px solid #e0d8c8;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#7a6e63;">
+        ${wang.season} · ${wang.wx}旺 · ${wang.desc}
+      </div>
+      ${insightText?`
+      <div style="background:rgba(245,240,232,.8);border:1.5px solid #d4aa4a;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+        <div style="font-size:11px;color:#b8912a;margin-bottom:8px;letter-spacing:.06em;">卦师见解</div>
+        <div style="font-size:13px;color:#3d3328;line-height:2;border-left:3px solid #d4aa4a;padding-left:10px;">${insightText}</div>
+      </div>`:''}
+      <div style="text-align:center;font-size:10px;color:#b0a89e;margin-top:8px;letter-spacing:.1em;">
+        ${new Date().toLocaleDateString('zh-CN')} · 梅花易数
+      </div>
+    `;
+    document.body.appendChild(card);
+
+    const canvas=await html2canvas(card,{
+      scale:2,
+      useCORS:true,
+      backgroundColor:'#f5f0e8',
+      logging:false
+    });
+    document.body.removeChild(card);
+
+    // 下载图片
+    const link=document.createElement('a');
+    link.download=`梅花易数_${guaName(g.uN,g.dN)}_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'')}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+
+    showToast('✓ 图片已保存');
+  }catch(e){
+    showToast('保存失败，请重试');
+    console.error(e);
+  }finally{
+    btn.textContent='📷 保存图片';
+    btn.disabled=false;
   }
 }
 
