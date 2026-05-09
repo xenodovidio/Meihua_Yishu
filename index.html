@@ -1760,18 +1760,28 @@ let qListening=false;
 
 function initQuestionSpeech(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){document.getElementById('q-mic-btn').disabled=true;return;}
+  const btn=document.getElementById('q-mic-btn');
+  if(!SR){if(btn)btn.style.display='none';return;}
   qRecognition=new SR();
   qRecognition.lang='zh-CN';
-  qRecognition.continuous=false;
-  qRecognition.interimResults=false;
+  qRecognition.continuous=true;
+  qRecognition.interimResults=true;
+  let qFinal='';
   qRecognition.onresult=(e)=>{
-    const text=e.results[0][0].transcript;
-    document.getElementById('question').value=text;
-    stopQuestionListening();
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) qFinal+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('question').value=qFinal+interim;
   };
   qRecognition.onerror=()=>stopQuestionListening();
-  qRecognition.onend=()=>stopQuestionListening();
+  qRecognition.onend=()=>{
+    // continuous模式下自动重启，直到用户手动停止
+    if(qListening)qRecognition.start();
+  };
+  // 重置qFinal用
+  qRecognition._resetFinal=()=>{qFinal='';};
 }
 
 function toggleQuestionMic(){
@@ -1782,9 +1792,10 @@ function toggleQuestionMic(){
 function startQuestionListening(){
   if(!qRecognition)return;
   qListening=true;
+  if(qRecognition._resetFinal)qRecognition._resetFinal();
   qRecognition.start();
-  document.getElementById('q-mic-btn').classList.add('active');
-  document.getElementById('q-mic-btn').textContent='⏹';
+  const btn=document.getElementById('q-mic-btn');
+  if(btn){btn.classList.add('active');btn.textContent='⏹';}
 }
 
 function stopQuestionListening(){
