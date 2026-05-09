@@ -941,6 +941,8 @@ function doQigua(){
 
 /* ─── 爻线渲染 ─── */
 function yaoLines(uL,dL,dongIdx,showNum){
+  // BL是初到上，all数组=[初,二,三,四,五,上]
+  // CSS用column-reverse，所以all[0](初爻)显示在最下，all[5](上爻)显示在最上
   const all=[...dL,...uL];
   const names=['初','二','三','四','五','上'];
   return`<div class="yao-lines">${all.map((l,i)=>{
@@ -1256,13 +1258,14 @@ function copyResult(){
 
 /* ─── 卦典渲染 ─── */
 function miniLines(u,d){
-  return [...BL[u],...BL[d]].map(l=>l==='y'
+  // BL是初到上，显示时需要从上到下：先上卦（倒序），再下卦（倒序）
+  return [...[...BL[u]].reverse(),...[...BL[d]].reverse()].map(l=>l==='y'
     ?`<div class="gml-yang"></div>`
     :`<div class="gml-yin"><div class="gml-yin-seg"></div><div class="gml-yin-seg"></div></div>`
   ).join('');
 }
 function modalLines(u,d){
-  return [...BL[u],...BL[d]].map(l=>l==='y'
+  return [...[...BL[u]].reverse(),...[...BL[d]].reverse()].map(l=>l==='y'
     ?`<div class="gdl-yang"></div>`
     :`<div class="gdl-yin"><div class="gdl-yin-seg"></div><div class="gdl-yin-seg"></div></div>`
   ).join('');
