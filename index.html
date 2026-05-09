@@ -75,6 +75,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .method-icon{font-size:16px;display:block;margin-bottom:3px;}
 
 .num-input-row{display:flex;gap:8px;margin-bottom:8px;}
+/* 指定起卦 */
+.zhiding-wrap{display:flex;flex-direction:column;gap:10px;}
+.zhiding-lines{display:flex;flex-direction:column;gap:10px;}
+.zhiding-row{display:flex;align-items:center;gap:10px;}
+.zhiding-label{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink4);width:36px;flex-shrink:0;text-align:right;}
+.zhiding-yao-wrap{flex:1;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;}
+.zhiding-yang{width:100%;height:6px;background:var(--ink2);border-radius:3px;transition:all .2s;}
+.zhiding-yin{display:flex;gap:8px;width:100%;}
+.zhiding-yin-seg{flex:1;height:6px;background:var(--ink2);border-radius:3px;transition:all .2s;}
+.zhiding-row.dong .zhiding-yang{background:var(--red);}
+.zhiding-row.dong .zhiding-yin-seg{background:var(--red);}
+.zhiding-dong-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--paper3);background:none;font-family:'Noto Serif SC',serif;font-size:10px;color:var(--ink4);cursor:pointer;flex-shrink:0;transition:all .2s;}
+.zhiding-dong-btn.active{background:var(--red);color:var(--paper);border-color:var(--red);}
+.zhiding-guaname{text-align:center;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);padding:8px;background:rgba(245,240,232,.6);border-radius:6px;}
 .num-mode-tabs{display:flex;background:rgba(224,216,200,.5);border-radius:8px;padding:3px;margin-bottom:14px;gap:3px;}
 .num-mode-tab{flex:1;background:none;border:none;border-radius:6px;padding:7px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;}
 .num-mode-tab.active{background:rgba(245,240,232,.95);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08);}
@@ -483,7 +497,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <button class="method-btn selected" onclick="selectMethod('time',this)"><span class="method-icon">⏱</span>时间起卦</button>
           <button class="method-btn" onclick="selectMethod('number',this)"><span class="method-icon">🔢</span>数字起卦</button>
           <button class="method-btn" onclick="selectMethod('random',this)"><span class="method-icon">🌸</span>万物起卦</button>
-          <button class="method-btn" onclick="selectMethod('word',this)"><span class="method-icon">✍️</span>字数起卦</button>
+          <button class="method-btn" onclick="selectMethod('word',this)"><span class="method-icon">☰</span>指定起卦</button>
         </div>
 
         <div id="method-time">
@@ -558,7 +572,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="time-display">诚心一念，点击起卦即可感应天机</div>
         </div>
         <div id="method-word" style="display:none">
-          <div class="time-display" id="word-display">在上方输入所问之事，自动统计字数</div>
+          <!-- 六爻指定 -->
+          <div class="zhiding-wrap">
+            <div class="zhiding-lines" id="zhiding-lines"></div>
+            <div class="zhiding-guaname" id="zhiding-guaname">请设定六爻</div>
+          </div>
         </div>
       </div>
 
@@ -757,6 +775,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <button class="img-preview-close" onclick="closeImgPreview()">关闭</button>
 </div>
 
+<!-- 卦详情弹窗 -->
+<div class="modal-overlay" id="gua-detail-modal" onclick="closeGuaDetailModal(event)">
+  <div class="modal-card" id="gua-detail-card"></div>
+</div>
+
 <!-- 卦典弹窗 -->
 <div class="modal-overlay" id="modal" onclick="closeModal(event)">
   <div class="modal-card" id="modal-card"></div>
@@ -877,7 +900,60 @@ async function saveRecordsToCloud(){
   });
 }
 
-/* ─── 数字起卦模式切换 ─── */
+/* ─── 指定起卦 ─── */
+const NAMES_ZHI=['初爻','二爻','三爻','四爻','五爻','上爻'];
+let zhidingYao=['y','y','y','y','y','y']; // 从初爻到上爻
+let zhidingDong=0; // 动爻索引（0=初爻）
+
+function initZhiding(){
+  zhidingYao=['y','y','y','y','y','y'];
+  zhidingDong=0;
+  renderZhiding();
+}
+
+function renderZhiding(){
+  const container=document.getElementById('zhiding-lines');
+  if(!container)return;
+  const rows=[...zhidingYao].map((yao,i)=>({yao,i})).reverse();
+  container.innerHTML=rows.map(({yao,i})=>{
+    const isDong=i===zhidingDong;
+    const isYang=yao==='y';
+    return`<div class="zhiding-row${isDong?' dong':''}">
+      <div class="zhiding-label">${NAMES_ZHI[i]}</div>
+      <div class="zhiding-yao-wrap" onclick="toggleZhidingYao(${i})">
+        ${isYang
+          ?`<div class="zhiding-yang"></div>`
+          :`<div class="zhiding-yin"><div class="zhiding-yin-seg"></div><div class="zhiding-yin-seg"></div></div>`
+        }
+      </div>
+      <button class="zhiding-dong-btn${isDong?' active':''}" onclick="setZhidingDong(${i})">动</button>
+    </div>`;
+  }).join('');
+  updateZhidingGuaname();
+}
+
+function toggleZhidingYao(i){
+  zhidingYao[i]=zhidingYao[i]==='y'?'n':'y';
+  renderZhiding();
+}
+
+function setZhidingDong(i){
+  zhidingDong=i;
+  renderZhiding();
+}
+
+function updateZhidingGuaname(){
+  const el=document.getElementById('zhiding-guaname');
+  if(!el)return;
+  const dL=zhidingYao.slice(0,3);
+  const uL=zhidingYao.slice(3);
+  const d=l2n(dL),u=l2n(uL);
+  // 变卦
+  const bYao=zhidingYao.map((y,i)=>i===zhidingDong?(y==='y'?'n':'y'):y);
+  const bDL=bYao.slice(0,3),bUL=bYao.slice(3);
+  const bd=l2n(bDL),bu=l2n(bUL);
+  el.textContent=`${guaName(u,d)} 之 ${guaName(bu,bd)}`;
+}
 let numMode='two';
 
 function switchNumMode(mode,btn){
@@ -936,6 +1012,7 @@ function selectMethod(m,btn){
   ['time','number','random','word'].forEach(id=>{
     document.getElementById('method-'+id).style.display=id===m?'block':'none';
   });
+  if(m==='word')initZhiding();
 }
 
 /* ── 干支工具 ── */
@@ -1043,17 +1120,19 @@ function getNums(){
   if(currentMethod==='random'){
     return{upper:Math.floor(Math.random()*8)+1,lower:Math.floor(Math.random()*8)+1,dong:Math.floor(Math.random()*6)+1};
   }
-  // word
-  const q=document.getElementById('question').value.replace(/\s/g,'');
-  const len=q.length||1;
-  return{upper:len%8||8,lower:(len+1)%8||8,dong:len%6||6};
+  // 指定起卦
+  const dL=zhidingYao.slice(0,3);
+  const uL=zhidingYao.slice(3);
+  return{upper:l2n(uL),lower:l2n(dL),dong:zhidingDong+1};
 }
 
 function doQigua(){
   const q=document.getElementById('question').value.trim();
-  if(!q){alert('请先输入所问之事');return;}
+  console.log('doQigua called, q=', q, 'method=', currentMethod);
+  if(!q){showToast('请先输入所问之事');return;}
   const nums=getNums();
-  if(!nums){alert('请输入三个数字');return;}
+  console.log('nums=', nums);
+  if(!nums){showToast('请输入完整数字');return;}
 
   const{upper,lower,dong}=nums;
   const uL=BL[upper],dL=BL[lower];
@@ -1080,7 +1159,7 @@ function doQigua(){
   activeGuaKey='benGua';
 
   // 填充结果页
-  const methodLabel={time:'时间起卦',number:'数字起卦',random:'万物起卦',word:'字数起卦'};
+  const methodLabel={time:'时间起卦',number:'数字起卦',random:'万物起卦',word:'指定起卦'};
   document.getElementById('result-title').textContent=`${guaName(upper,lower)} · 第${dong}爻动`;
   document.getElementById('result-meta').textContent=new Date().toLocaleDateString('zh-CN')+' · '+methodLabel[currentMethod];
   // 如果是时间起卦，在meta里显示推算依据
@@ -1137,15 +1216,58 @@ function yaoLines(uL,dL,dongIdx,showNum){
   }).join('')}</div>`;
 }
 
-/* ─── 三卦渲染 ─── */
 const GUA_MOBILE_LABELS={benGua:'主',huGua:'互',bianGua:'变'};
+
+function showGuaDetail(key){
+  const g=guaData.find(x=>x.key===key);
+  if(!g)return;
+  const ui=BI[g.uN],di=BI[g.dN];
+  const info=guaInfo(g.uN,g.dN);
+  const labelMap={benGua:'本卦',huGua:'互卦',bianGua:'变卦'};
+  const tipMap={
+    benGua:'本卦由起卦数直接推得，反映当前整体形势，是解读的核心主体。',
+    huGua:'互卦取本卦二三四五爻组成，揭示事物发展的内在原因与过程。',
+    bianGua:'变卦为动爻变化后所得之卦，预示事物未来的发展方向与结果。'
+  };
+  const vd=info.vd||'平';
+  const vcls={'大吉':'v-good','吉':'v-good','平':'v-mid','险':'v-bad','凶':'v-bad'};
+  document.getElementById('gua-detail-card').innerHTML=`
+    <div class="modal-header">
+      <div>
+        <div style="font-size:11px;color:var(--ink4);margin-bottom:4px;">${labelMap[key]}</div>
+        <div class="modal-name">${guaName(g.uN,g.dN)}</div>
+      </div>
+      <button class="close-btn" onclick="closeGuaDetailModal()">✕</button>
+    </div>
+    <div class="modal-lines">${modalLines(g.uN,g.dN)}</div>
+    <div class="modal-label">上卦 · 下卦</div>
+    <div class="modal-text">${ui.name}（${ui.attr}·${ui.wx}·${ui.nat}）／${di.name}（${di.attr}·${di.wx}·${di.nat}）</div>
+    <div class="modal-label">卦辞</div>
+    <div class="modal-text">${info.dc}</div>
+    <div class="modal-label">解读</div>
+    <div class="modal-text">${info.jg}</div>
+    <div class="modal-label">说明</div>
+    <div class="modal-text" style="color:var(--ink4);font-size:12px;">${tipMap[key]}</div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:12px;color:var(--ink4);">吉凶</span>
+      <span class="verdict-badge ${vcls[vd]||'v-mid'}">${vd}</span>
+      ${g.dongIdx>=0?`<span style="font-size:12px;color:var(--red);margin-left:8px;">第${g.dongIdx+1}爻动</span>`:''}
+    </div>
+  `;
+  document.getElementById('gua-detail-modal').classList.add('show');
+}
+
+function closeGuaDetailModal(e){
+  if(!e||e.target===document.getElementById('gua-detail-modal'))
+    document.getElementById('gua-detail-modal').classList.remove('show');
+}
+
 function renderTrigrams(){
   let html='';
   guaData.forEach((g,i)=>{
     const ui=BI[g.uN],di=BI[g.dN];
-    const sel=g.key===activeGuaKey?' selected':'';
     const mobileLabel=GUA_MOBILE_LABELS[g.key]||'';
-    html+=`<div class="trigram-block ${g.cls}${sel}" onclick="selectGua('${g.key}')">
+    html+=`<div class="trigram-block ${g.cls}" onclick="showGuaDetail('${g.key}')">
       <div class="tb-label"><span class="tb-label-desktop">${g.label}</span><span class="tb-label-mobile">[${mobileLabel}]</span></div>
       ${yaoLines(g.uL,g.dL,g.dongIdx,false)}
       <div class="tb-name">${guaName(g.uN,g.dN)}</div>
