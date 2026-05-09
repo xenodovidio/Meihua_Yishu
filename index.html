@@ -549,7 +549,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </label>
               <label class="num-method-opt">
                 <input type="radio" name="num3method" value="2"> 方法二
-                <span class="num-method-desc">一数上卦，一二数下卦，一二三数动爻</span>
+                <span class="num-method-desc">一数上卦，二三数下卦，一二三数动爻</span>
               </label>
             </div>
           </div>
@@ -1034,7 +1034,7 @@ function getNums(){
         dong=(v3+h)%6||6;
       }else{
         upper=(v1+h)%8||8;
-        lower=(v1+v2+h)%8||8;
+        lower=(v2+v3+h)%8||8;
         dong=(v1+v2+v3+h)%6||6;
       }
       return{upper,lower,dong};
