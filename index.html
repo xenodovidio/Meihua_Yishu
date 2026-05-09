@@ -296,6 +296,37 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .cat-tab:hover{border-color:var(--gold2);color:var(--gold);}
 .cat-tab.active{background:rgba(184,145,42,.1);border-color:var(--gold);color:var(--gold);}
 .record-category{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(184,145,42,.08);color:var(--gold);border:1px solid rgba(184,145,42,.2);font-family:'Noto Sans SC',sans-serif;flex-shrink:0;}
+/* 体用拆解（含旺衰） */
+.tiyong-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.tiyong-header{display:flex;align-items:center;justify-content:space-between;}
+.tiyong-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:8px;}
+.tiyong-title::before{content:'';display:block;width:3px;height:13px;background:var(--gold);border-radius:2px;}
+.tiyong-swap-btn{background:none;border:1px solid var(--paper3);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
+.tiyong-swap-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.tiyong-wang{background:rgba(245,240,232,.6);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+.tiyong-wang-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:12px;font-weight:500;border:1.5px solid;flex-shrink:0;}
+.tiyong-wang-info{flex:1;}
+.tiyong-wang-name{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink2);}
+.tiyong-wang-desc{font-size:11px;color:var(--ink4);margin-top:2px;line-height:1.5;}
+.tiyong-wang-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.tiyong-row{display:flex;align-items:stretch;gap:8px;}
+.tiyong-card{flex:1;background:rgba(245,240,232,.8);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid var(--paper3);}
+.tiyong-card.ti{border-color:rgba(45,110,90,.2);}
+.tiyong-card.yong{border-color:rgba(184,145,42,.2);}
+.tiyong-card-label{font-size:11px;letter-spacing:.08em;margin-bottom:6px;font-family:'Noto Serif SC',serif;}
+.tiyong-card.ti .tiyong-card-label{color:var(--jade);}
+.tiyong-card.yong .tiyong-card-label{color:var(--gold);}
+.tiyong-card-gua{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.tiyong-card-attr{font-size:11px;color:var(--ink4);}
+.tiyong-card-keyword{font-size:12px;color:var(--ink3);margin-top:6px;font-family:'Noto Serif SC',serif;line-height:1.6;border-top:1px solid var(--paper3);padding-top:6px;}
+.tiyong-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:0 0 auto;min-width:64px;}
+.tiyong-rel-text{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink2);text-align:center;}
+.tiyong-rel-badge{font-size:11px;padding:2px 10px;border-radius:20px;font-family:'Noto Serif SC',serif;}
+.ty-good{background:rgba(45,110,90,.08);color:var(--jade);border:1px solid rgba(45,110,90,.25);}
+.ty-bad{background:rgba(139,32,32,.06);color:var(--red);border:1px solid rgba(139,32,32,.2);}
+.ty-mid{background:rgba(184,145,42,.08);color:var(--gold);border:1px solid rgba(184,145,42,.25);}
+
+/* 折叠参考面板 */
 .ref-group{background:rgba(237,231,216,.4);border:1px solid var(--paper3);border-radius:10px;overflow:hidden;}
 .ref-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);transition:color .2s;user-select:none;}
 .ref-toggle:hover{color:var(--ink);}
@@ -521,8 +552,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <!-- 三卦图 -->
       <div class="trigrams-section" id="trigrams-section"></div>
-      <!-- 旺相信息条 -->
-      <div class="wang-inline" id="wang-inline"></div>
+      <!-- 体用关系（含旺衰） -->
+      <div class="tiyong-section" id="tiyong-section" style="display:none">
+        <div class="tiyong-header">
+          <div class="tiyong-title">体用关系</div>
+          <button class="tiyong-swap-btn" onclick="swapTiyong()">⇄ 调转体用</button>
+        </div>
+        <!-- 旺相嵌入 -->
+        <div class="tiyong-wang" id="tiyong-wang"></div>
+        <div class="tiyong-row" id="tiyong-row"></div>
+      </div>
+      </div>
 
       <!-- 卦师见解 -->
       <div class="insight-section insight-section--main" id="insight-section">
@@ -916,7 +956,6 @@ function doQigua(){
   document.getElementById('q-tag').textContent=methodLabel[currentMethod];
 
   renderTrigrams();
-  renderWangInline();
   renderDetail();
   renderWuxing();
   renderJiegua();
@@ -929,6 +968,7 @@ function doQigua(){
 
   // 重置见解区
   resetInsight();
+  document.getElementById('tiyong-section').style.display='none';
 
   // 跳转结果页
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
@@ -937,6 +977,8 @@ function doQigua(){
   window.scrollTo({top:0,behavior:'smooth'});
   // AI 自动分类（异步，不阻塞页面）
   aiAutoCategory(q);
+  // 体用拆解（异步）
+  initTiyong(q);
 }
 
 /* ─── 爻线渲染 ─── */
@@ -1511,6 +1553,111 @@ function stopQuestionListening(){
 
 /* ─── AI 功能 ─── */
 const PROXY_URL='https://meihua-proxy.vercel.app/api/proxy';
+
+/* ─── 体用拆解 ─── */
+let tiyongSwapped=false;
+
+// 问题关键词拆解（用AI）
+async function parseTiyong(question){
+  try{
+    const res=await fetch(PROXY_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'deepseek-chat',
+        max_tokens:80,
+        stream:false,
+        messages:[{role:'user',content:`从梅花易数角度，将问题拆成"体"（问卦者/主体）和"用"（所问之事/客体）。用完整短语表述，不要缩写。只输出JSON，格式：{"ti":"完整体描述","yong":"完整用描述"}，不要其他内容。\n示例：问题"我今年会发财吗" → {"ti":"问卦者（我）","yong":"今年能否发财"}\n问题：${question}`}]
+      })
+    });
+    if(!res.ok)return null;
+    const data=await res.json();
+    const text=data.choices?.[0]?.message?.content||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    return JSON.parse(clean);
+  }catch(e){return null;}
+}
+
+function getTiyongRelation(tiGua,yongGua){
+  const tiWx=BI[tiGua].wx,yongWx=BI[yongGua].wx;
+  if(WX_SHENG[yongWx]===tiWx)return{text:'用生体',cls:'ty-good',desc:'有利'};
+  if(WX_SHENG[tiWx]===yongWx)return{text:'体生用',cls:'ty-mid',desc:'耗泄'};
+  if(WX_KE[yongWx]===tiWx)return{text:'用克体',cls:'ty-bad',desc:'不利'};
+  if(WX_KE[tiWx]===yongWx)return{text:'体克用',cls:'ty-good',desc:'主动'};
+  return{text:'比和',cls:'ty-mid',desc:'平稳'};
+}
+
+function renderTiyong(tiKeyword,yongKeyword){
+  const g=guaData[0];
+  const tiGuaN=tiyongSwapped?g.dN:g.uN;
+  const yongGuaN=tiyongSwapped?g.uN:g.dN;
+  const tiGua=BI[tiGuaN],yongGua=BI[yongGuaN];
+  const rel=getTiyongRelation(tiGuaN,yongGuaN);
+
+  // 旺衰信息
+  const wang=getWangXiang();
+  const tiStatus=getBaguaStatus(wang.key,tiGua.name);
+  const yongStatus=getBaguaStatus(wang.key,yongGua.name);
+  const tiRelWx=getWxRelation(wang.wx,tiGua.wx);
+  const yongRelWx=getWxRelation(wang.wx,yongGua.wx);
+
+  document.getElementById('tiyong-section').style.display='flex';
+
+  // 旺相区
+  document.getElementById('tiyong-wang').innerHTML=`
+    <div class="tiyong-wang-circle ${WX_CLS[wang.wx]}">${wang.wx}</div>
+    <div class="tiyong-wang-info">
+      <div class="tiyong-wang-name">${wang.season}</div>
+      <div class="tiyong-wang-desc">${wang.desc}</div>
+      <div class="tiyong-wang-tags">
+        <span class="wang-tag ${getStatusCls(tiStatus)}">${tiGua.name}·${tiStatus||'平'}</span>
+        <span class="wang-tag">${tiRelWx.text||'比和'}</span>
+        <span class="wang-tag ${getStatusCls(yongStatus)}">${yongGua.name}·${yongStatus||'平'}</span>
+        <span class="wang-tag">${yongRelWx.text||'比和'}</span>
+      </div>
+    </div>
+  `;
+
+  // 体用卡片
+  document.getElementById('tiyong-row').innerHTML=`
+    <div class="tiyong-card ti">
+      <div class="tiyong-card-label">体 · 主</div>
+      <div class="tiyong-card-gua">${tiGua.name}</div>
+      <div class="tiyong-card-attr">${tiGua.attr} · ${tiGua.wx}</div>
+      <div class="tiyong-card-keyword">${tiKeyword||'问卦者'}</div>
+    </div>
+    <div class="tiyong-mid">
+      <div class="tiyong-rel-text">${rel.text}</div>
+      <div class="tiyong-rel-badge ${rel.cls}">${rel.desc}</div>
+    </div>
+    <div class="tiyong-card yong">
+      <div class="tiyong-card-label">用 · 客</div>
+      <div class="tiyong-card-gua">${yongGua.name}</div>
+      <div class="tiyong-card-attr">${yongGua.attr} · ${yongGua.wx}</div>
+      <div class="tiyong-card-keyword">${yongKeyword||'所问之事'}</div>
+    </div>
+  `;
+}
+
+function swapTiyong(){
+  tiyongSwapped=!tiyongSwapped;
+  renderTiyong(window._tiKeyword,window._yongKeyword);
+}
+
+async function initTiyong(question){
+  tiyongSwapped=false;
+  window._tiKeyword='';
+  window._yongKeyword='';
+  // 先用空关键词渲染
+  renderTiyong('','');
+  // 异步获取关键词
+  const result=await parseTiyong(question);
+  if(result){
+    window._tiKeyword=result.ti||'';
+    window._yongKeyword=result.yong||'';
+    renderTiyong(window._tiKeyword,window._yongKeyword);
+  }
+}
 
 /* ─── 折叠参考面板 ─── */
 function toggleRef(id){
