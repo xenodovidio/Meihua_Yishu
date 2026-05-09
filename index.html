@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>梅花易数</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
@@ -47,7 +47,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .q-mic-btn:hover{background:var(--ink2);transform:scale(1.05);}
 .q-mic-btn.active{background:var(--red);animation:micpulse 1.5s ease-in-out infinite;}
 .q-mic-btn:disabled{opacity:.4;cursor:not-allowed;}
-.input-field{width:100%;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:10px 12px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:16px;resize:none;line-height:1.7;}
+.input-field{width:100%;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:10px 12px;font-family:'Noto Sans SC',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:16px;resize:none;line-height:1.7;}
+.num-input{width:100%;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:8px;font-family:'Noto Sans SC',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color .2s;text-align:center;}
+@media(max-width:560px){
+  .input-field{font-size:16px;}
+  .num-input{font-size:16px;}
+  select.num-input{font-size:16px;}
+}
 .input-field:focus{border-color:var(--gold2);}
 .input-field::placeholder{color:var(--ink4);}
 
@@ -645,7 +651,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <script>
 /* ─── 数据 ─── */
-const BL={1:['y','y','y'],2:['y','y','n'],3:['y','n','y'],4:['n','n','y'],5:['y','n','n'],6:['n','y','n'],7:['n','y','y'],8:['n','n','n']};
+// BL爻线从下到上（初爻→上爻）：y=阳爻 n=阴爻
+const BL={1:['y','y','y'],2:['y','y','n'],3:['y','n','y'],4:['y','n','n'],5:['n','y','y'],6:['n','y','n'],7:['n','n','y'],8:['n','n','n']};
 const BI={1:{name:'乾',attr:'天',wx:'金',nat:'刚健'},2:{name:'兑',attr:'泽',wx:'金',nat:'喜悦'},3:{name:'离',attr:'火',wx:'火',nat:'文明'},4:{name:'震',attr:'雷',wx:'木',nat:'震动'},5:{name:'巽',attr:'风',wx:'木',nat:'顺入'},6:{name:'坎',attr:'水',wx:'水',nat:'险陷'},7:{name:'艮',attr:'山',wx:'土',nat:'止静'},8:{name:'坤',attr:'地',wx:'土',nat:'柔顺'}};
 const WX_CLS={金:'wx-jin',木:'wx-mu',水:'wx-shui',火:'wx-huo',土:'wx-tu'};
 const WX_SHENG={金:'水',水:'木',木:'火',火:'土',土:'金'};
@@ -719,7 +726,7 @@ const GUA64=[
 ];
 
 function guaName(u,d){const g=GUA64.find(x=>x.u===u&&x.d===d);return g?g.n:'未知卦';}
-function l2n(ls){const m={'y,y,y':1,'y,y,n':2,'y,n,y':3,'n,n,y':4,'y,n,n':5,'n,y,n':6,'n,y,y':7,'n,n,n':8};return m[ls.join(',')]||1;}
+function l2n(ls){const m={'y,y,y':1,'y,y,n':2,'y,n,y':3,'y,n,n':4,'n,y,y':5,'n,y,n':6,'n,n,y':7,'n,n,n':8};return m[ls.join(',')]||1;}
 function guaInfo(u,d){return GUA64.find(x=>x.u===u&&x.d===d)||{n:'',dc:'',jg:'',vd:'平'};}
 
 /* ─── 状态 ─── */
@@ -875,16 +882,18 @@ function doQigua(){
 
   const{upper,lower,dong}=nums;
   const uL=BL[upper],dL=BL[lower];
-  const all6=[...dL,...uL];
+  // BL已是从初爻到上爻顺序，直接拼接
+  const yao=[...dL,...uL]; // [初,二,三,四,五,上]
 
-  // 互卦
-  const huUL=[all6[2],all6[3],all6[4]];
-  const huDL=[all6[1],all6[2],all6[3]];
+  // 互卦：234爻为下卦，345爻为上卦
+  const huDL=[yao[1],yao[2],yao[3]];
+  const huUL=[yao[2],yao[3],yao[4]];
   const huU=l2n(huUL),huD=l2n(huDL);
 
-  // 变卦
-  const bAll=all6.map((l,i)=>i===dong-1?(l==='y'?'n':'y'):l);
-  const bDL=bAll.slice(0,3),bUL=bAll.slice(3);
+  // 变卦：动爻变化
+  const bYao=yao.map((l,i)=>i===dong-1?(l==='y'?'n':'y'):l);
+  const bDL=bYao.slice(0,3);
+  const bUL=bYao.slice(3);
   const bU=l2n(bUL),bD=l2n(bDL);
 
   guaData=[
@@ -1052,33 +1061,38 @@ function getStatusCls(status){
 function getLunarDate(date){
   date=date||new Date();
   try{
-    // 用完整格式一次性获取，更可靠
-    const fmt=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{
-      year:'numeric',month:'numeric',day:'numeric'
-    }).format(date);
-    // fmt 类似 "丙午年三月廿三" 或 "2026三23"
+    // 分别获取各字段，兼容性更好
+    const yearFmt=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{year:'numeric'}).format(date);
+    const monthFmt=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{month:'numeric'}).format(date);
+    const dayFmt=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{day:'numeric'}).format(date);
+    console.log('Intl农历 年:',yearFmt,' 月:',monthFmt,' 日:',dayFmt);
+
     // 提取年支
-    const zhiInYear=ZHI.find(z=>fmt.includes(z+'年'));
+    const zhiInYear=ZHI.find(z=>yearFmt.includes(z+'年'));
     const lunarYearZhi=zhiInYear?ZHI.indexOf(zhiInYear)+1:yearToZhi(date.getFullYear());
-    // 提取月：找汉字月份
+
+    // 提取月（可能是汉字"三月"或数字"3"）
     const hanMonths={'正':1,'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'冬':11,'腊':12,'十一':11,'十二':12};
     let lunarMo=date.getMonth()+1;
-    // 匹配"X月"模式，X为汉字
-    const moMatch=fmt.match(/([正一二三四五六七八九十冬腊]|十[一二])月/);
-    if(moMatch){
-      lunarMo=hanMonths[moMatch[1]]||lunarMo;
-    }
-    // 提取日：汉字日期
-    const hanDays={'初一':1,'初二':2,'初三':3,'初四':4,'初五':5,'初六':6,'初七':7,'初八':8,'初九':9,'初十':10,
-      '十一':11,'十二':12,'十三':13,'十四':14,'十五':15,'十六':16,'十七':17,'十八':18,'十九':19,'二十':20,
-      '廿一':21,'廿二':22,'廿三':23,'廿四':24,'廿五':25,'廿六':26,'廿七':27,'廿八':28,'廿九':29,'三十':30};
+    const moHan=monthFmt.match(/([正一二三四五六七八九十冬腊]|十[一二])/);
+    if(moHan) lunarMo=hanMonths[moHan[1]]||lunarMo;
+    else{const n=parseInt(monthFmt);if(n>=1&&n<=12)lunarMo=n;}
+
+    // 提取日（可能是汉字"廿三"或数字"23"）
+    const dayMapArr=[
+      ['三十',30],['廿九',29],['廿八',28],['廿七',27],['廿六',26],['廿五',25],['廿四',24],['廿三',23],['廿二',22],['廿一',21],
+      ['二十',20],['十九',19],['十八',18],['十七',17],['十六',16],['十五',15],['十四',14],['十三',13],['十二',12],['十一',11],
+      ['初十',10],['初九',9],['初八',8],['初七',7],['初六',6],['初五',5],['初四',4],['初三',3],['初二',2],['初一',1]
+    ];
     let lunarD=date.getDate();
-    for(const[k,v] of Object.entries(hanDays)){
-      if(fmt.includes(k)){lunarD=v;break;}
-    }
+    let matched=false;
+    for(const[k,v] of dayMapArr){if(dayFmt.includes(k)){lunarD=v;matched=true;break;}}
+    if(!matched){const n=parseInt(dayFmt);if(n>=1&&n<=30)lunarD=n;}
+
+    console.log('解析结果: 年支='+lunarYearZhi+' 月='+lunarMo+' 日='+lunarD);
     return{month:lunarMo,day:lunarD,yearZhi:lunarYearZhi};
   }catch(e){
-    // 降级：用估算
+    console.error('农历解析失败:',e);
     const y=date.getFullYear(),m=date.getMonth()+1,d=date.getDate();
     return{month:solarToLunarMonth(y,m,d),day:d,yearZhi:yearToZhi(y)};
   }
