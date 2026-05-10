@@ -708,33 +708,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
 
-      <!-- 参考资料（折叠） -->
-      <div class="ref-group">
-        <div class="ref-toggle" onclick="toggleRef('ref-wuxing')">
-          <span>五行体用</span><span class="ref-arr" id="arr-ref-wuxing">›</span>
-        </div>
-        <div class="ref-body" id="ref-wuxing" style="display:none">
-          <div class="wuxing-section" style="border:none;border-radius:0;padding:14px 0 0;background:none;" id="wuxing-section"></div>
-        </div>
-      </div>
-
-      <div class="ref-group">
-        <div class="ref-toggle" onclick="toggleRef('ref-jiegua')">
-          <span>综合解卦</span><span class="ref-arr" id="arr-ref-jiegua">›</span>
-        </div>
-        <div class="ref-body" id="ref-jiegua" style="display:none">
-          <div class="jiegua-section" style="border:none;border-radius:0;padding:14px 0 0;background:none;">
-            <div class="jiegua-body">
-              <div class="jiegua-text" id="jiegua-text"></div>
-              <div class="verdict-row">
-                <div class="verdict-lbl">吉凶论断</div>
-                <div class="verdict-badge" id="verdict-badge"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="action-row">
         <button class="act-btn" onclick="saveAsImage()">📷 保存图片</button>
         <button class="act-btn primary" onclick="saveCase()">保存案例</button>
@@ -1422,6 +1395,7 @@ function renderWangInline(){
 
 /* ─── 五行渲染 ─── */
 function renderWuxing(){
+  if(!document.getElementById('wuxing-section'))return;
   const ben=guaData[0],bian=guaData[2];
   const tiI=BI[ben.uN],yongI=BI[ben.dN];
   const tiWx=tiI.wx,yongWx=yongI.wx;
@@ -1457,6 +1431,7 @@ function renderWuxing(){
 
 /* ─── 综合解卦渲染 ─── */
 function renderJiegua(){
+  if(!document.getElementById('jiegua-text'))return;
   const g=guaData[0];
   const info=guaInfo(g.uN,g.dN);
   const ui=BI[g.uN],di=BI[g.dN];
