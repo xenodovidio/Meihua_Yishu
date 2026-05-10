@@ -710,22 +710,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
       <!-- 参考资料（折叠） -->
       <div class="ref-group">
-        <div class="ref-toggle" onclick="toggleRef('ref-detail')">
-          <span>卦象详解</span><span class="ref-arr" id="arr-ref-detail">›</span>
-        </div>
-        <div class="ref-body" id="ref-detail" style="display:none">
-          <div class="detail-panel" style="border:none;border-radius:0;padding:16px 0 0;background:none;">
-            <div class="detail-tabs">
-              <button class="dtab active" onclick="switchTab('benGua',this)">本卦</button>
-              <button class="dtab" onclick="switchTab('huGua',this)">互卦</button>
-              <button class="dtab" onclick="switchTab('bianGua',this)">变卦</button>
-            </div>
-            <div class="detail-content" id="detail-content"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="ref-group">
         <div class="ref-toggle" onclick="toggleRef('ref-wuxing')">
           <span>五行体用</span><span class="ref-arr" id="arr-ref-wuxing">›</span>
         </div>
@@ -1248,6 +1232,8 @@ function switchTab(key,btn){
 }
 
 function renderDetail(){
+  const el=document.getElementById('detail-content');
+  if(!el)return; // 卦象详解已移除
   const g=guaData.find(x=>x.key===activeGuaKey);
   if(!g)return;
   const ui=BI[g.uN],di=BI[g.dN];
