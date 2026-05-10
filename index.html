@@ -25,20 +25,26 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .app{max-width:780px;margin:0 auto;position:relative;z-index:1;}
 
 /* ── 顶部导航 ── */
-.header{padding:18px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
+.header{padding:16px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
 .logo{display:flex;align-items:baseline;gap:10px;}
 .logo-zh{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
 .logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 4px;display:inline-block;}
 .logo-sub{font-size:11px;color:var(--ink4);letter-spacing:.15em;}
-.nav{display:flex;gap:4px;}
-.nav-btn{background:none;border:1px solid transparent;border-radius:5px;padding:6px 14px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;letter-spacing:.05em;}
-.nav-btn:hover{color:var(--ink);border-color:var(--paper3);}
-.nav-btn.active{color:var(--gold);border-color:var(--gold2);background:rgba(184,145,42,.06);}
+
+/* ── 底部 Dock ── */
+.dock{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(245,240,232,.96);backdrop-filter:blur(12px);border-top:1px solid var(--paper3);display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom);}
+.dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 8px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
+.dock-btn.active{color:var(--gold);}
+.dock-btn:hover{color:var(--ink2);}
+.dock-icon{width:22px;height:22px;flex-shrink:0;}
+
+/* 内容区底部留出 Dock 高度 */
+.app{max-width:780px;margin:0 auto;position:relative;z-index:1;padding-bottom:70px;}
 
 /* ── 视图切换 ── */
 .view{display:none;}.view.active{display:block;}
 /* 防止隐藏视图影响布局 */
-#view-result:not(.active),#view-guadian:not(.active),#view-records:not(.active),#view-qigua:not(.active){
+#view-result:not(.active),#view-qigua:not(.active){
   position:absolute;visibility:hidden;height:0;overflow:hidden;pointer-events:none;
 }
 
@@ -473,16 +479,41 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <span class="logo-dot"></span>
       <span class="logo-sub">PLUM BLOSSOM ORACLE</span>
     </div>
-    <nav class="nav">
-      <button class="nav-btn active" onclick="showView('qigua',this)">起卦</button>
-      <button class="nav-btn" onclick="showView('guadian',this)">卦典</button>
-      <button class="nav-btn" onclick="showView('records',this)">记录</button>
-    </nav>
   </header>
+
+  <!-- 底部 Dock 导航 -->
+  <nav class="dock">
+    <button class="dock-btn active" id="dock-qigua" onclick="showView('qigua',this)">
+      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="4" y1="7" x2="20" y2="7"/>
+        <line x1="4" y1="12" x2="12" y2="12"/>
+        <line x1="15" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="17" x2="20" y2="17"/>
+      </svg>
+      <span>起卦</span>
+    </button>
+    <button class="dock-btn" id="dock-guadian" onclick="showView('guadian',this)">
+      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="3" width="16" height="18" rx="2"/>
+        <line x1="8" y1="8" x2="16" y2="8"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+        <line x1="8" y1="16" x2="12" y2="16"/>
+      </svg>
+      <span>卦典</span>
+    </button>
+    <button class="dock-btn" id="dock-records" onclick="showView('records',this)">
+      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="15" x2="12" y2="16"/>
+      </svg>
+      <span>记录</span>
+    </button>
+  </nav>
 
   <!-- ══════════════════ 起卦视图 ══════════════════ -->
   <div class="view active" id="view-qigua">
-    <div class="qigua-wrap">
+    <div class="qigua-wrap" style="grid-template-columns:1fr;max-width:480px;margin:0 auto;">
 
       <!-- 左：问题 + 起卦方式 -->
       <div class="panel">
@@ -580,19 +611,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
 
-      <!-- 右：说明 + 按钮 -->
-      <div class="panel" style="display:flex;flex-direction:column;justify-content:space-between;">
-        <div>
-          <div class="panel-title">起卦简述</div>
-          <div class="desc-text">梅花易数，北宋邵雍所创。<br>以先天八卦数理，观天地万物之变化。<br><br>起卦时，心存所问之事，<br>万物皆可为卦，时间即是天机。</div>
-          <div class="divider"></div>
-          <div class="tips-list">
-            <div class="tip-item"><span class="tip-dot">◆</span><span>本卦：观当前整体形势</span></div>
-            <div class="tip-item"><span class="tip-dot">◆</span><span>互卦：察事物内在因缘</span></div>
-            <div class="tip-item"><span class="tip-dot">◆</span><span>变卦：知未来发展趋势</span></div>
-            <div class="tip-item"><span class="tip-dot">◆</span><span>用生体：有利；用克体：不利</span></div>
-          </div>
-        </div>
         <button class="qigua-btn" onclick="doQigua()">立 即 起 卦</button>
       </div>
 
@@ -916,9 +934,11 @@ function initNumHourSelects(){
 }
 function showView(v,btn){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
-  if(btn)btn.classList.add('active');
+  // 高亮对应dock按钮
+  const dockBtn=document.getElementById('dock-'+v);
+  if(dockBtn)dockBtn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(v==='guadian')renderGuadian();
   if(v==='records'){
@@ -928,8 +948,7 @@ function showView(v,btn){
 }
 
 function backToQigua(){
-  showView('qigua',document.querySelector('.nav-btn'));
-  document.querySelectorAll('.nav-btn')[0].classList.add('active');
+  showView('qigua');
 }
 
 /* ─── 起卦页逻辑 ─── */
