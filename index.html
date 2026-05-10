@@ -46,6 +46,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 #view-result:not(.active),#view-qigua:not(.active){
   position:fixed;visibility:hidden;height:0;overflow:hidden;pointer-events:none;top:0;left:-9999px;
 }
+#view-guadian,#view-records{margin-top:0;padding-top:0;}
+.guadian-wrap,.records-wrap{padding-top:16px;}
 
 /* Dock 安全区域 */
 .dock{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(245,240,232,.96);backdrop-filter:blur(12px);border-top:1px solid var(--paper3);display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom);}
@@ -895,10 +897,10 @@ function showView(v,btn){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
-  // 高亮对应dock按钮
   const dockBtn=document.getElementById('dock-'+v);
   if(dockBtn)dockBtn.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
   if(v==='guadian')renderGuadian();
   if(v==='records'){
     document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
