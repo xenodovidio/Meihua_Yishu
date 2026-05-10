@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.22</title>
+<title>梅花易数 v1.24</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -487,7 +487,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.23</span>
+      <span class="logo-ver">v1.24</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -1757,12 +1757,18 @@ function getTiyongRelation(tiGua,yongGua){
 
 function renderTiyong(tiKeyword,yongKeyword){
   const g=guaData[0];
-  const tiGuaN=tiyongSwapped?g.dN:g.uN;
-  const yongGuaN=tiyongSwapped?g.uN:g.dN;
+  const dong=g.dongIdx+1; // 1-6，动爻位置
+  // 动爻所在卦为用，另一个为体
+  const dongInUpper=dong>=4;
+  const tiGuaN=dongInUpper?g.dN:g.uN;   // 体=无动爻的卦
+  const yongGuaN=dongInUpper?g.uN:g.dN; // 用=有动爻的卦
   const tiGua=BI[tiGuaN],yongGua=BI[yongGuaN];
   const rel=getTiyongRelation(tiGuaN,yongGuaN);
 
-  // 旺衰信息
+  // 调转只换关键词描述
+  const displayTiKw=tiyongSwapped?(yongKeyword||'所问之事'):(tiKeyword||'问卦者');
+  const displayYongKw=tiyongSwapped?(tiKeyword||'问卦者'):(yongKeyword||'所问之事');
+
   const wang=getWangXiang();
   const tiStatus=getBaguaStatus(wang.key,tiGua.name);
   const yongStatus=getBaguaStatus(wang.key,yongGua.name);
@@ -1771,7 +1777,6 @@ function renderTiyong(tiKeyword,yongKeyword){
 
   document.getElementById('tiyong-section').style.display='flex';
 
-  // 旺相区
   document.getElementById('tiyong-wang').innerHTML=`
     <div class="tiyong-wang-circle ${WX_CLS[wang.wx]}">${wang.wx}</div>
     <div class="tiyong-wang-info">
@@ -1786,13 +1791,12 @@ function renderTiyong(tiKeyword,yongKeyword){
     </div>
   `;
 
-  // 体用卡片
   document.getElementById('tiyong-row').innerHTML=`
     <div class="tiyong-card ti">
       <div class="tiyong-card-label">体 · 主</div>
       <div class="tiyong-card-gua">${tiGua.name}</div>
       <div class="tiyong-card-attr">${tiGua.attr} · ${tiGua.wx}</div>
-      <div class="tiyong-card-keyword">${tiKeyword||'问卦者'}</div>
+      <div class="tiyong-card-keyword">${displayTiKw}</div>
     </div>
     <div class="tiyong-mid">
       <div class="tiyong-rel-text">${rel.text}</div>
@@ -1802,7 +1806,7 @@ function renderTiyong(tiKeyword,yongKeyword){
       <div class="tiyong-card-label">用 · 客</div>
       <div class="tiyong-card-gua">${yongGua.name}</div>
       <div class="tiyong-card-attr">${yongGua.attr} · ${yongGua.wx}</div>
-      <div class="tiyong-card-keyword">${yongKeyword||'所问之事'}</div>
+      <div class="tiyong-card-keyword">${displayYongKw}</div>
     </div>
   `;
 }
