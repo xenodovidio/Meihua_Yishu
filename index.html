@@ -31,6 +31,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 4px;display:inline-block;}
 .logo-sub{font-size:11px;color:var(--ink4);letter-spacing:.15em;}
 .logo-ver{font-size:11px;color:var(--ink4);letter-spacing:.05em;}
+.header-result{display:flex;align-items:center;gap:10px;width:100%;}
+.header-result-title{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink2);letter-spacing:.06em;}
+.header-result-meta{margin-left:auto;font-size:11px;color:var(--ink4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
 
 /* ── 底部 Dock ── */
 .dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 8px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
@@ -479,11 +482,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="app">
 
   <!-- ── 全局顶部 ── -->
-  <header class="header">
-    <div class="logo">
+  <header class="header" id="main-header">
+    <!-- 默认状态：Logo -->
+    <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.22</span>
+      <span class="logo-ver">v1.23</span>
+    </div>
+    <!-- 结果页状态：返回+卦名 -->
+    <div class="header-result" id="header-result" style="display:none">
+      <button class="back-btn" onclick="backToQigua()">← 重新起卦</button>
+      <div class="header-result-title" id="result-title">卦象解读</div>
+      <div class="header-result-meta" id="result-meta"></div>
     </div>
   </header>
 
@@ -625,11 +635,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <!-- ══════════════════ 结果视图 ══════════════════ -->
   <div class="view" id="view-result">
-    <div class="topbar-result">
-      <button class="back-btn" onclick="backToQigua()">← 重新起卦</button>
-      <div class="topbar-ttl" id="result-title">卦象解读</div>
-      <div class="topbar-meta" id="result-meta"></div>
-    </div>
     <div class="result-wrap">
       <!-- 问题条 -->
       <div class="question-bar">
@@ -911,6 +916,8 @@ function showView(v,btn){
 }
 
 function backToQigua(){
+  document.getElementById('header-logo').style.display='flex';
+  document.getElementById('header-result').style.display='none';
   showView('qigua');
 }
 
@@ -1094,11 +1101,16 @@ function doQigua(){
   resetInsight();
   document.getElementById('tiyong-section').style.display='none';
 
+  // 切换页眉到结果模式
+  document.getElementById('header-logo').style.display='none';
+  document.getElementById('header-result').style.display='flex';
+
   // 跳转结果页
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-result').classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('active'));
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
   // AI 自动分类（异步，不阻塞页面）
   aiAutoCategory(q);
   // 体用拆解（异步）
