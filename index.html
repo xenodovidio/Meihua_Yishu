@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.20</title>
+<title>梅花易数 v1.21</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -83,6 +83,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .method-icon{font-size:16px;display:block;margin-bottom:3px;}
 
 .num-input-row{display:flex;gap:8px;margin-bottom:8px;}
+.time-select{font-size:11px;padding:6px 2px;height:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-appearance:menulist;appearance:menulist;}
+.time-num{font-size:16px;height:40px;padding:6px 4px;text-align:center;}
+@media(max-width:400px){.time-select{font-size:10px;}.time-num{font-size:14px;}}
 /* 指定起卦 */
 .zhiding-wrap{display:flex;flex-direction:column;gap:10px;}
 .zhiding-lines{display:flex;flex-direction:column;gap:10px;}
@@ -480,7 +483,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.20</span>
+      <span class="logo-ver">v1.21</span>
     </div>
   </header>
 
@@ -536,21 +539,21 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
         <div id="method-time">
           <div class="time-display" id="time-display">正在读取当前时间…</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:8px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-top:8px;">
             <div class="num-col">
-              <select class="num-input" id="lunar-year" style="font-size:12px;padding:6px 4px;"></select>
+              <select class="num-input time-select" id="lunar-year"></select>
               <div class="num-label">年支</div>
             </div>
             <div class="num-col">
-              <input class="num-input" type="number" id="lunar-month" min="1" max="12" style="font-size:13px;">
+              <input class="num-input time-num" type="number" id="lunar-month" min="1" max="12">
               <div class="num-label">农历月</div>
             </div>
             <div class="num-col">
-              <input class="num-input" type="number" id="lunar-day" min="1" max="30" style="font-size:13px;">
+              <input class="num-input time-num" type="number" id="lunar-day" min="1" max="30">
               <div class="num-label">农历日</div>
             </div>
             <div class="num-col">
-              <select class="num-input" id="lunar-hour" style="font-size:12px;padding:6px 4px;"></select>
+              <select class="num-input time-select" id="lunar-hour"></select>
               <div class="num-label">时辰</div>
             </div>
           </div>
