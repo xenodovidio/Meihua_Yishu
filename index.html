@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.21</title>
+<title>梅花易数 v1.22</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -25,7 +25,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .app{max-width:780px;margin:0 auto;position:relative;z-index:1;padding-bottom:calc(65px + env(safe-area-inset-bottom,0px));}
 
 /* ── 顶部导航 ── */
-.header{padding:16px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:flex-start;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
+.header{padding:16px 24px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:flex-start;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
 .logo{display:flex;align-items:baseline;gap:10px;}
 .logo-zh{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
 .logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 4px;display:inline-block;}
@@ -48,8 +48,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .guadian-wrap,.records-wrap{padding-top:16px;}
 
 /* Dock 安全区域 */
-.dock{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(245,240,232,.96);backdrop-filter:blur(12px);border-top:1px solid var(--paper3);display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom,0px);}
-.dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 10px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
+.dock{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(245,240,232,.96);backdrop-filter:blur(12px);border-top:1px solid var(--paper3);display:flex;align-items:stretch;padding-bottom:calc(env(safe-area-inset-bottom,0px) * 0.5);}
+.dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 8px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
 /* ══════════════════════════════
    起卦视图
 ══════════════════════════════ */
@@ -483,7 +483,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.21</span>
+      <span class="logo-ver">v1.22</span>
     </div>
   </header>
 
