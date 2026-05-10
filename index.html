@@ -25,7 +25,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .app{max-width:780px;margin:0 auto;position:relative;z-index:1;}
 
 /* ── 顶部导航 ── */
-.header{padding:16px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
+.header{padding:16px 24px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:flex-start;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);}
 .logo{display:flex;align-items:baseline;gap:10px;}
 .logo-zh{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
 .logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 4px;display:inline-block;}
@@ -45,7 +45,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .view{display:none;}.view.active{display:block;}
 /* 防止隐藏视图影响布局 */
 #view-result:not(.active),#view-qigua:not(.active){
-  position:absolute;visibility:hidden;height:0;overflow:hidden;pointer-events:none;
+  position:fixed;visibility:hidden;height:0;overflow:hidden;pointer-events:none;top:-9999px;
 }
 
 /* ══════════════════════════════
@@ -441,6 +441,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ══════════════════════════════
    记录视图
 ══════════════════════════════ */
+.guadian-wrap{padding:24px;}
 .records-wrap{padding:24px;}
 .records-list{display:flex;flex-direction:column;gap:10px;}
 .record-item{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;overflow:hidden;transition:border-color .2s;}
