@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦</title>
+<title>梅花易数 · 习卦 v1.01</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦</div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.01</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -405,7 +405,7 @@ function renderQuestion(){
     `;
     optsEl.className='options-grid single';
     optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" onclick="selectAnswer(${JSON.stringify(o.val)},${JSON.stringify(q.answer)})">
+      <button class="option-btn" data-val="${o.label.replace(/"/g,'&quot;')}" onclick="selectTiyongAnswer(this)">
         <span>${o.label}</span>
       </button>
     `).join('');
@@ -447,6 +447,12 @@ function renderQuestion(){
   }
 }
 
+function selectTiyongAnswer(btn){
+  const val=btn.getAttribute('data-val');
+  const q=questions[currentIdx];
+  selectAnswer(val, q.answer);
+}
+
 /* ─── 选择答案 ─── */
 function selectAnswer(val,answer){
   const btns=document.querySelectorAll('.option-btn');
@@ -454,7 +460,9 @@ function selectAnswer(val,answer){
 
   const isCorrect=val===answer;
   btns.forEach(b=>{
-    const bVal=b.getAttribute('onclick').match(/'([^']+)'/)[1];
+    // 支持 data-val（体用题）和 onclick（其他题）两种方式
+    const bVal=b.getAttribute('data-val')||
+      (b.getAttribute('onclick')||'').match(/'([^']+)'/)?.[1]||'';
     if(bVal===answer)b.classList.add(isCorrect?'correct':'reveal');
     else if(bVal===val&&!isCorrect)b.classList.add('wrong');
   });
