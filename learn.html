@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.03</title>
+<title>梅花易数 · 习卦 v1.04</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.03</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.04</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -330,10 +330,77 @@ function genJixiongQ(){
   };
 }
 
+/* ─── 工具：爻线数组转八卦编号 ─── */
+function lines2num(ls){
+  const m={'y,y,y':1,'y,y,n':2,'y,n,y':3,'y,n,n':5,'n,n,y':4,'n,y,n':6,'n,y,y':7,'n,n,n':8};
+  return m[ls.join(',')]||1;
+}
+
+/* ─── 猜互卦题 ─── */
+function genHuGuaQ(){
+  // 随机取一个六十四卦
+  const g=GUA64[Math.floor(Math.random()*GUA64.length)];
+  const all=[...BL[g.d],...BL[g.u]]; // 初→上共6爻
+  // 互卦：2/3/4爻为下互，3/4/5爻为上互（index从0起，即all[1][2][3]和all[2][3][4]）
+  const huDL=[all[1],all[2],all[3]];
+  const huUL=[all[2],all[3],all[4]];
+  const huD=lines2num(huDL);
+  const huU=lines2num(huUL);
+  const huInfo=GUA64.find(x=>x.u===huU&&x.d===huD);
+  const huName=huInfo?huInfo.n:'未知卦';
+  // 错误选项：从64卦里随机取3个不同的
+  const others=GUA64.filter(x=>!(x.u===huU&&x.d===huD));
+  shuffle(others);
+  const wrongs=others.slice(0,3).map(x=>x.n);
+  const opts=shuffle([huName,...wrongs]);
+  return{
+    type:'hugua',
+    benGua:g,
+    all,huDL,huUL,huD,huU,
+    answer:huName,
+    options:opts.map(o=>({val:o,label:o})),
+    explain:`互卦取本卦第2、3、4爻组成下互卦（${BI[huD].name}），第3、4、5爻组成上互卦（${BI[huU].name}），合为${huName}。`,
+  };
+}
+
+/* ─── 猜变卦题 ─── */
+function genBianGuaQ(){
+  const g=GUA64[Math.floor(Math.random()*GUA64.length)];
+  const all=[...BL[g.d],...BL[g.u]];
+  // 随机一个动爻（0~5）
+  const dong=Math.floor(Math.random()*6);
+  const bAll=all.map((l,i)=>i===dong?(l==='y'?'n':'y'):l);
+  const bDL=bAll.slice(0,3);
+  const bUL=bAll.slice(3);
+  const bD=lines2num(bDL);
+  const bU=lines2num(bUL);
+  const bianInfo=GUA64.find(x=>x.u===bU&&x.d===bD);
+  const bianName=bianInfo?bianInfo.n:'未知卦';
+  const dongNames=['初','二','三','四','五','上'];
+  const others=GUA64.filter(x=>!(x.u===bU&&x.d===bD));
+  shuffle(others);
+  const wrongs=others.slice(0,3).map(x=>x.n);
+  const opts=shuffle([bianName,...wrongs]);
+  return{
+    type:'biangua',
+    benGua:g,
+    all,dong,bAll,bD,bU,
+    answer:bianName,
+    options:opts.map(o=>({val:o,label:o})),
+    explain:`第${dongNames[dong]}爻为动爻，${all[dong]==='y'?'阳爻变阴爻':'阴爻变阳爻'}，上卦变为${BI[bU].name}，下卦变为${BI[bD].name}，合为变卦${bianName}。`,
+  };
+}
+
 function genQuestions(mode,count=10){
   const qs=[];
   for(let i=0;i<count;i++){
-    if(mode==='recognize')qs.push(genRecognizeQ());
+    if(mode==='recognize'){
+      // 随机混合三种子题型
+      const r=Math.random();
+      if(r<0.34)qs.push(genRecognizeQ());
+      else if(r<0.67)qs.push(genHuGuaQ());
+      else qs.push(genBianGuaQ());
+    }
     else if(mode==='tiyong')qs.push(genTiyongQ());
     else qs.push(genJixiongQ());
   }
@@ -389,7 +456,37 @@ function renderQuestion(){
     `).join('');
   }
 
-  else if(q.type==='tiyong'){
+  else if(q.type==='hugua'||q.type==='biangua'){
+    const {benGua,all,dong}=q;
+    const dongNames=['初','二','三','四','五','上'];
+    const isHu=q.type==='hugua';
+    // 渲染6爻本卦
+    const linesHtml=all.map((l,i)=>{
+      const isDong=!isHu&&i===dong;
+      const cls=`yao-line ${l==='y'?'yang':'yin'}${isDong?' dong':''}`;
+      return`<div class="yao-row">
+        <div class="yao-num">${dongNames[i]}</div>
+        <div class="${cls}" style="width:50px"></div>
+        ${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}
+      </div>`;
+    }).join('');
+    qEl.innerHTML=`
+      <div class="quiz-q-label">${isHu?'看本卦，选出互卦':'看本卦和动爻，选出变卦'}</div>
+      <div class="quiz-gua-display">
+        <div class="quiz-gua-item">
+          <div class="quiz-gua-label">本卦：${benGua.n}</div>
+          <div class="yao-lines" style="gap:5px;margin-top:8px;">${linesHtml}</div>
+        </div>
+      </div>
+      <div class="quiz-hint">${isHu?'互卦：取第2、3、4爻为下卦，第3、4、5爻为上卦':`第${dongNames[dong]}爻为动爻（红色），阴阳互换后得变卦`}</div>
+    `;
+    optsEl.className='options-grid';
+    optsEl.innerHTML=q.options.map(o=>`
+      <button class="option-btn" onclick="selectAnswer('${o.val}','${q.answer}')">
+        <span>${o.label}</span>
+      </button>
+    `).join('');
+  }
     const {qText}=q;
     qEl.innerHTML=`
       <div class="quiz-q-label">判断体用关系</div>
