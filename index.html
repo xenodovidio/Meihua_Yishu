@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.24</title>
+<title>梅花易数 v1.25</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -131,7 +131,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ══════════════════════════════
    结果视图
 ══════════════════════════════ */
-.result-wrap{padding:20px;display:flex;flex-direction:column;gap:18px;}
+.result-wrap{padding:20px;padding-bottom:32px;display:flex;flex-direction:column;gap:18px;}
 
 .topbar-result{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--paper3);background:rgba(245,240,232,.96);position:sticky;top:61px;z-index:40;backdrop-filter:blur(6px);}
 .back-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;}
@@ -301,7 +301,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .v-bad{background:rgba(139,32,32,.08);color:var(--red);border:1px solid rgba(139,32,32,.25);}
 
 /* 操作行 */
-.action-row{display:flex;gap:10px;}
+.action-row{display:flex;gap:10px;margin-top:4px;}
 .act-btn{flex:1;background:none;border:1px solid var(--paper3);border-radius:8px;padding:11px;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;letter-spacing:.06em;}
 .act-btn:hover{border-color:var(--ink3);color:var(--ink);}
 .act-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);}
@@ -406,7 +406,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .ai-polish-use:hover{background:var(--ink2);}
 .ai-polish-keep{background:none;border:1px solid var(--paper3);border-radius:8px;padding:10px 16px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink4);cursor:pointer;transition:all .2s;}
 .ai-polish-keep:hover{border-color:var(--ink4);color:var(--ink);}
-.transcript-box--large{min-height:90px;font-size:14px;line-height:2.3;}
+.transcript-box--large{min-height:60px;font-size:14px;line-height:2.0;}
 .insight-saved-text{font-size:14px;line-height:2.4;color:var(--ink);}
 .mic-toggle-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--paper3);border-radius:20px;padding:7px 16px;cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
 .mic-toggle-btn:hover{border-color:var(--gold2);}
@@ -487,7 +487,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.24</span>
+      <span class="logo-ver">v1.25</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
