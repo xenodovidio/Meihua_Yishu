@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.08</title>
+<title>梅花易数 · 习卦 v1.09</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.08</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.09</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -330,18 +330,17 @@ function genJixiongQ(){
   };
 }
 
-/* ─── 工具：爻线数组转八卦编号 ─── */
+/* ─── 工具：爻线数组转八卦编号（初→上顺序，与BL一致）─── */
 function lines2num(ls){
-  // BL中爻线顺序为从上到下（上爻→初爻）
   const m={
-    'y,y,y':1, // 乾
-    'y,y,n':2, // 兑
-    'y,n,y':3, // 离
-    'y,n,n':4, // 震
-    'n,y,y':5, // 巽
-    'n,y,n':6, // 坎
-    'n,n,y':7, // 艮
-    'n,n,n':8, // 坤
+    'y,y,y':1, // 乾：初阳二阳三阳
+    'y,y,n':2, // 兑：初阳二阳三阴
+    'y,n,y':3, // 离：初阳二阴三阳
+    'y,n,n':4, // 震：初阳二阴三阴
+    'n,y,y':5, // 巽：初阴二阳三阳
+    'n,y,n':6, // 坎：初阴二阳三阴
+    'n,n,y':7, // 艮：初阴二阴三阳
+    'n,n,n':8, // 坤：初阴二阴三阴
   };
   return m[ls.join(',')]||1;
 }
@@ -349,11 +348,11 @@ function lines2num(ls){
 /* ─── 猜互卦题 ─── */
 function genHuGuaQ(){
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  // BL顺序是上→下，转成初→上：各自reverse后拼接
-  const all=[...BL[g.d].slice().reverse(),...BL[g.u].slice().reverse()];
-  // 互卦：2,3,4爻为下互，3,4,5爻为上互（index从0起）
-  const huDL=[all[1],all[2],all[3]].slice().reverse(); // 转回上→下给lines2num
-  const huUL=[all[2],all[3],all[4]].slice().reverse();
+  // BL已经是初→上顺序，直接拼接
+  const all=[...BL[g.d],...BL[g.u]];
+  // 互卦：index 1,2,3为下互；index 2,3,4为上互
+  const huDL=[all[1],all[2],all[3]];
+  const huUL=[all[2],all[3],all[4]];
   const huD=lines2num(huDL);
   const huU=lines2num(huUL);
   const huInfo=GUA64.find(x=>x.u===huU&&x.d===huD);
@@ -365,7 +364,7 @@ function genHuGuaQ(){
   return{
     type:'hugua',
     benGua:g,
-    all,huDL,huUL,huD,huU,
+    all,huD,huU,
     answer:huName,
     options:opts.map(o=>({val:o,label:o})),
     explain:`互卦取本卦第2、3、4爻组成下互卦（${BI[huD].name}），第3、4、5爻组成上互卦（${BI[huU].name}），合为${huName}。`,
@@ -375,12 +374,12 @@ function genHuGuaQ(){
 /* ─── 猜变卦题 ─── */
 function genBianGuaQ(){
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  const all=[...BL[g.d].slice().reverse(),...BL[g.u].slice().reverse()];
+  const all=[...BL[g.d],...BL[g.u]];
   const dong=Math.floor(Math.random()*6);
   const bAll=all.map((l,i)=>i===dong?(l==='y'?'n':'y'):l);
-  // 转回上→下给lines2num
-  const bDL=bAll.slice(0,3).slice().reverse();
-  const bUL=bAll.slice(3).slice().reverse();
+  // 下卦=index 0-2，上卦=index 3-5，BL是初→上所以需要reverse给lines2num
+  const bDL=bAll.slice(0,3);
+  const bUL=bAll.slice(3);
   const bD=lines2num(bDL);
   const bU=lines2num(bUL);
   const bianInfo=GUA64.find(x=>x.u===bU&&x.d===bD);
