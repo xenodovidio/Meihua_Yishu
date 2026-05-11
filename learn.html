@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.09</title>
+<title>梅花易数 · 习卦 v1.10</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.09</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.10</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -154,6 +154,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="mode-desc">看爻线图形，猜出对应的卦名和属性</div>
       </div>
       <div class="mode-badge">入门</div>
+    </div>
+
+    <div class="mode-card" onclick="startMode('xiang')">
+      <div class="mode-icon">🌿</div>
+      <div class="mode-info">
+        <div class="mode-name">万物类象</div>
+        <div class="mode-desc">根据卦象选类象，或根据事物找对应的卦</div>
+      </div>
+      <div class="mode-badge mid">进阶</div>
     </div>
 
     <div class="mode-card" onclick="startMode('tiyong')">
@@ -224,6 +233,73 @@ function yaoLines(uL,dL,dongIdx,size=1){
     if(l==='y') return`<div class="yao-row"><div class="yao-line yang${isDong?' dong':''}" style="width:${w}px"></div>${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}</div>`;
     return`<div class="yao-row"><div class="yao-line yin${isDong?' dong':''}" style="width:${w}px"></div>${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}</div>`;
   }).join('')}</div>`;
+}
+
+/* ─── 万物类象数据 ─── */
+const BAGUA_XIANG={
+  1:{name:'乾',xiang:{自然:['天','太阳','冰雹','西北风'],人物:['父亲','君王','老人','领导','男性长辈'],身体:['头','骨骼','肺','大肠'],动物:['马','龙','狮子','象'],器物:['金属器具','圆形器物','钟表','镜子','帽子'],场所:['天空','宫殿','政府机关'],特性:['刚健','圆形','坚硬'],方位:['西北']}},
+  2:{name:'兑',xiang:{自然:['湖泊','沼泽','雨水','秋天'],人物:['少女','歌手','演员','律师'],身体:['口','舌','牙齿','咽喉'],动物:['羊','兔','水鸟'],器物:['刀剪','乐器','饮食器具'],场所:['湖边','沼泽地','娱乐场所'],特性:['喜悦','缺口','口才好'],方位:['西']}},
+  3:{name:'离',xiang:{自然:['太阳','火','闪电','夏天','彩虹'],人物:['中女','文人','美女'],身体:['眼睛','心脏','血液'],动物:['雉（野鸡）','龟','蟹'],器物:['灯具','电器','书籍','文件'],场所:['南方','图书馆','电视台'],特性:['光明','美丽','中空'],方位:['南']}},
+  4:{name:'震',xiang:{自然:['雷','地震','春天'],人物:['长男','军人','运动员'],身体:['足','肝','胆'],动物:['龙','蛇','鹰'],器物:['乐器','鼓','车辆','电话'],场所:['森林','马路','车站'],特性:['震动','突发','声音大'],方位:['东']}},
+  5:{name:'巽',xiang:{自然:['风','空气','木材'],人物:['长女','商人','旅行者'],身体:['股（大腿）','气管','神经'],动物:['鸡','蛇','蜈蚣'],器物:['绳索','纸张','通讯工具','飞机'],场所:['花园','机场','市场'],特性:['柔顺','细长','弯曲'],方位:['东南']}},
+  6:{name:'坎',xiang:{自然:['水','雨','河流','冬天','月亮'],人物:['中男','盗贼','渔夫'],身体:['耳','肾','膀胱','脊椎'],动物:['猪','鱼','水中生物'],器物:['水桶','酒瓶','轮胎'],场所:['水边','地下室','暗处','井'],特性:['险陷','弯曲','流动','黑暗'],方位:['北']}},
+  7:{name:'艮',xiang:{自然:['山','丘陵','土地'],人物:['少男','僧侣','守卫'],身体:['手','背','鼻','脾','胃'],动物:['狗','牛','鼠','虎'],器物:['石头','砖瓦','家具','门'],场所:['山地','仓库','厕所'],特性:['静止','厚重','阻隔'],方位:['东北']}},
+  8:{name:'坤',xiang:{自然:['大地','土壤','平原'],人物:['母亲','老女性','农民'],身体:['腹部','脾','胃','肉'],动物:['牛','蚂蚁','蚯蚓'],器物:['布匹','方形器物','陶器'],场所:['平地','田野','农村'],特性:['柔顺','宽厚','众多'],方位:['西南']}},
+};
+
+/* ─── 卦→类象题 ─── */
+function genXiangFromGuaQ(){
+  const n=Math.floor(Math.random()*8)+1;
+  const info=BI[n];
+  const xiang=BAGUA_XIANG[n].xiang;
+  // 随机选一个类别
+  const cats=Object.keys(xiang);
+  const cat=cats[Math.floor(Math.random()*cats.length)];
+  const items=xiang[cat];
+  // 正确答案：随机取一个类象
+  const correct=items[Math.floor(Math.random()*items.length)];
+  // 错误选项：从其他卦的同类别里取，或随机类别
+  const wrongPool=[];
+  Object.entries(BAGUA_XIANG).forEach(([k,v])=>{
+    if(Number(k)!==n){
+      const w=v.xiang[cat]||Object.values(v.xiang).flat();
+      wrongPool.push(...w);
+    }
+  });
+  const wrongs=shuffle([...new Set(wrongPool)].filter(x=>!items.includes(x))).slice(0,3);
+  const opts=shuffle([correct,...wrongs]);
+  return{
+    type:'xiang_from_gua',
+    guaNum:n,
+    lines:BL[n],
+    cat,
+    answer:correct,
+    options:opts.map(o=>({val:o,label:o})),
+    explain:`${info.name}卦（${info.attr}·${info.wx}）在"${cat}"类象中包含：${items.join('、')}等。`,
+  };
+}
+
+/* ─── 类象→卦题 ─── */
+function genGuaFromXiangQ(){
+  const n=Math.floor(Math.random()*8)+1;
+  const info=BI[n];
+  const xiang=BAGUA_XIANG[n].xiang;
+  const cats=Object.keys(xiang);
+  const cat=cats[Math.floor(Math.random()*cats.length)];
+  const items=xiang[cat];
+  const item=items[Math.floor(Math.random()*items.length)];
+  // 错误选项：其他3个卦
+  const others=Object.keys(BI).map(Number).filter(k=>k!==n);
+  shuffle(others);
+  const wrongs=others.slice(0,3);
+  const opts=shuffle([n,...wrongs]);
+  return{
+    type:'gua_from_xiang',
+    item,cat,
+    options:opts.map(k=>({val:String(k),label:BI[k].name,sub:`${BI[k].attr}·${BI[k].wx}`})),
+    explain:`"${item}"属于${info.name}卦（${info.attr}·${info.wx}）的"${cat}"类象。${info.name}卦还包含：${items.filter(x=>x!==item).slice(0,3).join('、')}等。`,
+    answer:String(n),
+  };
 }
 
 /* ─── 题目生成 ─── */
@@ -403,11 +479,14 @@ function genQuestions(mode,count=10){
   const qs=[];
   for(let i=0;i<count;i++){
     if(mode==='recognize'){
-      // 随机混合三种子题型
       const r=Math.random();
-      if(r<0.34)qs.push(genRecognizeQ());
-      else if(r<0.67)qs.push(genHuGuaQ());
-      else qs.push(genBianGuaQ());
+      if(r<0.25)qs.push(genRecognizeQ());
+      else if(r<0.50)qs.push(genHuGuaQ());
+      else if(r<0.75)qs.push(genBianGuaQ());
+      else qs.push(Math.random()<0.5?genXiangFromGuaQ():genGuaFromXiangQ());
+    }
+    else if(mode==='xiang'){
+      qs.push(Math.random()<0.5?genXiangFromGuaQ():genGuaFromXiangQ());
     }
     else if(mode==='tiyong')qs.push(genTiyongQ());
     else qs.push(genJixiongQ());
@@ -426,7 +505,7 @@ function startMode(mode){
     document.getElementById('mode-view').style.display='none';
     document.getElementById('result-view').classList.remove('active');
     document.getElementById('quiz-view').classList.add('active');
-    const labels={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断'};
+    const labels={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断',xiang:'万物类象'};
     document.getElementById('mode-label').textContent=labels[mode];
     document.getElementById('q-total').textContent=questions.length;
     renderQuestion();
@@ -501,7 +580,41 @@ function renderQuestion(){
     `).join('');
   }
 
-  else if(q.type==='tiyong'){
+  else if(q.type==='xiang_from_gua'){
+    const linesHtml=q.lines.map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:44px"></div><div style="width:10px"></div></div>`).join('');
+    qEl.innerHTML=`
+      <div class="quiz-q-label">看卦象，选出对应的${q.cat}类象</div>
+      <div class="quiz-gua-display">
+        <div class="quiz-gua-item">
+          <div class="yao-lines" style="gap:5px">${linesHtml}</div>
+          <div class="quiz-gua-name">${BI[q.guaNum].name}</div>
+          <div class="quiz-gua-attr">${BI[q.guaNum].attr}·${BI[q.guaNum].wx}</div>
+        </div>
+      </div>
+      <div class="quiz-hint">从以下选项中选出属于此卦「${q.cat}」的类象</div>
+    `;
+    optsEl.className='options-grid';
+    optsEl.innerHTML=q.options.map(o=>`
+      <button class="option-btn" data-val="${o.val.replace(/"/g,'&quot;')}" onclick="selectTiyongAnswer(this)">
+        <span>${o.label}</span>
+      </button>
+    `).join('');
+  }
+
+  else if(q.type==='gua_from_xiang'){
+    qEl.innerHTML=`
+      <div class="quiz-q-label">根据类象，选出对应的卦</div>
+      <div class="quiz-question-text" style="font-size:18px;text-align:center;padding:16px 0;font-weight:500;">「${q.item}」</div>
+      <div class="quiz-hint">以上事物属于哪个卦的「${q.cat}」类象？</div>
+    `;
+    optsEl.className='options-grid';
+    optsEl.innerHTML=q.options.map(o=>`
+      <button class="option-btn" data-val="${o.val}" onclick="selectTiyongAnswer(this)">
+        <span>${o.label}</span>
+        <span class="option-sub">${o.sub}</span>
+      </button>
+    `).join('');
+  }
     const {qText}=q;
     qEl.innerHTML=`
       <div class="quiz-q-label">判断体用关系</div>
