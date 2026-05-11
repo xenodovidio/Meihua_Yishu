@@ -246,33 +246,61 @@ function genRecognizeQ(){
   };
 }
 
+/* ─── 固定体用题库 ─── */
+const TIYONG_BANK=[
+  {q:"女方问：认识一个男生，相处了一段时间，想知道他对我有没有意思",answer:"男方为上卦（用），女方为下卦（体）",explain:"男上女下，女方问卦，自己（女）对应下卦为体，男方对应上卦为用。"},
+  {q:"男方问：喜欢一个女生，表白了但她说要考虑，想知道她会不会答应",answer:"男方为上卦（体），女方为下卦（用）",explain:"男上女下，男方问卦，自己（男）对应上卦为体，女方对应下卦为用。"},
+  {q:"女方问：和男友异地恋两年了，感觉他最近态度变冷淡，想知道他是否还爱我",answer:"男方为上卦（用），女方为下卦（体）",explain:"男上女下，女方问卦，自己对应下卦为体，男友对应上卦为用。"},
+  {q:"男方问：和女友吵架冷战了一周，想知道她现在是什么心情，会不会先低头",answer:"男方为上卦（体），女方为下卦（用）",explain:"男上女下，男方问卦，自己（男）对应上卦为体，女友对应下卦为用。"},
+  {q:"女方问：公司来了个新男同事，对我很好，不知道他是真心还是逢场作戏",answer:"男方为上卦（体），女方为下卦（用）",explain:"男上女下，问题焦点是男方本身的真实心意，男方对应上卦为体，女方对应下卦为用。"},
+  {q:"女方问：相亲对象条件不错，家里催着定下来，不知道这段婚姻合不合适",answer:"男方为上卦（用），女方为下卦（体）",explain:"男上女下，女方问自身婚姻走向，自己对应下卦为体，男方对应上卦为用。"},
+  {q:"男方问：和女友谈了三年，想确认她是否是合适的结婚对象",answer:"男方为上卦（体），女方为下卦（用）",explain:"男上女下，男方问自身婚姻决策，自己对应上卦为体，女方对应下卦为用。"},
+  {q:"女方问：婚后发现丈夫有些事情瞒着我，想知道他是否忠诚",answer:"男方为上卦（体），女方为下卦（用）",explain:"男上女下，问题焦点是丈夫本身的忠诚状态，丈夫对应上卦为体，妻子对应下卦为用。"},
+  {q:"男方问：和妻子感情出现裂痕，想知道这段婚姻还能不能继续",answer:"男方为上卦（体），女方为下卦（用）",explain:"男上女下，男方问自身婚姻走向，自己（男）对应上卦为体，妻子对应下卦为用。"},
+  {q:"女方问：考虑离婚，但担心孩子，想知道离婚后自己的生活会怎样",answer:"男方为上卦（用），女方为下卦（体）",explain:"男上女下，女方问自身未来状态，自己对应下卦为体，外部变化对应上卦为用。"},
+  {q:"手里有一笔闲钱，朋友推荐了一个私募基金，不知道这个基金靠不靠谱",answer:"基金为体，你为用",explain:"问题焦点是「基金本身靠不靠谱」，基金是锚点；你投不投是后续决定，为用。"},
+  {q:"最近做生意一直亏损，想知道近期财运如何，何时能好转",answer:"你为体，财运状态为用",explain:"问自身财运走向，你是主体；财运变化是作用在你身上的外部变量，你为体。"},
+  {q:"看上了一套商铺准备投资，不确定这个位置的商业价值如何",answer:"商铺为体，你为用",explain:"商铺是不动产，永远是体。问题焦点是「商铺本身的商业价值」，商铺为锚点，你为用。"},
+  {q:"手里同时有三个投资机会：股票、黄金、房产，纠结选哪个",answer:"你为体，投资标的为用",explain:"问题焦点是「哪种投资对你最有利」，你是不变的主体；三种投资是供你选择的变量，你为体。"},
+  {q:"借给朋友一笔钱，约定的还款日期快到了，不知道他能不能按时还",answer:"朋友为体，你为用",explain:"问题焦点是朋友的还款能力和意愿，朋友是锚点；你在等待和判断，为用。"},
+  {q:"投了简历参加一家大厂的面试，不知道这次能不能通过",answer:"你为体，面试结果为用",explain:"你是行动主体；面试结果是外部反馈，是作用在你身上的变量，你为体。"},
+  {q:"公司来了个新领导，风格和前任完全不同，不知道他对我的印象如何",answer:"新领导为体，你为用",explain:"问题焦点是新领导本身的态度和风格，领导是锚点；你在观察和适应，为用。"},
+  {q:"手头有两个工作机会，一个薪资高但不稳定，一个稳定但薪资低，纠结选哪个",answer:"你为体，两个工作机会为用",explain:"你是不变的主体；两个机会是供你选择的变量，你为体，工作为用。"},
+  {q:"准备自己创业开店，不知道这个时机合不合适",answer:"你为体，创业时机为用",explain:"你是行动主体；时机和外部环境是影响你的变量，你为体。"},
+  {q:"和合伙人一起做生意，最近感觉他有些异动，不知道他是否想单干",answer:"合伙人为体，你为用",explain:"问题焦点是合伙人的真实想法，对方是锚点；你在判断和应对，为用。"},
+  {q:"最近经常头痛、失眠，去医院检查没查出什么，想问问近期身体状况",answer:"你为体，健康状态为用",explain:"问自身健康状况，你是主体；身体症状是作用在你身上的变量，你为体。"},
+  {q:"家里老母亲最近经常咳嗽，医院检查结果还没出来，想问问她的病情",answer:"老母亲为体，你为用",explain:"问题焦点是老母亲本身的健康状态，老母亲是锚点；你在关心和应对，为用。"},
+  {q:"朋友介绍了一位中医，说很厉害，想知道这位医生靠不靠谱",answer:"医生为体，你为用",explain:"问题焦点是医生本身的医术和可信度，医生是锚点；你去不去看是后续行动，为用。"},
+  {q:"准备做一个手术，医生说风险不大，但心里还是担心，想问问手术结果",answer:"你为体，手术结果为用",explain:"你是主体；手术是外部事件，是作用在你身上的变量，你为体。"},
+  {q:"最近压力很大，担心自己身体垮掉，想问问接下来一段时间的健康运",answer:"你为体，健康运势为用",explain:"问自身健康走向，你是主体，外部健康运势是影响你的变量，你为体。"},
+  {q:"参加了研究生考试，成绩刚出来过了笔试，不知道复试能不能顺利",answer:"你为体，复试结果为用",explain:"你是行动主体；复试结果是外部反馈，你为体。"},
+  {q:"孩子马上要高考，不知道这次能不能发挥正常，考上理想的学校",answer:"孩子为体，你为用",explain:"问题焦点是孩子的考试状态和结果，孩子是锚点；你在担心和祈望，为用。"},
+  {q:"申请了几所国外大学，不知道哪所学校会录取我",answer:"你为体，各学校为用",explain:"你是主体；各学校是外部评判方，是影响你的变量，你为体，学校为用。"},
+  {q:"选了一门网课，花了不少钱，不知道这门课的内容是否真的有价值",answer:"网课为体，你为用",explain:"问题焦点是网课本身的质量和价值，网课是锚点；你学不学是后续变化，为用。"},
+  {q:"论文快到提交截止日期了，导师还没给反馈，不知道能不能顺利通过",answer:"你为体，论文审核结果为用",explain:"你是主体；导师审核是外部影响，你为体。"},
+  {q:"路边摊买了一块石头，摊主说是天然水晶，想知道是真是假",answer:"石头（水晶）为体，你为用",explain:"问题焦点是石头本身真不真，石头是固定锚点；你买不买是后续行动，为用。"},
+  {q:"朋友送了一块玉佩，不知道这块玉对我合不合，戴上有没有好处",answer:"玉佩为体，你为用",explain:"问题焦点是玉佩本身的气场和属性，玉佩是锚点；你戴不戴是后续变化，为用。"},
+  {q:"看中一辆二手车，价格合适，但不知道这辆车有没有暗病",answer:"车为体，你为用",explain:"问题焦点是车本身有没有问题，车是固定锚点；你买不买是后续行动，为用。"},
+  {q:"祖传了一批古玩，有人出价要收，不知道该不该卖",answer:"古玩为体，你为用",explain:"问题焦点是古玩本身的价值，古玩是锚点；你卖不卖是后续决定，为用。"},
+  {q:"家里装修好了，想知道这套房子的整体风水格局如何",answer:"房子为体，你为用",explain:"不动产永远是体。问题焦点是房子本身的风水，房子是固定锚点，你为用。"},
+  {q:"和朋友合伙开公司，最近有个外部投资人表示有兴趣，不知道这个人靠不靠谱",answer:"投资人为体，你为用",explain:"问题焦点是投资人本身的可信度，投资人是锚点；你接不接受投资是后续决定，为用。"},
+  {q:"和一个朋友闹了矛盾，想知道他是否真的在意这段友情",answer:"朋友为体，你为用",explain:"问题焦点是朋友对友情的态度，朋友是锚点；你在观察和等待，为用。"},
+  {q:"公司内部竞争升职，同时有三个候选人，想知道我能不能升上去",answer:"你为体，升职结果为用",explain:"你是主体；竞争结果是外部影响，你为体。"},
+  {q:"想知道某个人说的一件事是否是真的，他说的话能不能信",answer:"对方为体，你为用",explain:"问题焦点是对方本身的诚信状态，对方是锚点；你信不信是后续判断，为用。"},
+  {q:"出门在外遇到一个算命先生，他说我近期有劫难，不知道是真是假",answer:"算命先生为体，你为用",explain:"问题焦点是算命先生本身靠不靠谱，算命先生是锚点；你信不信是后续行动，为用。"},
+];
+
 function genTiyongQ(){
-  // 随机一个六十四卦
-  const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  const uInfo=BI[g.u],dInfo=BI[g.d];
-  // 随机问题类型
-  const qTypes=[
-    {q:'问感情婚姻',ti:'下卦',reason:'感情之事以自身为主，下卦代表问卦者（体）'},
-    {q:'问求职事业',ti:'下卦',reason:'主动求职，以自身为主，下卦为体'},
-    {q:'问对方意向',ti:'上卦',reason:'问对方则以对方为主，上卦代表对方（体）'},
-    {q:'问合作项目',ti:'上卦',reason:'合作以对方条件为主，上卦为体'},
-    {q:'问自身健康',ti:'下卦',reason:'问自身状况，下卦代表问卦者（体）'},
-  ];
-  const qt=qTypes[Math.floor(Math.random()*qTypes.length)];
-  const correctTi=qt.ti==='下卦'?g.d:g.u;
-  const wrongTi=qt.ti==='下卦'?g.u:g.d;
-  const opts=shuffle([
-    {val:'xia',label:'下卦为体',sub:`${dInfo.name}（${dInfo.attr}·${dInfo.wx}）`},
-    {val:'shang',label:'上卦为体',sub:`${uInfo.name}（${uInfo.attr}·${uInfo.wx}）`},
-  ]);
-  const answerVal=qt.ti==='下卦'?'xia':'shang';
+  const item=TIYONG_BANK[Math.floor(Math.random()*TIYONG_BANK.length)];
+  const wrongOpts=["你为体，对方为用","对方为体，你为用","上卦为体，下卦为用","下卦为体，上卦为用","物件为体，你为用"];
+  const wrongs=shuffle(wrongOpts.filter(o=>o!==item.answer)).slice(0,3);
+  const opts=shuffle([item.answer,...wrongs]);
   return{
     type:'tiyong',
-    g,uInfo,dInfo,
-    qText:qt.q,
-    answer:answerVal,
-    options:opts,
-    explain:qt.reason+`。本卦为${g.n}，上卦${uInfo.name}（${uInfo.wx}），下卦${dInfo.name}（${dInfo.wx}）。`
+    qText:item.q,
+    answer:item.answer,
+    options:opts.map(o=>({val:o,label:o})),
+    explain:item.explain,
   };
 }
 
@@ -369,35 +397,16 @@ function renderQuestion(){
   }
 
   else if(q.type==='tiyong'){
-    const {g,uInfo,dInfo,qText}=q;
+    const {qText}=q;
     qEl.innerHTML=`
       <div class="quiz-q-label">判断体用关系</div>
-      <div class="quiz-gua-display">
-        <div class="quiz-gua-item">
-          <div class="quiz-gua-label">上卦</div>
-          <div class="yao-lines" style="gap:5px">
-            ${BL[g.u].map(l=>`<div class="yao-row"><div class="yao-line ${l}" style="width:44px"></div></div>`).join('')}
-          </div>
-          <div class="quiz-gua-name">${uInfo.name}</div>
-          <div class="quiz-gua-attr">${uInfo.attr}·${uInfo.wx}</div>
-        </div>
-        <div style="font-size:22px;color:var(--ink4);align-self:center;padding-bottom:20px;">⊕</div>
-        <div class="quiz-gua-item">
-          <div class="quiz-gua-label">下卦</div>
-          <div class="yao-lines" style="gap:5px">
-            ${BL[g.d].map(l=>`<div class="yao-row"><div class="yao-line ${l}" style="width:44px"></div></div>`).join('')}
-          </div>
-          <div class="quiz-gua-name">${dInfo.name}</div>
-          <div class="quiz-gua-attr">${dInfo.attr}·${dInfo.wx}</div>
-        </div>
-      </div>
-      <div class="quiz-question-text">所问：<strong>${qText}</strong></div>
+      <div class="quiz-question-text" style="font-size:15px;line-height:2;margin-top:8px;">${qText}</div>
+      <div class="quiz-hint" style="margin-top:12px;">核心原则：以不动的为体，动的为用</div>
     `;
-    optsEl.className='options-grid';
+    optsEl.className='options-grid single';
     optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" onclick="selectAnswer('${o.val}','${q.answer}')">
+      <button class="option-btn" onclick="selectAnswer(${JSON.stringify(o.val)},${JSON.stringify(q.answer)})">
         <span>${o.label}</span>
-        <span class="option-sub">${o.sub}</span>
       </button>
     `).join('');
   }
