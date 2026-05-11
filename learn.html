@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.06</title>
+<title>梅花易数 · 习卦 v1.08</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.06</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.08</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -332,23 +332,32 @@ function genJixiongQ(){
 
 /* ─── 工具：爻线数组转八卦编号 ─── */
 function lines2num(ls){
-  const m={'y,y,y':1,'y,y,n':2,'y,n,y':3,'y,n,n':5,'n,n,y':4,'n,y,n':6,'n,y,y':7,'n,n,n':8};
+  // BL中爻线顺序为从上到下（上爻→初爻）
+  const m={
+    'y,y,y':1, // 乾
+    'y,y,n':2, // 兑
+    'y,n,y':3, // 离
+    'y,n,n':4, // 震
+    'n,y,y':5, // 巽
+    'n,y,n':6, // 坎
+    'n,n,y':7, // 艮
+    'n,n,n':8, // 坤
+  };
   return m[ls.join(',')]||1;
 }
 
 /* ─── 猜互卦题 ─── */
 function genHuGuaQ(){
-  // 随机取一个六十四卦
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  const all=[...BL[g.d],...BL[g.u]]; // 初→上共6爻
-  // 互卦：2/3/4爻为下互，3/4/5爻为上互（index从0起，即all[1][2][3]和all[2][3][4]）
-  const huDL=[all[1],all[2],all[3]];
-  const huUL=[all[2],all[3],all[4]];
+  // BL顺序是上→下，转成初→上：各自reverse后拼接
+  const all=[...BL[g.d].slice().reverse(),...BL[g.u].slice().reverse()];
+  // 互卦：2,3,4爻为下互，3,4,5爻为上互（index从0起）
+  const huDL=[all[1],all[2],all[3]].slice().reverse(); // 转回上→下给lines2num
+  const huUL=[all[2],all[3],all[4]].slice().reverse();
   const huD=lines2num(huDL);
   const huU=lines2num(huUL);
   const huInfo=GUA64.find(x=>x.u===huU&&x.d===huD);
   const huName=huInfo?huInfo.n:'未知卦';
-  // 错误选项：从64卦里随机取3个不同的
   const others=GUA64.filter(x=>!(x.u===huU&&x.d===huD));
   shuffle(others);
   const wrongs=others.slice(0,3).map(x=>x.n);
@@ -366,12 +375,12 @@ function genHuGuaQ(){
 /* ─── 猜变卦题 ─── */
 function genBianGuaQ(){
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  const all=[...BL[g.d],...BL[g.u]];
-  // 随机一个动爻（0~5）
+  const all=[...BL[g.d].slice().reverse(),...BL[g.u].slice().reverse()];
   const dong=Math.floor(Math.random()*6);
   const bAll=all.map((l,i)=>i===dong?(l==='y'?'n':'y'):l);
-  const bDL=bAll.slice(0,3);
-  const bUL=bAll.slice(3);
+  // 转回上→下给lines2num
+  const bDL=bAll.slice(0,3).slice().reverse();
+  const bUL=bAll.slice(3).slice().reverse();
   const bD=lines2num(bDL);
   const bU=lines2num(bUL);
   const bianInfo=GUA64.find(x=>x.u===bU&&x.d===bD);
@@ -465,12 +474,12 @@ function renderQuestion(){
     const {benGua,all,dong}=q;
     const dongNames=['初','二','三','四','五','上'];
     const isHu=q.type==='hugua';
-    // 渲染6爻本卦
+    // all是初→上，yao-lines用column-reverse，所以直接传入即可正确显示上→下
     const linesHtml=all.map((l,i)=>{
       const isDong=!isHu&&i===dong;
       const cls=`yao-line ${l==='y'?'yang':'yin'}${isDong?' dong':''}`;
       return`<div class="yao-row">
-        <div class="yao-num">${dongNames[i]}</div>
+        <div class="yao-num" style="width:14px;text-align:right;font-size:10px;color:var(--ink4);font-family:'Noto Serif SC',serif;">${dongNames[i]}</div>
         <div class="${cls}" style="width:50px"></div>
         ${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}
       </div>`;
