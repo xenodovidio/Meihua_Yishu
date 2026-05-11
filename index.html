@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.32</title>
+<title>梅花易数 v1.33</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -487,7 +487,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.32</span>
+      <span class="logo-ver">v1.33</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -667,6 +667,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <!-- 三卦图 -->
       <div class="trigrams-section" id="trigrams-section"></div>
+      <!-- 详情面板 -->
+      <div class="detail-panel" id="detail-panel">
+        <div class="detail-tabs">
+          <button class="dtab active" onclick="switchTab('benGua',this)">本卦详解</button>
+          <button class="dtab" onclick="switchTab('huGua',this)">互卦详解</button>
+          <button class="dtab" onclick="switchTab('bianGua',this)">变卦详解</button>
+        </div>
+        <div class="detail-content" id="detail-content"></div>
+      </div>
+      <!-- 五行体用 -->
+      <div id="wuxing-section"></div>
+      <!-- 综合解卦 -->
+      <div class="jiegua-section">
+        <div class="section-title">综合解卦</div>
+        <div class="jiegua-body">
+          <div class="jiegua-text" id="jiegua-text"></div>
+          <div class="verdict-row">
+            <div class="verdict-lbl">吉凶论断</div>
+            <div class="verdict-badge" id="verdict-badge"></div>
+          </div>
+        </div>
+      </div>
       <!-- 体用关系（含旺衰） -->
       <div class="tiyong-section" id="tiyong-section" style="display:none">
         <div class="tiyong-header">
