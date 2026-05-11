@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.37</title>
+<title>梅花易数 v1.39</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -392,6 +392,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
    卦典视图
 ══════════════════════════════ */
 .page-title{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink2);margin-bottom:18px;letter-spacing:.06em;}
+.header-page-title{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
 .guadian-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;}
 .gua-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:8px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;}
 .gua-card:hover{border-color:var(--gold2);background:rgba(184,145,42,.06);transform:translateY(-1px);}
@@ -457,7 +458,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.37</span>
+      <span class="logo-ver">v1.39</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -465,6 +466,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="header-result-title" id="result-title">卦象解读</div>
       <div class="header-result-meta" id="result-meta"></div>
     </div>
+    <!-- 卦典/记录页标题 -->
+    <div class="header-page-title" id="header-page-title" style="display:none"></div>
   </header>
 
 <div class="app">
@@ -699,7 +702,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <!-- ══════════════════ 卦典视图 ══════════════════ -->
   <div class="view" id="view-guadian">
     <div class="guadian-wrap">
-      <div class="page-title">六十四卦典</div>
       <div class="guadian-grid" id="guadian-grid"></div>
     </div>
   </div>
@@ -707,7 +709,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <!-- ══════════════════ 记录视图 ══════════════════ -->
   <div class="view" id="view-records">
     <div class="records-wrap">
-      <div class="page-title">起卦记录</div>
       <div class="category-tabs" id="category-tabs">
         <button class="cat-tab active" onclick="filterRecords('全部',this)">全部</button>
         <button class="cat-tab" onclick="filterRecords('事业',this)">事业</button>
@@ -879,6 +880,23 @@ function showView(v,btn){
   if(dockBtn)dockBtn.classList.add('active');
   document.documentElement.scrollTop=0;
   document.body.scrollTop=0;
+
+  // header 상태 전환
+  const pageTitles={guadian:'六十四卦典',records:'起卦记录'};
+  const logo=document.getElementById('header-logo');
+  const result=document.getElementById('header-result');
+  const pageTitle=document.getElementById('header-page-title');
+  if(pageTitles[v]){
+    logo.style.display='none';
+    result.style.display='none';
+    pageTitle.textContent=pageTitles[v];
+    pageTitle.style.display='block';
+  } else if(v==='qigua'){
+    logo.style.display='flex';
+    result.style.display='none';
+    pageTitle.style.display='none';
+  }
+
   if(v==='guadian')renderGuadian();
   if(v==='records'){
     document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
@@ -889,6 +907,7 @@ function showView(v,btn){
 function backToQigua(){
   document.getElementById('header-logo').style.display='flex';
   document.getElementById('header-result').style.display='none';
+  document.getElementById('header-page-title').style.display='none';
   showView('qigua');
 }
 
