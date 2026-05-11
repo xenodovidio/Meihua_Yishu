@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.01</title>
+<title>梅花易数 · 习卦 v1.02</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.01</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.02</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -369,23 +369,16 @@ function renderQuestion(){
   const optsEl=document.getElementById('options-grid');
 
   if(q.type==='recognize'){
+    const lines=q.lines;
+    const linesHtml=lines.map(l=>`<div class="yao-row"><div class="yao-line ${l}" style="width:50px"></div><div style="width:10px"></div></div>`).join('');
     qEl.innerHTML=`
       <div class="quiz-q-label">看爻线，选出对应的卦名</div>
       <div class="quiz-gua-display">
         <div class="quiz-gua-item">
-          ${yaoLines(BL[q.answer].slice(0,3),BL[q.answer].slice(0,3),-1)}
+          <div class="yao-lines" style="gap:5px">${linesHtml}</div>
         </div>
       </div>
       <div class="quiz-hint">提示：从下往上数，阳爻（实线）= 奇数，阴爻（断线）= 偶数</div>
-    `;
-    // 用单卦爻线显示
-    const lines=q.lines;
-    qEl.querySelector('.quiz-gua-display').innerHTML=`
-      <div class="quiz-gua-item">
-        <div class="yao-lines" style="gap:5px">
-          ${lines.map(l=>`<div class="yao-row"><div class="yao-line ${l}" style="width:50px"></div><div style="width:10px"></div></div>`).join('')}
-        </div>
-      </div>
     `;
     optsEl.className='options-grid';
     optsEl.innerHTML=q.options.map(o=>`
