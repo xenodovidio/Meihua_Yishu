@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.33</title>
+<title>梅花易数 v1.34</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -235,13 +235,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .bagua-tags{display:flex;gap:5px;margin-top:7px;}
 .bagua-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(237,231,216,.9);color:var(--ink3);border:1px solid var(--paper3);}
 
-/* 详情面板 */
-.detail-panel{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;animation:fadeUp .3s ease;}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.detail-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--paper3);}
-.dtab{background:none;border:none;border-bottom:2px solid transparent;padding:6px 16px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink4);cursor:pointer;transition:all .2s;margin-bottom:-1px;letter-spacing:.04em;}
-.dtab.active{color:var(--gold);border-bottom-color:var(--gold);}
-.detail-content{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.2;}
 
 /* 旺相内联条 */
 .wang-inline{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:8px;flex-wrap:wrap;}
@@ -273,27 +268,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .wang-tag{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);font-family:'Noto Serif SC',serif;}
 .wang-tag.rel-good{background:rgba(45,110,90,.06);border-color:rgba(45,110,90,.25);color:var(--jade);}
 .wang-tag.rel-bad{background:rgba(139,32,32,.05);border-color:rgba(139,32,32,.2);color:var(--red);}
-.wuxing-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
-.section-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.section-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0;}
-.wx-flow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
-.wx-node{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.wx-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;border:1.5px solid;}
-.wx-lbl{font-size:11px;color:var(--ink4);}
-.wx-arr{font-size:18px;color:var(--ink4);margin-bottom:14px;}
-.wx-jin{background:rgba(184,145,42,.1);border-color:rgba(184,145,42,.4);color:var(--gold);}
-.wx-mu{background:rgba(45,110,90,.1);border-color:rgba(45,110,90,.35);color:var(--jade);}
-.wx-shui{background:rgba(30,60,100,.08);border-color:rgba(30,60,100,.3);color:#1e3c64;}
-.wx-huo{background:rgba(139,32,32,.08);border-color:rgba(139,32,32,.3);color:var(--red);}
-.wx-tu{background:rgba(100,80,40,.08);border-color:rgba(100,80,40,.28);color:#64501f;}
-.relation-card{flex:1;min-width:160px;background:rgba(245,240,232,.8);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--ink2);line-height:1.9;font-family:'Noto Serif SC',serif;}
-.rel-good{color:var(--jade);}
-.rel-bad{color:var(--red);}
-
-/* 解卦 */
-.jiegua-section{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:20px;}
-.jiegua-body{border-left:3px solid var(--gold2);padding-left:16px;}
-.jiegua-text{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);line-height:2.5;letter-spacing:.04em;margin-bottom:14px;}
+/* 解卦吉凶标签（卦典弹窗使用） */
 .verdict-row{display:flex;align-items:center;gap:10px;}
 .verdict-lbl{font-size:12px;color:var(--ink4);}
 .verdict-badge{font-family:'Noto Serif SC',serif;font-size:13px;padding:4px 16px;border-radius:20px;font-weight:500;}
@@ -487,7 +462,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.33</span>
+      <span class="logo-ver">v1.34</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -667,28 +642,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
       <!-- 三卦图 -->
       <div class="trigrams-section" id="trigrams-section"></div>
-      <!-- 详情面板 -->
-      <div class="detail-panel" id="detail-panel">
-        <div class="detail-tabs">
-          <button class="dtab active" onclick="switchTab('benGua',this)">本卦详解</button>
-          <button class="dtab" onclick="switchTab('huGua',this)">互卦详解</button>
-          <button class="dtab" onclick="switchTab('bianGua',this)">变卦详解</button>
-        </div>
-        <div class="detail-content" id="detail-content"></div>
-      </div>
-      <!-- 五行体用 -->
-      <div id="wuxing-section"></div>
-      <!-- 综合解卦 -->
-      <div class="jiegua-section">
-        <div class="section-title">综合解卦</div>
-        <div class="jiegua-body">
-          <div class="jiegua-text" id="jiegua-text"></div>
-          <div class="verdict-row">
-            <div class="verdict-lbl">吉凶论断</div>
-            <div class="verdict-badge" id="verdict-badge"></div>
-          </div>
-        </div>
-      </div>
       <!-- 体用关系（含旺衰） -->
       <div class="tiyong-section" id="tiyong-section" style="display:none">
         <div class="tiyong-header">
@@ -1110,9 +1063,7 @@ function doQigua(){
   document.getElementById('q-tag').textContent=methodLabel[currentMethod];
 
   renderTrigrams();
-  renderDetail();
-  renderWuxing();
-  renderJiegua();
+  // renderDetail/renderWuxing/renderJiegua 已移除
 
   // 暂存记录到内存（点保存案例时才写云端）
   const category=autoCategory(q); // 先用关键词占位
@@ -1227,51 +1178,6 @@ function renderTrigrams(){
 function selectGua(key){
   activeGuaKey=key;
   renderTrigrams();
-  renderDetail();
-  // 同步tab
-  document.querySelectorAll('.dtab').forEach((b,i)=>{
-    const keys=['benGua','huGua','bianGua'];
-    b.classList.toggle('active',keys[i]===key);
-  });
-}
-
-/* ─── 详情渲染 ─── */
-function switchTab(key,btn){
-  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  activeGuaKey=key;
-  renderTrigrams();
-  renderDetail();
-}
-
-function renderDetail(){
-  const el=document.getElementById('detail-content');
-  if(!el)return; // 卦象详解已移除
-  const g=guaData.find(x=>x.key===activeGuaKey);
-  if(!g)return;
-  const ui=BI[g.uN],di=BI[g.dN];
-  const info=guaInfo(g.uN,g.dN);
-  const tipMap={
-    benGua:'本卦由起卦数直接推得，反映当前整体形势，是解读的核心主体。',
-    huGua:'互卦取本卦二三四五爻组成，揭示事物发展的内在原因与过程。',
-    bianGua:'变卦为动爻变化后所得之卦，预示事物未来的发展方向与结果。'
-  };
-  document.getElementById('detail-content').innerHTML=`
-    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;">
-      ${yaoLines(g.uL,g.dL,g.dongIdx,true)}
-      <div style="flex:1;">
-        <div style="font-size:19px;font-weight:700;font-family:'Noto Serif SC',serif;margin-bottom:4px;">${guaName(g.uN,g.dN)}</div>
-        <div style="font-size:12px;color:var(--ink4);margin-bottom:10px;">${info.dc}</div>
-        <div style="font-size:12px;color:var(--ink3);line-height:1.9;background:rgba(245,240,232,.7);padding:10px 12px;border-radius:6px;">${tipMap[activeGuaKey]}</div>
-        <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;">
-          <span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);">上 ${ui.name}（${ui.attr}·${ui.wx}·${ui.nat}）</span>
-          <span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(237,231,216,.9);border:1px solid var(--paper3);color:var(--ink3);">下 ${di.name}（${di.attr}·${di.wx}·${di.nat}）</span>
-          ${g.dongIdx>=0?`<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(139,32,32,.07);border:1px solid rgba(139,32,32,.2);color:var(--red);">第${g.dongIdx+1}爻动</span>`:''}
-        </div>
-      </div>
-    </div>
-    <div style="font-size:13px;color:var(--ink2);line-height:2.3;border-top:1px solid var(--paper3);padding-top:12px;">${info.jg||`此卦${ui.attr}在上、${di.attr}在下，${ui.wx}与${di.wx}相合，当审时度势，顺势而为。`}</div>
-  `;
 }
 
 /* ─── 八卦旺衰表 ─── */
@@ -1431,58 +1337,6 @@ function renderWangInline(){
       </div>
     </div>
   `;
-}
-
-/* ─── 五行渲染 ─── */
-function renderWuxing(){
-  if(!document.getElementById('wuxing-section'))return;
-  const ben=guaData[0],bian=guaData[2];
-  const tiI=BI[ben.uN],yongI=BI[ben.dN];
-  const tiWx=tiI.wx,yongWx=yongI.wx;
-  let rel='',relCls='';
-  if(WX_SHENG[yongWx]===tiWx){rel=`用生体：${yongI.name}（${yongWx}）生${tiI.name}（${tiWx}），用卦生助体卦，事较有利，多有贵人相助。`;relCls='rel-good';}
-  else if(WX_SHENG[tiWx]===yongWx){rel=`体生用：${tiI.name}（${tiWx}）生${yongI.name}（${yongWx}），体卦耗泄于用卦，付出较多，收获相对较少。`;}
-  else if(WX_KE[yongWx]===tiWx){rel=`用克体：${yongI.name}（${yongWx}）克${tiI.name}（${tiWx}），用卦克制体卦，事不顺遂，需格外谨慎应对。`;relCls='rel-bad';}
-  else if(WX_KE[tiWx]===yongWx){rel=`体克用：${tiI.name}（${tiWx}）克${yongI.name}（${yongWx}），体卦克制用卦，主动有力，所问之事可成。`;relCls='rel-good';}
-  else{rel=`体用比和：${tiWx}与${yongWx}同类，两者平衡，事情平稳发展，无大起伏。`;}
-
-  const bUI=BI[bian.uN],bDI=BI[bian.dN];
-  const bianNote=WX_SHENG[bUI.wx]===tiWx||WX_SHENG[bDI.wx]===tiWx?'变卦有生助体卦之象，未来趋势向好，前景可期。':'变卦与体卦关系一般，未来仍需持续努力，把握变化。';
-
-  document.getElementById('wuxing-section').innerHTML=`
-    <div class="section-title">体用五行分析</div>
-    <div class="wx-flow">
-      <div class="wx-node">
-        <div class="wx-circle ${WX_CLS[tiWx]}">${tiI.name}</div>
-        <div class="wx-lbl">体卦·${tiWx}</div>
-      </div>
-      <div class="wx-arr">⇌</div>
-      <div class="wx-node">
-        <div class="wx-circle ${WX_CLS[yongWx]}">${yongI.name}</div>
-        <div class="wx-lbl">用卦·${yongWx}</div>
-      </div>
-      <div class="relation-card"><span class="${relCls}">${rel}</span></div>
-    </div>
-    <div style="font-size:12px;color:var(--ink4);line-height:1.9;background:rgba(245,240,232,.6);padding:10px 12px;border-radius:6px;">
-      变卦五行：${bUI.name}（${bUI.wx}）·${bDI.name}（${bDI.wx}），${bianNote}
-    </div>
-  `;
-}
-
-/* ─── 综合解卦渲染 ─── */
-function renderJiegua(){
-  if(!document.getElementById('jiegua-text'))return;
-  const g=guaData[0];
-  const info=guaInfo(g.uN,g.dN);
-  const ui=BI[g.uN],di=BI[g.dN];
-  const huG=guaData[1],bianG=guaData[2];
-  document.getElementById('jiegua-text').textContent=info.jg||
-    `所得${guaName(g.uN,g.dN)}，${ui.attr}在上，${di.attr}在下。互卦为${guaName(huG.uN,huG.dN)}，揭示内在缘由；变卦为${guaName(bianG.uN,bianG.dN)}，示未来走向。动爻在第${g.dongIdx+1}爻，此为变动之机，宜顺势而为，把握时机。`;
-  const vd=info.vd||'平';
-  const vcls={'大吉':'v-good','吉':'v-good','平':'v-mid','险':'v-bad','凶':'v-bad'};
-  const vb=document.getElementById('verdict-badge');
-  vb.textContent=vd;
-  vb.className='verdict-badge '+(vcls[vd]||'v-mid');
 }
 
 function copyResult(){
