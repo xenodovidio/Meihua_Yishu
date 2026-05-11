@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.11</title>
+<title>梅花易数 · 习卦 v1.12</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.11</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.12</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -389,15 +389,15 @@ function genJixiongQ(){
   const tiWx=tiInfo.wx,yongWx=yongInfo.wx;
   let rel='',answer='',explain='';
   if(WX_SHENG[yongWx]===tiWx){rel='用生体';answer='good';explain=`用卦${yongInfo.name}（${yongWx}）生体卦${tiInfo.name}（${tiWx}），用生体，所问之事有贵人相助，较为有利。`;}
-  else if(WX_SHENG[tiWx]===yongWx){rel='体生用';answer='mid';explain=`体卦${tiInfo.name}（${tiWx}）生用卦${yongInfo.name}（${yongWx}），体生用，付出较多，收获相对较少，需量力而行。`;}
+  else if(WX_SHENG[tiWx]===yongWx){rel='体生用';answer='bad';explain=`体卦${tiInfo.name}（${tiWx}）生用卦${yongInfo.name}（${yongWx}），体生用，体卦泄气于用卦，付出多收获少，属小凶，不利。`;}
   else if(WX_KE[yongWx]===tiWx){rel='用克体';answer='bad';explain=`用卦${yongInfo.name}（${yongWx}）克体卦${tiInfo.name}（${tiWx}），用克体，所问之事受阻，需谨慎应对。`;}
   else if(WX_KE[tiWx]===yongWx){rel='体克用';answer='good';explain=`体卦${tiInfo.name}（${tiWx}）克用卦${yongInfo.name}（${yongWx}），体克用，主动有力，所问之事可成。`;}
   else{rel='体用比和';answer='mid';explain=`体卦${tiInfo.name}与用卦${yongInfo.name}同属${tiWx}，比和平衡，事情平稳，无大起伏。`;}
 
   const opts=shuffle([
     {val:'good',label:'有利',sub:'用生体 或 体克用'},
-    {val:'bad',label:'不利',sub:'用克体'},
-    {val:'mid',label:'平稳',sub:'体生用 或 比和'},
+    {val:'bad',label:'不利',sub:'用克体 或 体生用'},
+    {val:'mid',label:'平稳',sub:'比和'},
   ]);
   return{
     type:'jixiong',
@@ -655,7 +655,7 @@ function renderQuestion(){
         </div>
       </div>
       <div class="quiz-question-text">五行关系：<strong>${tiWx} vs ${yongWx}</strong></div>
-      <div class="quiz-hint">用生体/体克用→有利，用克体→不利，体生用/比和→平稳</div>
+      <div class="quiz-hint">用生体/体克用→有利，用克体/体生用→不利，比和→平稳</div>
     `;
     optsEl.className='options-grid';
     optsEl.innerHTML=q.options.map(o=>`
