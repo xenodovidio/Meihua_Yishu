@@ -88,7 +88,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .bagua-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
 .bagua-cell{background:rgba(245,240,232,.8);border:1px solid var(--paper3);border-radius:10px;padding:10px 6px;text-align:center;}
 .bagua-cell.highlight{border-color:var(--gold2);background:rgba(184,145,42,.07);}
-.bc-lines{display:flex;flex-direction:column;gap:4px;align-items:center;margin-bottom:6px;}
+.bc-lines{display:flex;flex-direction:column-reverse;gap:4px;align-items:center;margin-bottom:6px;}
 .bc-line{height:5px;border-radius:2px;}
 .bc-yang{width:36px;background:var(--ink2);}
 .bc-yin{width:36px;display:flex;gap:5px;}
@@ -168,7 +168,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <a class="back-btn" href="learn.html">← 返回</a>
-  <div class="header-title">学习之旅</div>
+  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.00</span></div>
   <div class="heart-row">
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
@@ -569,33 +569,30 @@ function renderQuiz(q) {
   const isGuaOpt = q.type === 'name2lines' || q.type === 'attr2gua' || q.type === 'xiang2gua';
 
   if (q.type === 'name2lines') {
-    // 选项是爻线图
     optsHtml = `<div class="opts">${q.opts.map(n => {
       const lHtml = BL[n].map(l =>
         `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px;height:5px;"></div></div>`
       ).join('');
-      return `<button class="opt-btn" data-val="${n}" onclick="selectOpt(this,'${q.answer}','${getExplain(q)}')">
+      return `<button class="opt-btn" data-val="${n}" data-answer="${q.answer}" data-explain="${getExplain(q).replace(/"/g,'&quot;')}" onclick="selectOpt(this)">
         <div class="yao-lines" style="gap:4px;pointer-events:none;">${lHtml}</div>
         <span class="opt-sub">${BI[n].name}</span>
       </button>`;
     }).join('')}</div>`;
   } else if (q.type === 'attr2gua' || q.type === 'xiang2gua') {
-    // 选项是卦名+爻线
     optsHtml = `<div class="opts">${q.opts.map(n => {
       const lHtml = BL[n].map(l =>
         `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px;height:5px;"></div></div>`
       ).join('');
-      return `<button class="opt-btn" data-val="${n}" onclick="selectOpt(this,${q.answer},'${getExplain(q)}')">
+      return `<button class="opt-btn" data-val="${n}" data-answer="${q.answer}" data-explain="${getExplain(q).replace(/"/g,'&quot;')}" onclick="selectOpt(this)">
         <div class="yao-lines" style="gap:4px;pointer-events:none;">${lHtml}</div>
         <span class="opt-sub">${BI[n].name}（${BI[n].attr}）</span>
       </button>`;
     }).join('')}</div>`;
   } else {
-    // 文字选项
     optsHtml = `<div class="opts ${q.opts.length<=2?'single':''}">${q.opts.map(o => {
       const val = typeof o === 'number' ? o : o;
       const label = typeof o === 'number' ? BI[o].name : o;
-      return `<button class="opt-btn" data-val="${val}" onclick="selectOpt(this,'${q.answer}','${getExplain(q)}')">${label}</button>`;
+      return `<button class="opt-btn" data-val="${val}" data-answer="${q.answer}" data-explain="${getExplain(q).replace(/"/g,'&quot;')}" onclick="selectOpt(this)">${label}</button>`;
     }).join('')}</div>`;
   }
 
@@ -623,11 +620,13 @@ function getExplain(q) {
 }
 
 /* ── 选择答案 ── */
-function selectOpt(btn, answer, explain) {
+function selectOpt(btn) {
+  const val = btn.getAttribute('data-val');
+  const answer = btn.getAttribute('data-answer');
+  const explain = btn.getAttribute('data-explain');
   const btns = document.querySelectorAll('.opt-btn');
   btns.forEach(b => b.disabled = true);
 
-  const val = btn.getAttribute('data-val');
   const isCorrect = String(val) === String(answer);
   const explainBox = document.getElementById('explain-box');
 
