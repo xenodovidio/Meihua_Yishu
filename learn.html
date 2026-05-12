@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.12</title>
+<title>梅花易数 · 习卦 v1.13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -135,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <header class="header">
   <div class="header-left">
     <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.12</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.13</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -146,6 +146,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="mode-view" id="mode-view">
     <div class="mode-header">选择练习</div>
     <div class="mode-sub">通过互动练习，熟悉八卦与梅花易数的基础知识</div>
+
+    <div class="mode-card" onclick="window.location.href='journey.html'" style="border-color:var(--gold);background:rgba(184,145,42,.07);">
+      <div class="mode-icon">🗺️</div>
+      <div class="mode-info">
+        <div class="mode-name">学习之旅</div>
+        <div class="mode-desc">从零开始，系统学习梅花易数基础知识</div>
+      </div>
+      <div class="mode-badge" style="background:rgba(139,32,32,.07);color:var(--red);border-color:rgba(139,32,32,.2);">新</div>
+    </div>
 
     <div class="mode-card" onclick="startMode('recognize')">
       <div class="mode-icon">☰</div>

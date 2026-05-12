@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>梅花易数 · 学习之旅 v1.00</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
+  --paper:#f5f0e8;--paper2:#ede7d8;--paper3:#e0d8c8;
+  --gold:#b8912a;--gold2:#d4aa4a;--red:#8b2020;--jade:#2d6e5a;
+  --jade2:#3d8a6e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 12% 15%,rgba(184,145,42,.07) 0%,transparent 45%),radial-gradient(ellipse at 88% 85%,rgba(139,32,32,.05) 0%,transparent 45%);pointer-events:none;z-index:0;}
+
+/* ── Header ── */
+.header{padding:16px 20px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(8px);}
+.back-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;}
+.back-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.header-title{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);letter-spacing:.08em;}
+.heart-row{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--red);}
+.heart{font-size:16px;transition:transform .2s;}
+.heart.lost{opacity:.25;filter:grayscale(1);}
+
+/* ── 主体 ── */
+.main{max-width:520px;margin:0 auto;padding:calc(68px + env(safe-area-inset-top,0px)) 20px calc(40px + env(safe-area-inset-bottom,0px));}
+
+/* ══ 地图视图 ══ */
+.map-view{display:block;}
+.map-chapter{margin-bottom:32px;}
+.chapter-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink4);letter-spacing:.15em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.chapter-title::after{content:'';flex:1;height:1px;background:var(--paper3);}
+
+.lessons-path{display:flex;flex-direction:column;align-items:center;gap:0;}
+.lesson-node{display:flex;flex-direction:column;align-items:center;position:relative;width:100%;}
+.path-line{width:2px;height:24px;background:var(--paper3);}
+.path-line.done{background:var(--jade);}
+
+.lesson-btn{width:100%;max-width:340px;background:rgba(237,231,216,.7);border:2px solid var(--paper3);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s;position:relative;}
+.lesson-btn:hover:not(.locked){transform:translateY(-1px);border-color:var(--gold2);}
+.lesson-btn.done{border-color:var(--jade);background:rgba(45,110,90,.06);}
+.lesson-btn.active{border-color:var(--gold);background:rgba(184,145,42,.07);box-shadow:0 4px 16px rgba(184,145,42,.15);}
+.lesson-btn.locked{opacity:.5;cursor:default;}
+
+.lesson-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.lesson-btn.done .lesson-icon{background:rgba(45,110,90,.12);}
+.lesson-btn.active .lesson-icon{background:rgba(184,145,42,.12);}
+.lesson-btn.locked .lesson-icon{background:rgba(176,168,158,.15);}
+
+.lesson-info{flex:1;}
+.lesson-name{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:3px;}
+.lesson-desc{font-size:12px;color:var(--ink4);line-height:1.6;}
+.lesson-status{font-size:11px;flex-shrink:0;}
+.status-done{color:var(--jade);}
+.status-active{color:var(--gold);}
+.status-lock{color:var(--ink4);}
+
+.stars-row{display:flex;gap:2px;margin-top:4px;}
+.star{font-size:11px;color:var(--paper3);}
+.star.lit{color:var(--gold);}
+
+/* ══ 关卡视图 ══ */
+.lesson-view{display:none;}
+.lesson-view.active{display:block;}
+
+/* 进度条 */
+.lesson-progress{margin-bottom:20px;}
+.lp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.lp-label{font-size:12px;color:var(--ink4);}
+.lp-count{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);}
+.lp-bar{height:6px;background:var(--paper3);border-radius:3px;overflow:hidden;}
+.lp-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--jade2));border-radius:3px;transition:width .5s ease;}
+
+/* 讲解卡 */
+.teach-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:14px;padding:24px;margin-bottom:16px;animation:fadeUp .35s ease;}
+.teach-icon{font-size:32px;margin-bottom:12px;}
+.teach-title{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5;}
+.teach-body{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);line-height:2.3;}
+.teach-body strong{color:var(--gold);font-weight:500;}
+.teach-body .red{color:var(--red);}
+.teach-body .jade{color:var(--jade);}
+
+/* 八卦展示 */
+.bagua-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
+.bagua-cell{background:rgba(245,240,232,.8);border:1px solid var(--paper3);border-radius:10px;padding:10px 6px;text-align:center;}
+.bagua-cell.highlight{border-color:var(--gold2);background:rgba(184,145,42,.07);}
+.bc-lines{display:flex;flex-direction:column;gap:4px;align-items:center;margin-bottom:6px;}
+.bc-line{height:5px;border-radius:2px;}
+.bc-yang{width:36px;background:var(--ink2);}
+.bc-yin{width:36px;display:flex;gap:5px;}
+.bc-yin::before,.bc-yin::after{content:'';display:block;height:5px;flex:1;background:var(--ink2);border-radius:2px;}
+.bc-name{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink);}
+.bc-attr{font-size:10px;color:var(--ink4);margin-top:2px;}
+
+/* 讲解继续按钮 */
+.teach-next{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:10px;padding:14px;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.1em;transition:all .2s;margin-top:8px;}
+.teach-next:hover{background:var(--ink2);}
+
+/* 练习题 */
+.quiz-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:14px;padding:20px;margin-bottom:16px;animation:fadeUp .35s ease;}
+.quiz-label{font-size:11px;color:var(--ink4);letter-spacing:.12em;margin-bottom:10px;}
+.quiz-q{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);line-height:1.9;margin-bottom:14px;}
+.quiz-gua-show{display:flex;justify-content:center;margin:12px 0;}
+.yao-lines{display:flex;flex-direction:column-reverse;gap:5px;align-items:center;}
+.yao-row{display:flex;align-items:center;gap:5px;}
+.yao-line{height:6px;border-radius:3px;}
+.yang{width:52px;background:var(--ink2);}
+.yin{width:52px;display:flex;gap:8px;}
+.yin::before,.yin::after{content:'';display:block;height:6px;flex:1;background:var(--ink2);border-radius:3px;}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.opts.single{grid-template-columns:1fr;}
+.opt-btn{background:rgba(245,240,232,.8);border:1.5px solid var(--paper3);border-radius:10px;padding:13px 12px;font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);cursor:pointer;transition:all .2s;text-align:center;line-height:1.5;}
+.opt-btn:hover:not(:disabled){border-color:var(--gold2);background:rgba(184,145,42,.06);}
+.opt-btn.correct{border-color:var(--jade);background:rgba(45,110,90,.08);color:var(--jade);}
+.opt-btn.wrong{border-color:var(--red);background:rgba(139,32,32,.05);color:var(--red);}
+.opt-btn.reveal{border-color:var(--jade);background:rgba(45,110,90,.04);}
+.opt-btn:disabled{cursor:default;}
+.opt-sub{font-size:11px;color:var(--ink4);display:block;margin-top:2px;}
+
+/* 解析 */
+.explain-box{background:rgba(245,240,232,.8);border-left:3px solid var(--gold2);border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;animation:fadeUp .3s ease;display:none;}
+.explain-box.show{display:block;}
+.explain-result{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.er-icon{font-size:18px;}
+.er-text{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;}
+.er-text.ok{color:var(--jade);}
+.er-text.ng{color:var(--red);}
+.explain-text{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.1;}
+
+.next-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:10px;padding:14px;font-family:'Noto Serif SC',serif;font-size:15px;cursor:pointer;letter-spacing:.1em;transition:all .2s;display:none;margin-top:12px;}
+.next-btn.show{display:block;}
+.next-btn:hover{background:var(--ink2);}
+
+/* 结算 */
+.result-view{display:none;flex-direction:column;align-items:center;gap:18px;padding:20px 0;text-align:center;animation:fadeUp .4s ease;}
+.result-view.active{display:flex;}
+.result-circle{width:110px;height:110px;border-radius:50%;border:3px solid var(--gold2);display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(184,145,42,.06);}
+.result-big{font-family:'Noto Serif SC',serif;font-size:32px;font-weight:700;color:var(--gold);}
+.result-of{font-size:12px;color:var(--ink4);}
+.result-stars{font-size:26px;letter-spacing:6px;}
+.result-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);}
+.result-desc{font-size:13px;color:var(--ink3);line-height:2;max-width:280px;}
+.result-btns{display:flex;gap:10px;width:100%;}
+.rb{flex:1;border-radius:10px;padding:13px;font-family:'Noto Serif SC',serif;font-size:14px;cursor:pointer;transition:all .2s;letter-spacing:.06em;}
+.rb.primary{background:var(--ink);color:var(--paper);border:none;}
+.rb.primary:hover{background:var(--ink2);}
+.rb.secondary{background:none;border:1px solid var(--paper3);color:var(--ink3);}
+.rb.secondary:hover{border-color:var(--ink3);}
+
+/* 失败结算 */
+.fail-view{display:none;flex-direction:column;align-items:center;gap:16px;padding:20px 0;text-align:center;animation:fadeUp .4s ease;}
+.fail-view.active{display:flex;}
+.fail-icon{font-size:52px;}
+.fail-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--red);}
+.fail-desc{font-size:13px;color:var(--ink3);line-height:2;max-width:280px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.heart-beat{animation:heartbeat .3s ease;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="back-btn" href="learn.html">← 返回</a>
+  <div class="header-title">学习之旅</div>
+  <div class="heart-row">
+    <span class="heart" id="h1">❤️</span>
+    <span class="heart" id="h2">❤️</span>
+    <span class="heart" id="h3">❤️</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- 地图 -->
+  <div class="map-view" id="map-view">
+    <div class="map-chapter">
+      <div class="chapter-title">第一章 · 认识八卦</div>
+      <div class="lessons-path" id="lessons-path"></div>
+    </div>
+  </div>
+
+  <!-- 关卡内容 -->
+  <div class="lesson-view" id="lesson-view">
+    <div class="lesson-progress">
+      <div class="lp-top">
+        <div class="lp-label" id="lp-label">关卡进度</div>
+        <div class="lp-count"><span id="lp-cur">0</span> / <span id="lp-total">0</span></div>
+      </div>
+      <div class="lp-bar"><div class="lp-fill" id="lp-fill" style="width:0%"></div></div>
+    </div>
+    <div id="lesson-content"></div>
+    <div class="fail-view" id="fail-view">
+      <div class="fail-icon">💔</div>
+      <div class="fail-title">本关挑战失败</div>
+      <div class="fail-desc" id="fail-desc">答错了，这关需要重新来过。温故知新，再试一次！</div>
+      <div class="result-btns">
+        <button class="rb secondary" onclick="backToMap()">返回地图</button>
+        <button class="rb primary" onclick="retryLesson()">重新挑战</button>
+      </div>
+    </div>
+    <div class="result-view" id="result-view">
+      <div class="result-circle">
+        <div class="result-big" id="r-score">6/6</div>
+        <div class="result-of">答题</div>
+      </div>
+      <div class="result-stars" id="r-stars">★★★</div>
+      <div class="result-title" id="r-title">完美通关！</div>
+      <div class="result-desc" id="r-desc"></div>
+      <div class="result-btns">
+        <button class="rb secondary" onclick="backToMap()">返回地图</button>
+        <button class="rb primary" id="r-next-btn" onclick="goNextLesson()">下一关 →</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="data.js"></script>
+<script>
+/* ══════════════════════════════════════
+   关卡数据定义
+══════════════════════════════════════ */
+const LESSONS = [
+  {
+    id: 0,
+    name: '八卦初识',
+    desc: '认识八个基本卦的爻线形态',
+    icon: '☰',
+    // 教学页数组
+    teaches: [
+      {
+        icon: '📖',
+        title: '什么是八卦？',
+        body: `八卦是中国古代的八种符号，由<strong>阳爻（—）</strong>和<strong>阴爻（- -）</strong>三条组合而成。<br><br>
+阳爻代表<strong>刚、动、实</strong>，阴爻代表<strong>柔、静、虚</strong>。<br><br>
+三条爻线的不同排列，形成了八种不同的卦象，称为<strong>八卦</strong>。`,
+        showBagua: false,
+      },
+      {
+        icon: '🔍',
+        title: '记住八卦口诀',
+        body: `古人总结了一套口诀，帮助记忆八卦的爻线形态：<br><br>
+<strong>乾三连</strong>——三条阳爻全相连<br>
+<strong>坤六断</strong>——六条阴爻全断开<br>
+<strong>震仰盂</strong>——下阳上阴，像个碗<br>
+<strong>艮覆碗</strong>——上阳下阴，碗倒扣<br>
+<strong>离中虚</strong>——中间一条阴爻空<br>
+<strong>坎中满</strong>——中间一条阳爻实<br>
+<strong>兑上缺</strong>——上面一条阴爻缺<br>
+<strong>巽下断</strong>——下面一条阴爻断`,
+        showBagua: true,
+      },
+    ],
+    // 6道练习题
+    quizzes: [
+      { type:'name2lines', q:'乾卦的爻线是？', answer:1, opts:[1,8,6,3] },
+      { type:'name2lines', q:'坤卦的爻线是？', answer:8, opts:[8,1,7,4] },
+      { type:'lines2name', q:'看爻线，这是哪个卦？', guaNum:4, opts:[4,1,7,8] },
+      { type:'lines2name', q:'看爻线，这是哪个卦？', guaNum:6, opts:[6,3,5,1] },
+      { type:'lines2name', q:'看爻线，这是哪个卦？', guaNum:2, opts:[2,1,3,7] },
+      { type:'lines2name', q:'看爻线，这是哪个卦？', guaNum:5, opts:[5,4,6,8] },
+    ],
+  },
+  {
+    id: 1,
+    name: '八卦属性',
+    desc: '掌握八卦对应的自然属性',
+    icon: '🌿',
+    teaches: [
+      {
+        icon: '🌍',
+        title: '八卦各有所象',
+        body: `每个卦象都对应着自然界中的一种事物：<br><br>
+<strong>乾☰</strong> 象天，刚健向上<br>
+<strong>坤☷</strong> 象地，柔顺厚载<br>
+<strong>震☳</strong> 象雷，震动奋发<br>
+<strong>巽☴</strong> 象风，柔顺入微<br>
+<strong>坎☵</strong> 象水，险陷流动<br>
+<strong>离☲</strong> 象火，光明附丽<br>
+<strong>艮☶</strong> 象山，静止厚重<br>
+<strong>兑☱</strong> 象泽，喜悦润泽`,
+        showBagua: true,
+      },
+      {
+        icon: '💡',
+        title: '记忆小技巧',
+        body: `结合口诀联想属性：<br><br>
+<strong class="jade">乾三连→天</strong>：三条实线，像阳光充足的晴天<br>
+<strong class="jade">坤六断→地</strong>：六条虚线，像广阔柔软的大地<br>
+<strong class="jade">震仰盂→雷</strong>：碗口朝上，像打雷时仰头看天<br>
+<strong class="jade">坎中满→水</strong>：中间实心，像水流中间最深<br>
+<strong class="jade">离中虚→火</strong>：中间空心，像火焰中心是空的`,
+        showBagua: false,
+      },
+    ],
+    quizzes: [
+      { type:'attr', q:'乾卦对应的自然属性是？', answer:'天', opts:['天','地','水','火'], guaNum:1 },
+      { type:'attr', q:'坤卦对应的自然属性是？', answer:'地', opts:['地','天','山','泽'], guaNum:8 },
+      { type:'attr', q:'坎卦对应的自然属性是？', answer:'水', opts:['水','火','风','雷'], guaNum:6 },
+      { type:'attr', q:'离卦对应的自然属性是？', answer:'火', opts:['火','水','天','地'], guaNum:3 },
+      { type:'attr2gua', q:'「雷」对应的是哪个卦？', answer:4, opts:[4,5,6,7] },
+      { type:'attr2gua', q:'「山」对应的是哪个卦？', answer:7, opts:[7,8,6,4] },
+    ],
+  },
+  {
+    id: 2,
+    name: '八卦五行',
+    desc: '了解八卦与五行的对应关系',
+    icon: '⚡',
+    teaches: [
+      {
+        icon: '🔥',
+        title: '八卦与五行',
+        body: `五行是金、木、水、火、土，八卦与五行的对应关系：<br><br>
+<strong>金：乾、兑</strong>——天与泽，金属之性<br>
+<strong>木：震、巽</strong>——雷与风，生发之性<br>
+<strong>水：坎</strong>——水，流动险陷<br>
+<strong>火：离</strong>——火，光明炎热<br>
+<strong>土：艮、坤</strong>——山与地，厚重承载`,
+        showBagua: false,
+      },
+      {
+        icon: '⚖️',
+        title: '五行生克',
+        body: `五行之间有相生相克的关系：<br><br>
+<strong>相生</strong>（有利）：<br>
+金生水 → 水生木 → 木生火 → 火生土 → 土生金<br><br>
+<strong>相克</strong>（不利）：<br>
+金克木 → 木克土 → 土克水 → 水克火 → 火克金<br><br>
+记忆口诀：<span class="jade">生：金水木火土循环</span><br>
+<span class="red">克：金木土水火循环</span>`,
+        showBagua: false,
+      },
+    ],
+    quizzes: [
+      { type:'wx', q:'乾卦的五行属性是？', answer:'金', opts:['金','木','水','火'], guaNum:1 },
+      { type:'wx', q:'离卦的五行属性是？', answer:'火', opts:['火','金','木','土'], guaNum:3 },
+      { type:'wx', q:'震卦的五行属性是？', answer:'木', opts:['木','火','土','金'], guaNum:4 },
+      { type:'wx', q:'坎卦的五行属性是？', answer:'水', opts:['水','土','金','木'], guaNum:6 },
+      { type:'sheng', q:'以下哪组是五行相生关系？', answer:'木生火', opts:['木生火','火克金','土克水','金克木'] },
+      { type:'sheng', q:'以下哪组是五行相克关系？', answer:'水克火', opts:['水克火','金生土','木生火','火生土'] },
+    ],
+  },
+  {
+    id: 3,
+    name: '万物类象',
+    desc: '八卦对应的人物、动物与器物',
+    icon: '🌸',
+    teaches: [
+      {
+        icon: '👨‍👩‍👧',
+        title: '八卦与人物',
+        body: `八卦与家庭成员的对应关系，是起卦判断的重要基础：<br><br>
+<strong>乾→父亲</strong>（一家之主，刚健）<br>
+<strong>坤→母亲</strong>（慈爱包容，柔顺）<br>
+<strong>震→长男</strong>（震动奋发）<br>
+<strong>巽→长女</strong>（柔顺入微）<br>
+<strong>坎→中男</strong>（险陷流动）<br>
+<strong>离→中女</strong>（光明附丽）<br>
+<strong>艮→少男</strong>（静止厚重）<br>
+<strong>兑→少女</strong>（喜悦润泽）`,
+        showBagua: false,
+      },
+      {
+        icon: '🐴',
+        title: '八卦与动物',
+        body: `常见的八卦动物类象：<br><br>
+<strong>乾→马</strong>（刚健奔腾）<br>
+<strong>坤→牛</strong>（柔顺厚重）<br>
+<strong>震→龙、蛇</strong>（震动灵活）<br>
+<strong>巽→鸡</strong>（善于进退）<br>
+<strong>坎→猪、鱼</strong>（水中生物）<br>
+<strong>离→雉（野鸡）</strong>（色彩鲜明）<br>
+<strong>艮→狗、虎</strong>（守护静止）<br>
+<strong>兑→羊</strong>（温顺喜悦）`,
+        showBagua: false,
+      },
+    ],
+    quizzes: [
+      { type:'xiang', q:'乾卦对应的家庭成员是？', answer:'父亲', opts:['父亲','母亲','长男','少男'], guaNum:1 },
+      { type:'xiang', q:'兑卦对应的家庭成员是？', answer:'少女', opts:['少女','长女','中女','母亲'], guaNum:2 },
+      { type:'xiang', q:'坎卦对应的动物是？', answer:'猪、鱼', opts:['猪、鱼','马','羊','龙、蛇'], guaNum:6 },
+      { type:'xiang', q:'乾卦对应的动物是？', answer:'马', opts:['马','牛','羊','鸡'], guaNum:1 },
+      { type:'xiang2gua', q:'「母亲」对应的是哪个卦？', answer:8, opts:[8,1,3,6] },
+      { type:'xiang2gua', q:'「少男」对应的是哪个卦？', answer:7, opts:[7,4,6,8] },
+    ],
+  },
+];
+
+/* ══════════════════════════════════════
+   状态
+══════════════════════════════════════ */
+let progress = JSON.parse(localStorage.getItem('journey_progress') || '{}');
+let hearts = 3;
+let currentLessonId = 0;
+let currentStep = 0; // 0..teaches.length-1 = 讲解，之后是题目
+let correctCount = 0;
+let totalQuizzes = 0;
+let currentLesson = null;
+
+/* ══════════════════════════════════════
+   地图渲染
+══════════════════════════════════════ */
+function renderMap() {
+  document.getElementById('map-view').style.display = 'block';
+  document.getElementById('lesson-view').style.display = 'none';
+  document.getElementById('result-view').classList.remove('active');
+  document.getElementById('fail-view').classList.remove('active');
+
+  const path = document.getElementById('lessons-path');
+  path.innerHTML = '';
+
+  LESSONS.forEach((l, i) => {
+    const done = progress[l.id]?.done;
+    const stars = progress[l.id]?.stars || 0;
+    const unlocked = i === 0 || progress[LESSONS[i-1].id]?.done;
+    const isActive = unlocked && !done;
+
+    const cls = done ? 'done' : isActive ? 'active' : 'locked';
+    const statusHtml = done
+      ? `<div class="lesson-status status-done">✓ 已完成</div>`
+      : isActive
+        ? `<div class="lesson-status status-active">▶ 开始</div>`
+        : `<div class="lesson-status status-lock">🔒</div>`;
+    const starsHtml = `<div class="stars-row">${[1,2,3].map(s=>`<span class="star${stars>=s?' lit':''}">${stars>=s?'★':'☆'}</span>`).join('')}</div>`;
+
+    const node = document.createElement('div');
+    node.className = 'lesson-node';
+    node.innerHTML = `
+      ${i > 0 ? `<div class="path-line${progress[LESSONS[i-1].id]?.done?' done':''}"></div>` : ''}
+      <div class="lesson-btn ${cls}" onclick="${unlocked?`startLesson(${l.id})`:''}">
+        <div class="lesson-icon">${l.icon}</div>
+        <div class="lesson-info">
+          <div class="lesson-name">${l.name}</div>
+          <div class="lesson-desc">${l.desc}</div>
+          ${starsHtml}
+        </div>
+        ${statusHtml}
+      </div>
+    `;
+    path.appendChild(node);
+  });
+}
+
+/* ══════════════════════════════════════
+   开始关卡
+══════════════════════════════════════ */
+function startLesson(id) {
+  currentLessonId = id;
+  currentLesson = LESSONS.find(l => l.id === id);
+  currentStep = 0;
+  correctCount = 0;
+  totalQuizzes = currentLesson.quizzes.length;
+  hearts = 3;
+  updateHearts();
+
+  document.getElementById('map-view').style.display = 'none';
+  document.getElementById('lesson-view').style.display = 'block';
+  document.getElementById('result-view').classList.remove('active');
+  document.getElementById('fail-view').classList.remove('active');
+
+  document.getElementById('lp-label').textContent = currentLesson.name;
+  document.getElementById('lp-total').textContent = currentLesson.teaches.length + totalQuizzes;
+
+  renderStep();
+}
+
+function retryLesson() { startLesson(currentLessonId); }
+
+/* ══════════════════════════════════════
+   渲染步骤
+══════════════════════════════════════ */
+function renderStep() {
+  const totalSteps = currentLesson.teaches.length + currentLesson.quizzes.length;
+  document.getElementById('lp-cur').textContent = currentStep;
+  document.getElementById('lp-fill').style.width = `${(currentStep/totalSteps)*100}%`;
+  document.getElementById('fail-view').classList.remove('active');
+  document.getElementById('result-view').classList.remove('active');
+
+  const content = document.getElementById('lesson-content');
+
+  if (currentStep < currentLesson.teaches.length) {
+    // 讲解页
+    const t = currentLesson.teaches[currentStep];
+    content.innerHTML = `
+      <div class="teach-card">
+        <div class="teach-icon">${t.icon}</div>
+        <div class="teach-title">${t.title}</div>
+        <div class="teach-body">${t.body}</div>
+        ${t.showBagua ? renderBaguaGrid() : ''}
+      </div>
+      <button class="teach-next" onclick="nextStep()">明白了，继续 →</button>
+    `;
+  } else {
+    // 题目
+    const qi = currentStep - currentLesson.teaches.length;
+    if (qi >= currentLesson.quizzes.length) {
+      showResult();
+      return;
+    }
+    renderQuiz(currentLesson.quizzes[qi]);
+  }
+}
+
+/* ── 八卦展示格 ── */
+function renderBaguaGrid() {
+  const order = [1,2,3,4,5,6,7,8];
+  return `<div class="bagua-grid">${order.map(n => {
+    const info = BI[n];
+    const linesHtml = BL[n].map(l =>
+      l==='y' ? '<div class="bc-line bc-yang"></div>' : '<div class="bc-line bc-yin"></div>'
+    ).join('');
+    return `<div class="bagua-cell">
+      <div class="bc-lines">${linesHtml}</div>
+      <div class="bc-name">${info.name}</div>
+      <div class="bc-attr">${info.attr}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ── 题目渲染 ── */
+function renderQuiz(q) {
+  const content = document.getElementById('lesson-content');
+  let qHtml = '';
+
+  if (q.type === 'lines2name') {
+    // 看爻线选卦名
+    const linesHtml = BL[q.guaNum].map(l =>
+      `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}"></div></div>`
+    ).join('');
+    qHtml = `
+      <div class="quiz-gua-show">
+        <div class="yao-lines">${linesHtml}</div>
+      </div>
+    `;
+  } else if (q.type === 'name2lines') {
+    // 看卦名选爻线，选项显示爻线图
+    qHtml = `<div style="font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;text-align:center;padding:16px 0;color:var(--ink);">${BI[q.answer].name}</div>`;
+  } else if (q.type === 'attr' || q.type === 'wx' || q.type === 'xiang') {
+    // 看卦名/爻线选属性/五行/类象
+    const linesHtml = BL[q.guaNum].map(l =>
+      `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}"></div></div>`
+    ).join('');
+    qHtml = `
+      <div class="quiz-gua-show" style="flex-direction:column;align-items:center;gap:6px;">
+        <div class="yao-lines">${linesHtml}</div>
+        <div style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:600;color:var(--ink);margin-top:4px;">${BI[q.guaNum].name}</div>
+      </div>
+    `;
+  } else if (q.type === 'attr2gua' || q.type === 'xiang2gua') {
+    // 看属性/类象选卦，选项显示卦名+爻线
+    qHtml = `<div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;text-align:center;padding:16px 0;color:var(--gold);">「${q.answer===undefined?q.opts[0]:typeof q.answer==='string'?q.answer:BI[q.opts[0]].attr}」</div>`;
+    // 实际显示问题里的关键词
+    const keyEl = q.q.match(/「(.+?)」/);
+    if (keyEl) qHtml = `<div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;text-align:center;padding:16px 0;color:var(--gold);">「${keyEl[1]}」</div>`;
+  } else if (q.type === 'sheng') {
+    qHtml = '';
+  }
+
+  // 选项
+  let optsHtml = '';
+  const isGuaOpt = q.type === 'name2lines' || q.type === 'attr2gua' || q.type === 'xiang2gua';
+
+  if (q.type === 'name2lines') {
+    // 选项是爻线图
+    optsHtml = `<div class="opts">${q.opts.map(n => {
+      const lHtml = BL[n].map(l =>
+        `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px;height:5px;"></div></div>`
+      ).join('');
+      return `<button class="opt-btn" data-val="${n}" onclick="selectOpt(this,'${q.answer}','${getExplain(q)}')">
+        <div class="yao-lines" style="gap:4px;pointer-events:none;">${lHtml}</div>
+        <span class="opt-sub">${BI[n].name}</span>
+      </button>`;
+    }).join('')}</div>`;
+  } else if (q.type === 'attr2gua' || q.type === 'xiang2gua') {
+    // 选项是卦名+爻线
+    optsHtml = `<div class="opts">${q.opts.map(n => {
+      const lHtml = BL[n].map(l =>
+        `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px;height:5px;"></div></div>`
+      ).join('');
+      return `<button class="opt-btn" data-val="${n}" onclick="selectOpt(this,${q.answer},'${getExplain(q)}')">
+        <div class="yao-lines" style="gap:4px;pointer-events:none;">${lHtml}</div>
+        <span class="opt-sub">${BI[n].name}（${BI[n].attr}）</span>
+      </button>`;
+    }).join('')}</div>`;
+  } else {
+    // 文字选项
+    optsHtml = `<div class="opts ${q.opts.length<=2?'single':''}">${q.opts.map(o => {
+      const val = typeof o === 'number' ? o : o;
+      const label = typeof o === 'number' ? BI[o].name : o;
+      return `<button class="opt-btn" data-val="${val}" onclick="selectOpt(this,'${q.answer}','${getExplain(q)}')">${label}</button>`;
+    }).join('')}</div>`;
+  }
+
+  content.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-label">第 ${currentStep - currentLesson.teaches.length + 1} / ${totalQuizzes} 题</div>
+      <div class="quiz-q">${q.q}</div>
+      ${qHtml}
+      ${optsHtml}
+      <div class="explain-box" id="explain-box"></div>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="nextStep()">继续 →</button>
+  `;
+}
+
+function getExplain(q) {
+  if (q.type === 'lines2name' || q.type === 'name2lines') return `${BI[q.guaNum].name}卦：${BI[q.guaNum].attr}·${BI[q.guaNum].wx}·${BI[q.guaNum].nat}`;
+  if (q.type === 'attr') return `${BI[q.guaNum].name}卦对应的属性是"${BI[q.guaNum].attr}"`;
+  if (q.type === 'wx') return `${BI[q.guaNum].name}卦五行属${BI[q.guaNum].wx}`;
+  if (q.type === 'xiang') return `${BI[q.guaNum].name}卦的类象：${q.answer}`;
+  if (q.type === 'attr2gua') return `"${q.q.match(/「(.+?)」/)?.[1]}"对应${BI[q.answer].name}卦（${BI[q.answer].attr}）`;
+  if (q.type === 'xiang2gua') return `"${q.q.match(/「(.+?)」/)?.[1]}"属于${BI[q.answer].name}卦的类象`;
+  if (q.type === 'sheng') return `正确答案是：${q.answer}`;
+  return '';
+}
+
+/* ── 选择答案 ── */
+function selectOpt(btn, answer, explain) {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const val = btn.getAttribute('data-val');
+  const isCorrect = String(val) === String(answer);
+  const explainBox = document.getElementById('explain-box');
+
+  btns.forEach(b => {
+    if (String(b.getAttribute('data-val')) === String(answer)) b.classList.add(isCorrect ? 'correct' : 'reveal');
+    else if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    correctCount++;
+    explainBox.innerHTML = `
+      <div class="explain-result"><span class="er-icon">✓</span><span class="er-text ok">回答正确！</span></div>
+      <div class="explain-text">${explain}</div>
+    `;
+  } else {
+    hearts--;
+    updateHearts();
+    explainBox.innerHTML = `
+      <div class="explain-result"><span class="er-icon">✗</span><span class="er-text ng">回答错误</span></div>
+      <div class="explain-text">${explain}</div>
+    `;
+    if (hearts <= 0) {
+      explainBox.classList.add('show');
+      setTimeout(() => showFail(), 1200);
+      return;
+    }
+  }
+
+  explainBox.classList.add('show');
+  document.getElementById('next-btn').classList.add('show');
+}
+
+/* ── 更新心 ── */
+function updateHearts() {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById(`h${i}`);
+    if (i <= hearts) { el.classList.remove('lost'); }
+    else { el.classList.add('lost'); el.classList.add('heart-beat'); setTimeout(()=>el.classList.remove('heart-beat'),300); }
+  });
+}
+
+/* ── 下一步 ── */
+function nextStep() {
+  currentStep++;
+  const totalSteps = currentLesson.teaches.length + currentLesson.quizzes.length;
+  if (currentStep >= totalSteps) { showResult(); return; }
+  renderStep();
+}
+
+/* ── 失败 ── */
+function showFail() {
+  document.getElementById('lesson-content').innerHTML = '';
+  document.getElementById('fail-view').classList.add('active');
+  document.getElementById('lp-fill').style.width = '0%';
+}
+
+/* ── 结算 ── */
+function showResult() {
+  document.getElementById('lesson-content').innerHTML = '';
+  const rv = document.getElementById('result-view');
+  const pct = Math.round((correctCount / totalQuizzes) * 100);
+  const stars = pct === 100 ? 3 : pct >= 67 ? 2 : 1;
+  const title = pct === 100 ? '完美通关！' : pct >= 67 ? '顺利通关！' : '勉强通关';
+  const desc = pct === 100 ? '全部答对，掌握扎实，继续前进！' : pct >= 67 ? '答对大部分，可以继续下一关。' : '有些题目需要加强，建议再练习一次。';
+
+  document.getElementById('r-score').textContent = `${correctCount}/${totalQuizzes}`;
+  document.getElementById('r-stars').textContent = ['★','★★','★★★'][stars-1];
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-desc').textContent = desc;
+  document.getElementById('lp-fill').style.width = '100%';
+
+  // 检查是否有下一关
+  const nextLesson = LESSONS.find(l => l.id === currentLessonId + 1);
+  const nextBtn = document.getElementById('r-next-btn');
+  if (!nextLesson) { nextBtn.style.display='none'; }
+  else { nextBtn.style.display=''; }
+
+  // 保存进度
+  const prev = progress[currentLessonId] || {};
+  progress[currentLessonId] = { done: true, stars: Math.max(stars, prev.stars||0) };
+  localStorage.setItem('journey_progress', JSON.stringify(progress));
+
+  rv.classList.add('active');
+}
+
+function goNextLesson() {
+  const next = LESSONS.find(l => l.id === currentLessonId + 1);
+  if (next) startLesson(next.id);
+  else backToMap();
+}
+
+function backToMap() {
+  document.getElementById('lesson-view').style.display = 'none';
+  document.getElementById('result-view').classList.remove('active');
+  document.getElementById('fail-view').classList.remove('active');
+  renderMap();
+}
+
+/* ── 初始化 ── */
+renderMap();
+</script>
+</body>
+</html>
