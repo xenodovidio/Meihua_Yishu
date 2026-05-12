@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 学习之旅 v1.04</title>
+<title>梅花易数 · 学习之旅 v1.05</title>
 
 
 <style>
@@ -172,7 +172,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <a class="back-btn" href="learn.html">← 返回</a>
-  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.04</span></div>
+  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.05</span></div>
   <div class="heart-row">
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
@@ -592,7 +592,7 @@ function renderQuiz(q) {
       return `<button class="opt-btn" data-val="${n}" data-answer="${q.answer}" data-explain="${getExplain(q).replace(/"/g,'&quot;')}" onclick="selectOpt(this)">
         <div style="pointer-events:none;">
           <div class="yao-lines" style="gap:4px;">${lHtml}</div>
-          <span class="opt-sub">${BI[n].name}（${BI[n].attr}）</span>
+          <span class="opt-sub">${BI[n].name}</span>
         </div>
       </button>`;
     }).join('')}</div>`;
