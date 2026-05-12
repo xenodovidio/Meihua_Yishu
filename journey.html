@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 学习之旅 v1.05</title>
+<title>梅花易数 · 学习之旅 v1.06</title>
 
 
 <style>
@@ -36,7 +36,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ══ 地图视图 ══ */
 .map-view{display:block;}
 .map-chapter{margin-bottom:32px;}
-.chapter-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink4);letter-spacing:.15em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.chapter-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink4);letter-spacing:.15em;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.chapter-title::before{content:'';flex:1;height:1px;background:var(--paper3);}
 .chapter-title::after{content:'';flex:1;height:1px;background:var(--paper3);}
 
 .lessons-path{display:flex;flex-direction:column;align-items:center;gap:0;}
@@ -172,7 +173,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <a class="back-btn" href="learn.html">← 返回</a>
-  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.05</span></div>
+  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.06</span></div>
   <div class="heart-row">
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
