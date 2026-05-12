@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 学习之旅 v1.00</title>
+<title>梅花易数 · 学习之旅 v1.01</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -168,7 +168,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <a class="back-btn" href="learn.html">← 返回</a>
-  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.00</span></div>
+  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.01</span></div>
   <div class="heart-row">
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
@@ -609,7 +609,8 @@ function renderQuiz(q) {
 }
 
 function getExplain(q) {
-  if (q.type === 'lines2name' || q.type === 'name2lines') return `${BI[q.guaNum].name}卦：${BI[q.guaNum].attr}·${BI[q.guaNum].wx}·${BI[q.guaNum].nat}`;
+  const gn = q.guaNum || q.answer;
+  if (q.type === 'lines2name' || q.type === 'name2lines') return `${BI[gn].name}卦：${BI[gn].attr}·${BI[gn].wx}·${BI[gn].nat}`;
   if (q.type === 'attr') return `${BI[q.guaNum].name}卦对应的属性是"${BI[q.guaNum].attr}"`;
   if (q.type === 'wx') return `${BI[q.guaNum].name}卦五行属${BI[q.guaNum].wx}`;
   if (q.type === 'xiang') return `${BI[q.guaNum].name}卦的类象：${q.answer}`;
