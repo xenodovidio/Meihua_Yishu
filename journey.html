@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 学习之旅 v1.06</title>
+<title>梅花易数 · 学习之旅 v1.07</title>
 
 
 <style>
@@ -36,6 +36,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ══ 地图视图 ══ */
 .map-view{display:block;}
 .map-chapter{margin-bottom:32px;}
+.lessons-path-inner{display:flex;flex-direction:column;align-items:center;gap:0;}
 .chapter-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink4);letter-spacing:.15em;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .chapter-title::before{content:'';flex:1;height:1px;background:var(--paper3);}
 .chapter-title::after{content:'';flex:1;height:1px;background:var(--paper3);}
@@ -173,7 +174,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <a class="back-btn" href="learn.html">← 返回</a>
-  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.06</span></div>
+  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.07</span></div>
   <div class="heart-row">
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
@@ -185,10 +186,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <!-- 地图 -->
   <div class="map-view" id="map-view">
-    <div class="map-chapter">
-      <div class="chapter-title">第一章 · 认识八卦</div>
-      <div class="lessons-path" id="lessons-path"></div>
-    </div>
+    <div id="lessons-path"></div>
   </div>
 
   <!-- 关卡内容 -->
@@ -399,6 +397,133 @@ const LESSONS = [
   },
 ];
 
+const CHAPTER2 = [
+  {
+    id: 4,
+    name: '六十四卦基础',
+    desc: '了解六十四卦的构成原理',
+    icon: '📐',
+    teaches: [
+      {
+        icon: '🔢',
+        title: '六十四卦的由来',
+        body: `八卦两两相叠，产生六十四卦。<br><br>
+每个六十四卦由<strong>上卦</strong>（外卦）和<strong>下卦</strong>（内卦）组成，共6条爻线。<br><br>
+8 × 8 = <strong>64卦</strong><br><br>
+读卦顺序：从<strong>下往上</strong>读，下卦在内代表自身，上卦在外代表他人或外部环境。<br><br>
+例如：<strong>水天需</strong>——上卦坎（水），下卦乾（天）`,
+        showBagua: false,
+      },
+      {
+        icon: '📖',
+        title: '常见六十四卦',
+        body: `记住几个常见的六十四卦：<br><br>
+<strong>乾为天</strong>——上乾下乾，纯阳至刚，大吉<br>
+<strong>坤为地</strong>——上坤下坤，纯阴柔顺，宜顺势<br>
+<strong>水火既济</strong>——上坎下离，阴阳平衡，事已成<br>
+<strong>火水未济</strong>——上离下坎，阴阳未合，事未成<br>
+<strong>地天泰</strong>——上坤下乾，天地交泰，大吉亨通<br>
+<strong>天地否</strong>——上乾下坤，天地不交，闭塞不通`,
+        showBagua: false,
+      },
+    ],
+    quizzes: [
+      { type:'gua64name', q:'上卦为坎（水），下卦为乾（天），此卦为？', answer:'水天需', opts:['水天需','天水讼','水地比','地水师'], uN:6, dN:1 },
+      { type:'gua64name', q:'上卦为离（火），下卦为坎（水），此卦为？', answer:'火水未济', opts:['火水未济','水火既济','火地晋','地火明夷'], uN:3, dN:6 },
+      { type:'gua64name', q:'上卦为坤（地），下卦为乾（天），此卦为？', answer:'地天泰', opts:['地天泰','天地否','地雷复','雷地豫'], uN:8, dN:1 },
+      { type:'gua64attr', q:'「水火既济」的上卦是哪个卦？', answer:'坎（水）', opts:['坎（水）','离（火）','乾（天）','坤（地）'] },
+      { type:'gua64attr', q:'「天地否」代表什么含义？', answer:'天地不交，闭塞不通', opts:['天地不交，闭塞不通','天地交泰，大吉亨通','阴阳平衡，事已成','纯阳至刚，大吉'] },
+      { type:'gua64attr', q:'六十四卦读卦的顺序是？', answer:'从下往上读', opts:['从下往上读','从上往下读','从左往右读','从中间往外读'] },
+    ],
+  },
+  {
+    id: 5,
+    name: '互卦推算',
+    desc: '学会从本卦推算互卦',
+    icon: '🔄',
+    teaches: [
+      {
+        icon: '🔍',
+        title: '什么是互卦？',
+        body: `互卦揭示事物发展的<strong>内在原因与过程</strong>，是解卦的重要参考。<br><br>
+取法：从本卦六爻中取中间四爻：<br><br>
+<strong>下互卦</strong>：取第2、3、4爻（从初爻算起）<br>
+<strong>上互卦</strong>：取第3、4、5爻<br><br>
+这两组爻线各自组成一个三爻卦，合并即为互卦。`,
+        showBagua: false,
+      },
+      {
+        icon: '✏️',
+        title: '互卦推算示例',
+        body: `以<strong>水火既济</strong>为例：<br><br>
+本卦六爻（初→上）：<br>
+初爻阳、二爻阴、三爻阳、四爻阴、五爻阳、上爻阴<br><br>
+<strong>下互卦</strong>（2、3、4爻）：阴、阳、阴 = <span class="jade">坎卦</span><br>
+<strong>上互卦</strong>（3、4、5爻）：阳、阴、阳 = <span class="jade">离卦</span><br><br>
+互卦为<strong>火水未济</strong>，反映事虽成但暗藏隐患。`,
+        showBagua: false,
+      },
+    ],
+    quizzes: [
+      { type:'hugua_simple', q:'互卦取本卦哪几爻组成下互卦？', answer:'第2、3、4爻', opts:['第2、3、4爻','第1、2、3爻','第3、4、5爻','第4、5、6爻'] },
+      { type:'hugua_simple', q:'互卦取本卦哪几爻组成上互卦？', answer:'第3、4、5爻', opts:['第3、4、5爻','第2、3、4爻','第1、2、3爻','第4、5、6爻'] },
+      { type:'hugua_simple', q:'互卦在解卦中的作用是？', answer:'揭示事物内在原因与过程', opts:['揭示事物内在原因与过程','预测未来发展方向','反映当前整体形势','判断吉凶结果'] },
+      { type:'hugua_simple', q:'以下关于互卦的说法，哪个是正确的？', answer:'互卦由本卦中间四爻组成', opts:['互卦由本卦中间四爻组成','互卦由本卦上下各三爻组成','互卦是本卦阴阳全部互换','互卦只有在动爻时才出现'] },
+      { type:'hugua_simple', q:'水火既济的互卦上卦是哪个卦？', answer:'离卦', opts:['离卦','坎卦','乾卦','坤卦'] },
+      { type:'hugua_simple', q:'水火既济的互卦下卦是哪个卦？', answer:'坎卦', opts:['坎卦','离卦','震卦','巽卦'] },
+    ],
+  },
+  {
+    id: 6,
+    name: '变卦推算',
+    desc: '掌握动爻变化与变卦推算',
+    icon: '⚡',
+    teaches: [
+      {
+        icon: '🎯',
+        title: '什么是动爻？',
+        body: `起卦时，会有一条爻被标记为<strong>动爻</strong>（用红色表示）。<br><br>
+动爻代表事物的<strong>变化之机</strong>，是整个卦象中最关键的一爻。<br><br>
+动爻规则：<br>
+<strong class="red">阳爻动 → 变为阴爻</strong><br>
+<strong class="jade">阴爻动 → 变为阳爻</strong><br><br>
+动爻变化后，形成新的六十四卦，称为<strong>变卦</strong>。`,
+        showBagua: false,
+      },
+      {
+        icon: '🔮',
+        title: '变卦的意义',
+        body: `变卦预示事物<strong>未来的发展方向</strong>。<br><br>
+解读顺序：<br>
+1. <strong>本卦</strong>——当前整体形势<br>
+2. <strong>互卦</strong>——内在原因与过程<br>
+3. <strong>变卦</strong>——未来发展方向<br><br>
+变卦口诀：<br>
+<span class="jade">本卦看现在，互卦看过程，变卦看未来</span><br><br>
+体用生克关系以<strong>本卦</strong>为主，变卦辅助判断趋势。`,
+        showBagua: false,
+      },
+    ],
+    quizzes: [
+      { type:'biangua_simple', q:'动爻的变化规则是？', answer:'阳爻变阴爻，阴爻变阳爻', opts:['阳爻变阴爻，阴爻变阳爻','阳爻不变，阴爻变阳爻','所有爻线全部互换','只有上爻和初爻会变'] },
+      { type:'biangua_simple', q:'变卦在解卦中的作用是？', answer:'预示未来发展方向', opts:['预示未来发展方向','反映当前整体形势','揭示内在原因','判断体用关系'] },
+      { type:'biangua_simple', q:'解读三卦的正确顺序是？', answer:'本卦→互卦→变卦', opts:['本卦→互卦→变卦','变卦→互卦→本卦','互卦→本卦→变卦','本卦→变卦→互卦'] },
+      { type:'biangua_calc', q:'乾为天第三爻动，动爻为阳爻，变后第三爻变为？', answer:'阴爻', opts:['阴爻','阳爻','不变','消失'] },
+      { type:'biangua_calc', q:'坤为地第一爻动，坤卦六爻皆为阴爻，变后初爻变为？', answer:'阳爻', opts:['阳爻','阴爻','不变','消失'] },
+      { type:'biangua_simple', q:'本卦与变卦的关系是？', answer:'变卦是本卦动爻变化后形成的新卦', opts:['变卦是本卦动爻变化后形成的新卦','变卦是本卦的互卦','变卦是本卦阴阳全部互换','变卦与本卦完全无关'] },
+    ],
+  },
+];
+
+// 合并两章
+const ALL_LESSONS = [...LESSONS, ...CHAPTER2];
+
+// 章节分组
+const CHAPTERS = [
+  { title: '第一章 · 认识八卦', lessonIds: [0,1,2,3] },
+  { title: '第二章 · 六十四卦', lessonIds: [4,5,6] },
+];
+
 /* ══════════════════════════════════════
    状态
 ══════════════════════════════════════ */
@@ -422,35 +547,47 @@ function renderMap() {
   const path = document.getElementById('lessons-path');
   path.innerHTML = '';
 
-  LESSONS.forEach((l, i) => {
-    const done = progress[l.id]?.done;
-    const stars = progress[l.id]?.stars || 0;
-    const unlocked = i === 0 || progress[LESSONS[i-1].id]?.done;
-    const isActive = unlocked && !done;
+  CHAPTERS.forEach(chapter => {
+    // 章节标题
+    const chapterEl = document.createElement('div');
+    chapterEl.className = 'map-chapter';
+    chapterEl.innerHTML = `<div class="chapter-title">${chapter.title}</div><div class="lessons-path-inner"></div>`;
+    path.appendChild(chapterEl);
+    const inner = chapterEl.querySelector('.lessons-path-inner');
 
-    const cls = done ? 'done' : isActive ? 'active' : 'locked';
-    const statusHtml = done
-      ? `<div class="lesson-status status-done">✓ 已完成</div>`
-      : isActive
-        ? `<div class="lesson-status status-active">▶ 开始</div>`
-        : `<div class="lesson-status status-lock">🔒</div>`;
-    const starsHtml = `<div class="stars-row">${[1,2,3].map(s=>`<span class="star${stars>=s?' lit':''}">${stars>=s?'★':'☆'}</span>`).join('')}</div>`;
+    chapter.lessonIds.forEach((lid, i) => {
+      const l = ALL_LESSONS.find(x => x.id === lid);
+      if (!l) return;
+      const allIdx = ALL_LESSONS.findIndex(x => x.id === lid);
+      const done = progress[l.id]?.done;
+      const stars = progress[l.id]?.stars || 0;
+      const unlocked = allIdx === 0 || progress[ALL_LESSONS[allIdx-1].id]?.done;
+      const isActive = unlocked && !done;
 
-    const node = document.createElement('div');
-    node.className = 'lesson-node';
-    node.innerHTML = `
-      ${i > 0 ? `<div class="path-line${progress[LESSONS[i-1].id]?.done?' done':''}"></div>` : ''}
-      <div class="lesson-btn ${cls}" onclick="${unlocked?`startLesson(${l.id})`:''}">
-        <div class="lesson-icon">${l.icon}</div>
-        <div class="lesson-info">
-          <div class="lesson-name">${l.name}</div>
-          <div class="lesson-desc">${l.desc}</div>
-          ${starsHtml}
+      const cls = done ? 'done' : isActive ? 'active' : 'locked';
+      const statusHtml = done
+        ? `<div class="lesson-status status-done">✓ 已完成</div>`
+        : isActive
+          ? `<div class="lesson-status status-active">▶ 开始</div>`
+          : `<div class="lesson-status status-lock">🔒</div>`;
+      const starsHtml = `<div class="stars-row">${[1,2,3].map(s=>`<span class="star${stars>=s?' lit':''}">${stars>=s?'★':'☆'}</span>`).join('')}</div>`;
+
+      const node = document.createElement('div');
+      node.className = 'lesson-node';
+      node.innerHTML = `
+        ${i > 0 ? `<div class="path-line${progress[ALL_LESSONS[allIdx-1].id]?.done?' done':''}"></div>` : ''}
+        <div class="lesson-btn ${cls}" onclick="${unlocked?`startLesson(${l.id})`:''}">
+          <div class="lesson-icon">${l.icon}</div>
+          <div class="lesson-info">
+            <div class="lesson-name">${l.name}</div>
+            <div class="lesson-desc">${l.desc}</div>
+            ${starsHtml}
+          </div>
+          ${statusHtml}
         </div>
-        ${statusHtml}
-      </div>
-    `;
-    path.appendChild(node);
+      `;
+      inner.appendChild(node);
+    });
   });
 }
 
@@ -459,7 +596,7 @@ function renderMap() {
 ══════════════════════════════════════ */
 function startLesson(id) {
   currentLessonId = id;
-  currentLesson = LESSONS.find(l => l.id === id);
+  currentLesson = ALL_LESSONS.find(l => l.id === id);
   currentStep = 0;
   correctCount = 0;
   totalQuizzes = currentLesson.quizzes.length;
@@ -567,6 +704,33 @@ function renderQuiz(q) {
     if (keyEl) qHtml = `<div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;text-align:center;padding:16px 0;color:var(--gold);">「${keyEl[1]}」</div>`;
   } else if (q.type === 'sheng') {
     qHtml = '';
+  } else if (['gua64name','gua64attr','hugua_simple','biangua_simple','biangua_calc'].includes(q.type)) {
+    // 纯文字题，无需额外图示
+    if (q.uN && q.dN) {
+      const all6 = [...BL[q.dN],...BL[q.uN]];
+      const linesHtml = all6.map(l=>
+        `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}"></div></div>`
+      ).join('');
+      qHtml = `<div class="quiz-gua-show" style="flex-direction:column;align-items:center;gap:6px;">
+        <div class="yao-lines">${linesHtml}</div>
+      </div>`;
+    } else {
+      qHtml = '';
+    }
+  } else if (q.type === 'hugua') {
+    // 互卦题：显示本卦爻线
+    if (q.uN && q.dN) {
+      const all6 = [...BL[q.dN],...BL[q.uN]];
+      const linesHtml = all6.map((l,i)=>
+        `<div class="yao-row"><div class="yao-num" style="font-size:9px;color:var(--ink4);width:14px;font-family:'Noto Serif SC',serif;">${['初','二','三','四','五','上'][i]}</div><div class="yao-line ${l==='y'?'yang':'yin'}"></div></div>`
+      ).join('');
+      qHtml = `<div class="quiz-gua-show" style="flex-direction:column;align-items:center;gap:6px;">
+        <div class="quiz-gua-label" style="font-size:12px;color:var(--ink4);">本卦：${q.benGuaName||''}</div>
+        <div class="yao-lines">${linesHtml}</div>
+      </div>`;
+    } else {
+      qHtml = '';
+    }
   }
 
   // 选项
@@ -626,6 +790,7 @@ function getExplain(q) {
   if (q.type === 'attr2gua') return `"${q.q.match(/「(.+?)」/)?.[1]}"对应${BI[q.answer].name}卦（${BI[q.answer].attr}）`;
   if (q.type === 'xiang2gua') return `"${q.q.match(/「(.+?)」/)?.[1]}"属于${BI[q.answer].name}卦的类象`;
   if (q.type === 'sheng') return `正确答案是：${q.answer}`;
+  if (['gua64name','gua64attr','hugua_simple','hugua','biangua_simple','biangua_calc'].includes(q.type)) return `正确答案是：${q.answer}`;
   return '';
 }
 
@@ -723,7 +888,8 @@ function showResult() {
 }
 
 function goNextLesson() {
-  const next = LESSONS.find(l => l.id === currentLessonId + 1);
+  const allIdx = ALL_LESSONS.findIndex(l => l.id === currentLessonId);
+  const next = ALL_LESSONS[allIdx + 1];
   if (next) startLesson(next.id);
   else backToMap();
 }
