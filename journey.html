@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 学习之旅 v1.07</title>
+<title>梅花易数 · 学习之旅 v1.08</title>
 
 
 <style>
@@ -174,7 +174,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <a class="back-btn" href="learn.html">← 返回</a>
-  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.07</span></div>
+  <div class="header-title">学习之旅 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.08</span></div>
   <div class="heart-row">
     <span class="heart" id="h1">❤️</span>
     <span class="heart" id="h2">❤️</span>
@@ -736,9 +736,10 @@ function renderQuiz(q) {
   // 选项
   let optsHtml = '';
   const isGuaOpt = q.type === 'name2lines' || q.type === 'attr2gua' || q.type === 'xiang2gua';
+  const shuffledOpts = shuffle([...q.opts]);
 
   if (q.type === 'name2lines') {
-    optsHtml = `<div class="opts">${q.opts.map(n => {
+    optsHtml = `<div class="opts">${shuffledOpts.map(n => {
       const lHtml = BL[n].map(l =>
         `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px;height:5px;"></div></div>`
       ).join('');
@@ -750,7 +751,7 @@ function renderQuiz(q) {
       </button>`;
     }).join('')}</div>`;
   } else if (q.type === 'attr2gua' || q.type === 'xiang2gua') {
-    optsHtml = `<div class="opts">${q.opts.map(n => {
+    optsHtml = `<div class="opts">${shuffledOpts.map(n => {
       const lHtml = BL[n].map(l =>
         `<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px;height:5px;"></div></div>`
       ).join('');
@@ -762,7 +763,7 @@ function renderQuiz(q) {
       </button>`;
     }).join('')}</div>`;
   } else {
-    optsHtml = `<div class="opts ${q.opts.length<=2?'single':''}">${q.opts.map(o => {
+    optsHtml = `<div class="opts ${q.opts.length<=2?'single':''}">${shuffledOpts.map(o => {
       const val = typeof o === 'number' ? o : o;
       const label = typeof o === 'number' ? BI[o].name : o;
       return `<button class="opt-btn" data-val="${val}" data-answer="${q.answer}" data-explain="${getExplain(q).replace(/"/g,'&quot;')}" onclick="selectOpt(this)">${label}</button>`;
