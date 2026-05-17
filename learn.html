@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.17</title>
+<title>梅花易数 · 习卦 v1.18</title>
 
 
 <style>
@@ -146,8 +146,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <div class="header-left">
-    <a class="back-btn" href="index.html">← 返回</a>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.17</span></div>
+    <button class="back-btn" id="back-btn" style="display:none" onclick="goBack()">← 返回</button>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.18</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -501,6 +501,7 @@ function startMode(mode){
     document.getElementById('mode-view').style.display='none';
     document.getElementById('result-view').classList.remove('active');
     document.getElementById('quiz-view').classList.add('active');
+    document.getElementById('back-btn').style.display='inline-flex';
     const labels={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断',xiang:'万物类象'};
     document.getElementById('mode-label').textContent=labels[mode];
     document.getElementById('q-total').textContent=questions.length;
@@ -746,15 +747,19 @@ function showResult(){
 }
 
 /* ─── 工具 ─── */
+function goBack(){
+  showModes();
+}
+
 function showModes(){
   document.getElementById('result-view').classList.remove('active');
   document.getElementById('quiz-view').classList.remove('active');
   document.getElementById('mode-view').style.display='flex';
+  document.getElementById('back-btn').style.display='none';
 }
 
 function quitQuiz(){
-  document.getElementById('quiz-view').classList.remove('active');
-  document.getElementById('mode-view').style.display='flex';
+  showModes();
 }
 
 function showCombo(n,pts){
