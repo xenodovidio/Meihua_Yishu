@@ -9,62 +9,68 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.18</title>
-
-
+<title>梅花易数 · 习卦 v1.25</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
   --paper:#f5f0e8;--paper2:#ede7d8;--paper3:#e0d8c8;
   --gold:#b8912a;--gold2:#d4aa4a;--red:#8b2020;--jade:#2d6e5a;
+  --jade2:#3d8a6e;--blue:#2563eb;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 12% 15%,rgba(184,145,42,.07) 0%,transparent 45%),radial-gradient(ellipse at 88% 85%,rgba(139,32,32,.05) 0%,transparent 45%);pointer-events:none;z-index:0;}
 
 /* ── Header ── */
-.header{padding:16px 24px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(8px);}
+.header{padding:14px 20px;padding-top:calc(14px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(8px);}
 .header-left{display:flex;align-items:center;gap:10px;}
-.back-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;}
-.back-btn:hover{border-color:var(--gold2);color:var(--gold);}
-.header-title{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
-.header-score{font-size:12px;color:var(--ink4);display:flex;align-items:center;gap:6px;}
+.back-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;display:none;align-items:center;}
+.back-btn.show{display:inline-flex;}
+.header-title{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;color:var(--ink);}
+.header-score{font-size:12px;color:var(--ink4);display:flex;align-items:center;gap:4px;}
 .score-val{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--gold);font-weight:500;}
 
 /* ── 主体 ── */
-.main{max-width:520px;margin:0 auto;padding:calc(70px + env(safe-area-inset-top,0px)) 20px calc(40px + env(safe-area-inset-bottom,0px));}
+.main{max-width:520px;margin:0 auto;padding:calc(68px + env(safe-area-inset-top,0px)) 20px calc(90px + env(safe-area-inset-bottom,0px));}
+.view{display:none;}.view.active{display:block;}
 
-/* ── 模式选择 ── */
-.mode-view{display:flex;flex-direction:column;gap:14px;}
-.mode-header{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);margin:20px 0 6px;letter-spacing:.06em;}
-.mode-sub{font-size:13px;color:var(--ink3);line-height:1.9;margin-bottom:8px;}
-.mode-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:20px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:16px;}
+/* ════════════════════
+   智能学习 View
+════════════════════ */
+.study-home{display:flex;flex-direction:column;gap:14px;}
+.study-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);margin:8px 0 2px;}
+.study-sub{font-size:13px;color:var(--ink3);line-height:1.8;margin-bottom:4px;}
+.mode-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:18px 20px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:16px;}
 .mode-card:hover{border-color:var(--gold2);background:rgba(184,145,42,.06);transform:translateY(-1px);}
-.mode-icon{font-size:28px;width:52px;height:52px;background:rgba(245,240,232,.9);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--paper3);}
+.mode-card.featured{border-color:var(--gold);background:rgba(184,145,42,.07);}
+.mode-icon{font-size:26px;width:48px;height:48px;background:rgba(245,240,232,.9);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--paper3);}
 .mode-info{flex:1;}
-.mode-name{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);margin-bottom:4px;}
-.mode-desc{font-size:12px;color:var(--ink3);line-height:1.7;}
+.mode-name{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:3px;}
+.mode-desc{font-size:12px;color:var(--ink3);line-height:1.6;}
 .mode-badge{font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(184,145,42,.1);color:var(--gold);border:1px solid rgba(184,145,42,.25);flex-shrink:0;}
 .mode-badge.hard{background:rgba(139,32,32,.07);color:var(--red);border-color:rgba(139,32,32,.2);}
 .mode-badge.mid{background:rgba(45,110,90,.08);color:var(--jade);border-color:rgba(45,110,90,.25);}
+.mode-badge.new{background:rgba(139,32,32,.07);color:var(--red);border-color:rgba(139,32,32,.2);}
 
-/* ── 进度条 ── */
-.progress-bar-wrap{margin-bottom:20px;}
-.progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+/* 题目练习 */
+.quiz-wrap{display:flex;flex-direction:column;gap:14px;}
+.progress-bar-wrap{background:rgba(237,231,216,.5);border-radius:10px;padding:14px 16px;}
+.progress-info{display:flex;justify-content:space-between;margin-bottom:8px;}
 .progress-label{font-size:12px;color:var(--ink4);}
 .progress-count{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink3);}
-.progress-bar{height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width .4s ease;}
+.progress-bar{height:5px;background:var(--paper3);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--jade2));border-radius:3px;transition:width .4s ease;}
 
-/* ── 题目卡片 ── */
-.quiz-view{display:none;flex-direction:column;gap:16px;}
-.quiz-view.active{display:flex;}
-.quiz-type-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4px 12px;border-radius:20px;background:rgba(184,145,42,.1);color:var(--gold);border:1px solid rgba(184,145,42,.25);margin-bottom:4px;width:fit-content;}
-.quiz-question{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:22px;}
-.quiz-q-label{font-size:11px;color:var(--ink4);letter-spacing:.1em;margin-bottom:12px;}
-.quiz-gua-display{display:flex;justify-content:center;gap:32px;margin:16px 0;}
+.quiz-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:20px;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.quiz-q-label{font-size:11px;color:var(--ink4);letter-spacing:.1em;margin-bottom:10px;}
+.quiz-question-text{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);line-height:1.9;}
+.quiz-gua-display{display:flex;justify-content:center;gap:32px;margin:14px 0;}
 .quiz-gua-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .quiz-gua-label{font-size:11px;color:var(--ink4);}
+.quiz-gua-name{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);}
+.quiz-gua-attr{font-size:11px;color:var(--ink4);}
+.quiz-hint{font-size:12px;color:var(--ink4);margin-top:10px;padding:8px 12px;background:rgba(245,240,232,.7);border-radius:6px;line-height:1.7;}
 
 /* 爻线 */
 .yao-lines{display:flex;flex-direction:column-reverse;gap:5px;align-items:center;}
@@ -78,67 +84,186 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .dong.yin::before,.dong.yin::after{background:var(--red);}
 .dong-mark{font-size:9px;color:var(--red);}
 
-.quiz-gua-name{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);}
-.quiz-gua-attr{font-size:11px;color:var(--ink4);}
-.quiz-question-text{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink2);line-height:1.9;margin-top:10px;}
-.quiz-hint{font-size:12px;color:var(--ink4);margin-top:8px;line-height:1.7;padding:8px 12px;background:rgba(245,240,232,.7);border-radius:6px;}
-
-/* ── 选项 ── */
+/* 选项 */
 .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .options-grid.single{grid-template-columns:1fr;}
-.option-btn{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:14px 16px;font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);cursor:pointer;transition:all .2s;text-align:center;line-height:1.6;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.option-btn{background:rgba(237,231,216,.5);border:1.5px solid var(--paper3);border-radius:10px;padding:13px 14px;font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);cursor:pointer;transition:all .2s;text-align:center;line-height:1.6;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .option-btn:hover:not(:disabled){border-color:var(--gold2);background:rgba(184,145,42,.06);}
 .option-btn.correct{border-color:var(--jade);background:rgba(45,110,90,.08);color:var(--jade);}
 .option-btn.wrong{border-color:var(--red);background:rgba(139,32,32,.06);color:var(--red);}
-.option-btn.reveal{border-color:var(--jade);background:rgba(45,110,90,.05);}
+.option-btn.reveal{border-color:var(--jade);background:rgba(45,110,90,.04);}
 .option-btn:disabled{cursor:default;}
 .option-sub{font-size:11px;color:var(--ink4);}
-.option-btn.correct .option-sub{color:var(--jade);}
-.option-btn.wrong .option-sub{color:var(--red);}
 
-/* ── 解析 ── */
-.explain-card{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:18px;animation:fadeUp .3s ease;display:none;}
+/* 解析 */
+.explain-card{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px;animation:fadeUp .3s ease;display:none;}
 .explain-card.show{display:block;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.explain-result{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.result-icon{font-size:20px;}
-.result-text{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;}
+.explain-result{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.result-icon{font-size:18px;}
+.result-text{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;}
 .result-text.correct{color:var(--jade);}
 .result-text.wrong{color:var(--red);}
-.explain-body{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.2;border-left:3px solid var(--gold2);padding-left:12px;}
-
-/* ── 底部按钮 ── */
-.quiz-actions{display:flex;gap:10px;}
-.next-btn{flex:1;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:14px;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.15em;transition:all .2s;display:none;}
+.explain-body{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.1;border-left:3px solid var(--gold2);padding-left:12px;}
+.next-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:14px;font-family:'Noto Serif SC',serif;font-size:15px;cursor:pointer;transition:all .2s;display:none;margin-top:4px;letter-spacing:.1em;}
 .next-btn.show{display:block;}
 .next-btn:hover{background:var(--ink2);}
-.quit-btn{background:none;border:1px solid var(--paper3);border-radius:8px;padding:14px 18px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink4);cursor:pointer;transition:all .2s;}
-.quit-btn:hover{border-color:var(--ink4);color:var(--ink3);}
+.quit-btn{background:none;border:1px solid var(--paper3);border-radius:8px;padding:14px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink4);cursor:pointer;width:100%;margin-top:4px;}
 
-/* ── 结算页 ── */
-.result-view{display:none;flex-direction:column;align-items:center;gap:20px;padding:20px 0;}
+/* 结算 */
+.result-view{display:none;flex-direction:column;align-items:center;gap:18px;padding:20px 0;text-align:center;}
 .result-view.active{display:flex;}
-.result-circle{width:120px;height:120px;border-radius:50%;border:3px solid var(--gold2);display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(184,145,42,.06);}
-.result-big{font-family:'Noto Serif SC',serif;font-size:36px;font-weight:700;color:var(--gold);}
-.result-of{font-size:12px;color:var(--ink4);margin-top:2px;}
-.result-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);}
-.result-desc{font-size:13px;color:var(--ink3);line-height:1.9;text-align:center;max-width:280px;}
+.result-circle{width:110px;height:110px;border-radius:50%;border:3px solid var(--gold2);display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(184,145,42,.06);}
+.result-big{font-family:'Noto Serif SC',serif;font-size:32px;font-weight:700;color:var(--gold);}
+.result-of{font-size:12px;color:var(--ink4);}
 .result-stars{font-size:24px;letter-spacing:4px;}
+.result-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);}
+.result-desc{font-size:13px;color:var(--ink3);line-height:1.9;max-width:280px;}
 .result-btns{display:flex;gap:10px;width:100%;}
-.result-btn{flex:1;border-radius:8px;padding:13px;font-family:'Noto Serif SC',serif;font-size:14px;cursor:pointer;transition:all .2s;letter-spacing:.08em;}
+.result-btn{flex:1;border-radius:8px;padding:13px;font-family:'Noto Serif SC',serif;font-size:14px;cursor:pointer;transition:all .2s;}
 .result-btn.primary{background:var(--ink);color:var(--paper);border:none;}
-.result-btn.primary:hover{background:var(--ink2);}
 .result-btn.secondary{background:none;border:1px solid var(--paper3);color:var(--ink3);}
-.result-btn.secondary:hover{border-color:var(--ink3);}
 
-/* ── 连击提示 ── */
-.combo-toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--gold);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:13px;padding:6px 18px;border-radius:20px;opacity:0;transition:all .3s;pointer-events:none;z-index:100;white-space:nowrap;}
+/* 连击 */
+.combo-toast{position:fixed;top:120px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--gold);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:13px;padding:6px 18px;border-radius:20px;opacity:0;transition:all .3s;pointer-events:none;z-index:100;}
 .combo-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ════════════════════
+   闪卡 View
+════════════════════ */
+.flashcard-home{display:flex;flex-direction:column;gap:16px;}
+.fc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:4px;}
+.fc-stat{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:10px;padding:12px 8px;text-align:center;}
+.fc-stat-num{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);display:block;}
+.fc-stat-num.learning{color:var(--gold);}
+.fc-stat-num.review{color:var(--blue);}
+.fc-stat-num.mastered{color:var(--jade);}
+.fc-stat-label{font-size:10px;color:var(--ink4);margin-top:2px;display:block;}
+.fc-start-btn{width:100%;background:var(--jade);color:white;border:none;border-radius:12px;padding:16px;font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.1em;}
+.fc-start-btn:hover{background:var(--jade2);}
+.fc-start-btn:disabled{opacity:.5;cursor:default;}
+.fc-category{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.fc-cat-name{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink);}
+.fc-cat-count{font-size:12px;color:var(--ink4);}
+
+/* 闪卡练习 */
+.fc-session{display:flex;flex-direction:column;align-items:center;gap:20px;}
+.fc-progress{width:100%;display:flex;align-items:center;gap:12px;}
+.fc-prog-nums{font-size:12px;color:var(--ink4);white-space:nowrap;}
+.fc-prog-bar{flex:1;height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;}
+.fc-prog-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--jade2));border-radius:2px;transition:width .4s;}
+.fc-card-wrap{width:100%;perspective:1000px;}
+.fc-card{width:100%;min-height:260px;border-radius:16px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s ease;}
+.fc-card.flipped{transform:rotateY(180deg);}
+.fc-card-front,.fc-card-back{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.fc-card-front{background:rgba(237,231,216,.8);border:1px solid var(--paper3);}
+.fc-card-back{background:rgba(45,110,90,.06);border:1px solid rgba(45,110,90,.2);transform:rotateY(180deg);}
+.fc-card-label{font-size:11px;color:var(--ink4);letter-spacing:.12em;margin-bottom:16px;}
+.fc-card-main{font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;color:var(--ink);text-align:center;line-height:1.4;}
+.fc-card-sub{font-size:13px;color:var(--ink3);margin-top:10px;text-align:center;line-height:1.8;}
+.fc-card-hint{font-size:12px;color:var(--ink4);margin-top:16px;}
+.fc-ratings{display:flex;gap:12px;width:100%;}
+.fc-rate-btn{flex:1;border:none;border-radius:12px;padding:14px 8px;font-size:22px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.fc-rate-btn span{font-size:11px;font-family:'Noto Sans SC',sans-serif;}
+.fc-rate-bad{background:rgba(239,68,68,.12);color:#dc2626;}
+.fc-rate-bad:hover{background:rgba(239,68,68,.2);}
+.fc-rate-ok{background:rgba(234,179,8,.12);color:#ca8a04;}
+.fc-rate-ok:hover{background:rgba(234,179,8,.2);}
+.fc-rate-good{background:rgba(45,110,90,.1);color:var(--jade);}
+.fc-rate-good:hover{background:rgba(45,110,90,.18);}
+.fc-flip-hint{font-size:12px;color:var(--ink4);text-align:center;}
+
+/* ════════════════════
+   测试 View
+════════════════════ */
+.test-home{display:flex;flex-direction:column;gap:20px;}
+.test-section-title{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.test-section-title::before{content:'';display:block;width:3px;height:16px;background:var(--gold);border-radius:2px;}
+.test-config{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px;}
+.test-row{display:flex;align-items:center;justify-content:space-between;}
+.test-row-label{font-size:14px;color:var(--ink2);}
+.test-counter{display:flex;align-items:center;gap:12px;}
+.test-counter-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--paper3);background:none;font-size:18px;color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.test-counter-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.test-counter-val{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);min-width:32px;text-align:center;}
+.test-create-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:10px;padding:15px;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.1em;}
+.test-create-btn:hover{background:var(--ink2);}
+.test-history{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;overflow:hidden;}
+.test-hist-row{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--paper3);gap:12px;}
+.test-hist-row:last-child{border-bottom:none;}
+.test-hist-num{font-size:12px;color:var(--ink4);width:36px;}
+.test-hist-info{flex:1;}
+.test-hist-score{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--gold);}
+.test-hist-meta{font-size:11px;color:var(--ink4);margin-top:2px;}
+.test-hist-retry{background:none;border:1px solid var(--paper3);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--ink3);cursor:pointer;}
+
+/* 测试中 */
+.test-session{display:flex;flex-direction:column;gap:14px;}
+.test-header-bar{display:flex;align-items:center;gap:12px;background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:10px;padding:12px 16px;}
+.test-timer{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--jade);min-width:52px;}
+.test-timer.urgent{color:var(--red);}
+.test-timer-bar{flex:1;height:6px;background:var(--paper3);border-radius:3px;overflow:hidden;}
+.test-timer-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--jade2));border-radius:3px;transition:width 1s linear;}
+.test-timer-fill.urgent{background:linear-gradient(90deg,var(--red),#c0392b);}
+.test-done-btn{background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.test-q-list{display:flex;flex-direction:column;gap:14px;}
+.test-q-item{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:18px;}
+.test-q-meta{font-size:11px;color:var(--ink4);margin-bottom:10px;}
+.test-q-text{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:14px;line-height:1.7;}
+.test-opts{display:flex;flex-direction:column;gap:8px;}
+.test-opt{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--paper3);border-radius:8px;cursor:pointer;transition:all .2s;background:rgba(245,240,232,.7);}
+.test-opt:hover{border-color:var(--gold2);}
+.test-opt.selected{border-color:var(--gold);background:rgba(184,145,42,.08);}
+.test-opt.correct{border-color:var(--jade);background:rgba(45,110,90,.08);}
+.test-opt.wrong{border-color:var(--red);background:rgba(139,32,32,.06);}
+.test-opt-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--paper3);flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.test-opt.selected .test-opt-dot{border-color:var(--gold);background:var(--gold);}
+.test-opt.correct .test-opt-dot{border-color:var(--jade);background:var(--jade);}
+.test-opt.wrong .test-opt-dot{border-color:var(--red);background:var(--red);}
+.test-opt-dot-inner{width:8px;height:8px;border-radius:50%;background:white;display:none;}
+.test-opt.selected .test-opt-dot-inner,.test-opt.correct .test-opt-dot-inner,.test-opt.wrong .test-opt-dot-inner{display:block;}
+.test-opt-text{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);}
+.test-opt.correct .test-opt-text{color:var(--jade);}
+.test-opt.wrong .test-opt-text{color:var(--red);}
+.test-feedback{margin-top:10px;font-size:12px;color:var(--ink3);line-height:1.8;padding:8px 12px;border-radius:6px;background:rgba(245,240,232,.8);display:none;}
+.test-feedback.show{display:block;}
+
+/* 测试结果 */
+.test-result{display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px 0;}
+.test-result-score{font-family:'Noto Serif SC',serif;font-size:52px;font-weight:700;color:var(--gold);}
+.test-result-label{font-size:13px;color:var(--ink4);}
+.test-result-detail{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.test-result-cell{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:10px;padding:12px;text-align:center;}
+.test-result-cell-num{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);}
+.test-result-cell-label{font-size:11px;color:var(--ink4);margin-top:2px;}
+
+/* ════════════════════
+   学习指南 View
+════════════════════ */
+/* ── 学习指南 ── */
+.guide-category{margin-bottom:24px;}
+.guide-cat-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.guide-cat-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;}
+.guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.guide-file{background:rgba(237,231,216,.7);border:1px solid var(--paper3);border-radius:10px;padding:14px 10px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.guide-file:hover{border-color:var(--gold2);background:rgba(184,145,42,.07);transform:translateY(-1px);}
+.guide-file-icon{font-size:28px;}
+.guide-file-name{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ink);line-height:1.5;word-break:break-all;}
+
+/* 沉浸式阅读 */
+.reader-view{display:none;flex-direction:column;}
+.reader-view.active{display:flex;}
+.reader-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.reader-back{background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--ink3);cursor:pointer;}
+.reader-title{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:700;color:var(--ink);}
+.reader-body{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink2);line-height:2.4;}
+.reader-body p{margin-bottom:12px;}
+.reader-loading{color:var(--ink4);font-size:13px;text-align:center;padding:40px 0;}
+.reader-error{color:var(--red);font-size:13px;text-align:center;padding:40px 0;}
+
 /* ── Dock ── */
 .dock{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(245,240,232,.96);backdrop-filter:blur(12px);border-top:1px solid var(--paper3);display:flex;align-items:stretch;padding-bottom:calc(env(safe-area-inset-bottom,0px) * 0.5);}
 .dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 8px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
 .dock-btn.active{color:var(--gold);}
-.dock-btn:hover{color:var(--ink2);}
 .dock-icon{width:22px;height:22px;flex-shrink:0;}
 </style>
 </head>
@@ -146,314 +271,478 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <header class="header">
   <div class="header-left">
-    <button class="back-btn" id="back-btn" style="display:none" onclick="goBack()">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.05em;">v1.18</span></div>
+    <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
+    <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.25</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
 
 <div class="main">
+  <div class="combo-toast" id="combo-toast"></div>
 
-  <!-- 模式选择 -->
-  <div class="mode-view" id="mode-view">
-    <div class="mode-header">选择练习</div>
-    <div class="mode-sub">通过互动练习，熟悉八卦与梅花易数的基础知识</div>
+  <!-- ══ 智能学习 ══ -->
+  <div class="view" id="view-study">
 
-    <div class="mode-card" onclick="window.location.href='journey.html'" style="border-color:var(--gold);background:rgba(184,145,42,.07);">
-      <div class="mode-icon">🗺️</div>
-      <div class="mode-info">
-        <div class="mode-name">学习之旅</div>
-        <div class="mode-desc">从零开始，系统学习梅花易数基础知识</div>
+    <!-- 首页 -->
+    <div id="study-home">
+      <div class="study-title">智能学习</div>
+      <div class="study-sub">通过主动回忆练习，强化梅花易数知识记忆</div>
+
+      <div class="study-home">
+        <div class="mode-card featured" onclick="window.location.href='journey.html'">
+          <div class="mode-icon">🗺️</div>
+          <div class="mode-info">
+            <div class="mode-name">学习之旅</div>
+            <div class="mode-desc">从零开始，系统学习梅花易数基础知识</div>
+          </div>
+          <div class="mode-badge new">新</div>
+        </div>
+        <div class="mode-card" onclick="startMode('recognize')">
+          <div class="mode-icon">☰</div>
+          <div class="mode-info">
+            <div class="mode-name">识卦练习</div>
+            <div class="mode-desc">看爻线，猜卦名、互卦、变卦</div>
+          </div>
+          <div class="mode-badge">入门</div>
+        </div>
+        <div class="mode-card" onclick="startMode('xiang')">
+          <div class="mode-icon">🌿</div>
+          <div class="mode-info">
+            <div class="mode-name">万物类象</div>
+            <div class="mode-desc">根据卦象选类象，或根据事物找对应的卦</div>
+          </div>
+          <div class="mode-badge mid">进阶</div>
+        </div>
+        <div class="mode-card" onclick="startMode('tiyong')">
+          <div class="mode-icon">⚖️</div>
+          <div class="mode-info">
+            <div class="mode-name">体用判断</div>
+            <div class="mode-desc">判断所问事项中哪个是体卦哪个是用卦</div>
+          </div>
+          <div class="mode-badge mid">进阶</div>
+        </div>
+        <div class="mode-card" onclick="startMode('jixiong')">
+          <div class="mode-icon">🔮</div>
+          <div class="mode-info">
+            <div class="mode-name">吉凶判断</div>
+            <div class="mode-desc">根据体用五行关系判断吉凶走向</div>
+          </div>
+          <div class="mode-badge hard">高阶</div>
+        </div>
       </div>
-      <div class="mode-badge" style="background:rgba(139,32,32,.07);color:var(--red);border-color:rgba(139,32,32,.2);">新</div>
     </div>
 
-    <div class="mode-card" onclick="startMode('recognize')">
-      <div class="mode-icon">☰</div>
-      <div class="mode-info">
-        <div class="mode-name">识卦练习</div>
-        <div class="mode-desc">看爻线图形，猜出对应的卦名和属性</div>
+    <!-- 题目区 -->
+    <div class="quiz-wrap" id="quiz-wrap" style="display:none">
+      <div class="progress-bar-wrap">
+        <div class="progress-info">
+          <div class="progress-label" id="mode-label">识卦练习</div>
+          <div class="progress-count"><span id="q-current">1</span> / <span id="q-total">10</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
       </div>
-      <div class="mode-badge">入门</div>
-    </div>
-
-    <div class="mode-card" onclick="startMode('xiang')">
-      <div class="mode-icon">🌿</div>
-      <div class="mode-info">
-        <div class="mode-name">万物类象</div>
-        <div class="mode-desc">根据卦象选类象，或根据事物找对应的卦</div>
-      </div>
-      <div class="mode-badge mid">进阶</div>
-    </div>
-
-    <div class="mode-card" onclick="startMode('tiyong')">
-      <div class="mode-icon">⚖️</div>
-      <div class="mode-info">
-        <div class="mode-name">体用判断</div>
-        <div class="mode-desc">根据所问事项，判断本卦中哪个是体卦哪个是用卦</div>
-      </div>
-      <div class="mode-badge mid">进阶</div>
-    </div>
-
-    <div class="mode-card" onclick="startMode('jixiong')">
-      <div class="mode-icon">🔮</div>
-      <div class="mode-info">
-        <div class="mode-name">吉凶判断</div>
-        <div class="mode-desc">根据体用五行关系，判断所问事项的吉凶走向</div>
-      </div>
-      <div class="mode-badge hard">高阶</div>
-    </div>
-  </div>
-
-  <!-- 题目区 -->
-  <div class="quiz-view" id="quiz-view">
-    <div class="progress-bar-wrap">
-      <div class="progress-info">
-        <div class="progress-label" id="mode-label">识卦练习</div>
-        <div class="progress-count"><span id="q-current">1</span> / <span id="q-total">10</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
-    </div>
-
-    <div class="quiz-question" id="quiz-question"></div>
-    <div class="options-grid" id="options-grid"></div>
-    <div class="explain-card" id="explain-card"></div>
-    <div class="quiz-actions">
-      <button class="quit-btn" onclick="quitQuiz()">退出</button>
+      <div class="quiz-card" id="quiz-question"></div>
+      <div class="options-grid" id="options-grid"></div>
+      <div class="explain-card" id="explain-card"></div>
       <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 →</button>
+      <button class="quit-btn" onclick="quitQuiz()">退出</button>
     </div>
+
+    <!-- 结算 -->
+    <div class="result-view" id="result-view">
+      <div class="result-circle">
+        <div class="result-big" id="r-score">0/10</div>
+        <div class="result-of">答题</div>
+      </div>
+      <div class="result-stars" id="r-stars">★★★</div>
+      <div class="result-title" id="r-title">完美！</div>
+      <div class="result-desc" id="r-desc"></div>
+      <div class="result-btns">
+        <button class="result-btn secondary" onclick="showStudyHome()">返回</button>
+        <button class="result-btn primary" id="r-retry-btn" onclick="retryMode()">再来一次</button>
+      </div>
+    </div>
+
   </div>
 
-  <!-- 结算页 -->
-  <div class="result-view" id="result-view"></div>
+  <!-- ══ 闪卡 ══ -->
+  <div class="view" id="view-flashcard">
+
+    <!-- 首页 -->
+    <div id="fc-home">
+      <div class="study-title" style="margin-bottom:16px;">闪卡</div>
+      <div class="fc-stats">
+        <div class="fc-stat"><span class="fc-stat-num learning" id="fc-learning">0</span><span class="fc-stat-label">学习中</span></div>
+        <div class="fc-stat"><span class="fc-stat-num review" id="fc-review">0</span><span class="fc-stat-label">复习中</span></div>
+        <div class="fc-stat"><span class="fc-stat-num mastered" id="fc-mastered">0</span><span class="fc-stat-label">已掌握</span></div>
+        <div class="fc-stat"><span class="fc-stat-num" id="fc-total">0</span><span class="fc-stat-label">总计</span></div>
+      </div>
+      <button class="fc-start-btn" onclick="startFlashcards()">开始复习</button>
+      <div style="margin-top:20px;">
+        <div class="test-section-title">卡组</div>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="fc-categories"></div>
+      </div>
+    </div>
+
+    <!-- 闪卡练习 -->
+    <div id="fc-session" style="display:none">
+      <div class="fc-session">
+        <div class="fc-progress">
+          <div class="fc-prog-nums"><span id="fc-cur">1</span>/<span id="fc-total-s">10</span></div>
+          <div class="fc-prog-bar"><div class="fc-prog-fill" id="fc-prog-fill" style="width:10%"></div></div>
+        </div>
+        <div class="fc-card-wrap">
+          <div class="fc-card" id="fc-card" onclick="flipCard()">
+            <div class="fc-card-front">
+              <div class="fc-card-label">点击翻转</div>
+              <div class="fc-card-main" id="fc-front-main"></div>
+              <div class="fc-card-sub" id="fc-front-sub"></div>
+              <div class="fc-card-hint">👆 点击查看答案</div>
+            </div>
+            <div class="fc-card-back">
+              <div class="fc-card-label">答案</div>
+              <div class="fc-card-main" id="fc-back-main"></div>
+              <div class="fc-card-sub" id="fc-back-sub"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-flip-hint" id="fc-flip-hint">翻转后评分</div>
+        <div class="fc-ratings" id="fc-ratings" style="display:none">
+          <button class="fc-rate-btn fc-rate-bad" onclick="rateCard(0)">😞<span>错误</span></button>
+          <button class="fc-rate-btn fc-rate-ok" onclick="rateCard(1)">😐<span>不确定</span></button>
+          <button class="fc-rate-btn fc-rate-good" onclick="rateCard(2)">😊<span>掌握了</span></button>
+        </div>
+        <button class="quit-btn" onclick="quitFlashcards()">结束复习</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ 测试 ══ -->
+  <div class="view" id="view-test">
+
+    <!-- 首页 -->
+    <div id="test-home">
+      <div class="study-title" style="margin-bottom:16px;">模拟测试</div>
+      <div class="test-config">
+        <div class="test-section-title">时间</div>
+        <div class="test-row">
+          <span class="test-row-label">测试时长</span>
+          <div class="test-counter">
+            <button class="test-counter-btn" onclick="adjustTime(-5)">−</button>
+            <span class="test-counter-val"><span id="test-time-val">10</span> 分钟</span>
+            <button class="test-counter-btn" onclick="adjustTime(5)">+</button>
+          </div>
+        </div>
+        <div class="test-section-title" style="margin-top:4px;">题目</div>
+        <div class="test-row">
+          <span class="test-row-label">题目数量</span>
+          <div class="test-counter">
+            <button class="test-counter-btn" onclick="adjustCount(-5)">−</button>
+            <span class="test-counter-val"><span id="test-count-val">10</span> 题</span>
+            <button class="test-counter-btn" onclick="adjustCount(5)">+</button>
+          </div>
+        </div>
+        <button class="test-create-btn" onclick="startTest()">创建测试</button>
+      </div>
+
+      <div style="margin-top:20px;" id="test-history-wrap">
+        <div class="test-section-title">历史记录</div>
+        <div class="test-history" id="test-history-list"></div>
+      </div>
+    </div>
+
+    <!-- 测试中 -->
+    <div id="test-session" style="display:none">
+      <div class="test-session">
+        <div class="test-header-bar">
+          <div class="test-timer" id="test-timer">10:00</div>
+          <div class="test-timer-bar"><div class="test-timer-fill" id="test-timer-fill" style="width:100%"></div></div>
+          <button class="test-done-btn" onclick="finishTest()">我完成了</button>
+        </div>
+        <div class="test-q-list" id="test-q-list"></div>
+        <button class="test-create-btn" onclick="finishTest()" style="margin-top:4px;">提交测试</button>
+      </div>
+    </div>
+
+    <!-- 测试结果 -->
+    <div id="test-result-view" style="display:none">
+      <div class="test-result">
+        <div class="test-result-score" id="test-result-pct">0%</div>
+        <div class="test-result-label">得分</div>
+        <div class="test-result-detail">
+          <div class="test-result-cell">
+            <div class="test-result-cell-num" id="tr-correct">0</div>
+            <div class="test-result-cell-label">答对</div>
+          </div>
+          <div class="test-result-cell">
+            <div class="test-result-cell-num" id="tr-wrong">0</div>
+            <div class="test-result-cell-label">答错</div>
+          </div>
+          <div class="test-result-cell">
+            <div class="test-result-cell-num" id="tr-skip">0</div>
+            <div class="test-result-cell-label">未答</div>
+          </div>
+        </div>
+        <div class="result-btns" style="width:100%">
+          <button class="result-btn secondary" onclick="showTestHome()">返回</button>
+          <button class="result-btn primary" onclick="startTest()">再次测试</button>
+        </div>
+        <div style="width:100%;margin-top:8px;" id="test-review-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ 学习指南 ══ -->
+  <div class="view active" id="view-guide">
+    <!-- 文件列表 -->
+    <div id="guide-home">
+      <div class="study-title" style="margin-bottom:20px;">学习指南</div>
+      <div id="guide-categories"></div>
+    </div>
+    <!-- 沉浸式阅读 -->
+    <div class="reader-view" id="reader-view">
+      <div class="reader-header">
+        <button class="reader-back" onclick="closeReader()">← 返回</button>
+        <div class="reader-title" id="reader-title"></div>
+      </div>
+      <div class="reader-body" id="reader-body"></div>
+    </div>
+  </div>
 
 </div>
 
-<div class="combo-toast" id="combo-toast"></div>
+<!-- Dock：习卦内部5个tab -->
+<nav class="dock" id="main-dock">
+  <button class="dock-btn" id="tab-guide" onclick="switchTab('guide')">
+    <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+    </svg>
+    <span>指南</span>
+  </button>
+  <button class="dock-btn" id="tab-study" onclick="switchTab('study')">
+    <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+    <span>练习</span>
+  </button>
+  <button class="dock-btn" id="tab-flashcard" onclick="switchTab('flashcard')">
+    <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2"/>
+      <line x1="2" y1="10" x2="22" y2="10"/>
+    </svg>
+    <span>闪卡</span>
+  </button>
+  <button class="dock-btn" id="tab-test" onclick="switchTab('test')">
+    <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
+    <span>测试</span>
+  </button>
+  <button class="dock-btn" id="tab-journey" onclick="window.location.href='journey.html'">
+    <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+    <span>之旅</span>
+  </button>
+</nav>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="data.js"></script>
 <script>
-/* ─── 状态 ─── */
-let currentMode='';
-let questions=[];
-let currentIdx=0;
-let correctCount=0;
-let combo=0;
-let totalScore=parseInt(localStorage.getItem('learn_score')||'0');
-let comboTimer=null;
+/* ══════════ 状态 ══════════ */
+let currentTab = 'study';
+let currentMode = '';
+let questions = [];
+let currentIdx = 0;
+let correctCount = 0;
+let combo = 0;
+let comboTimer = null;
+let totalScore = parseInt(localStorage.getItem('learn_score')||'0');
+document.getElementById('total-score').textContent = totalScore;
 
-document.getElementById('total-score').textContent=totalScore;
-
-/* ─── 爻线渲染 ─── */
-function yaoLines(uL,dL,dongIdx,size=1){
-  const all=[...dL,...uL];
-  const w=size===1?50:38;
-  const gap=size===1?7:5;
-  return`<div class="yao-lines" style="gap:${size===1?5:4}px">${all.map((l,i)=>{
-    const isDong=i===dongIdx;
-    if(l==='y') return`<div class="yao-row"><div class="yao-line yang${isDong?' dong':''}" style="width:${w}px"></div>${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}</div>`;
-    return`<div class="yao-row"><div class="yao-line yin${isDong?' dong':''}" style="width:${w}px"></div>${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}</div>`;
-  }).join('')}</div>`;
-}
-
-/* ─── 题库（从questions.json加载）─── */
-let TIYONG_BANK=[];
-let BAGUA_XIANG={};
-let XIANG_FROM_GUA=[];
-let GUA_FROM_XIANG=[];
-let questionsLoaded=false;
-
+/* ══════════ 题库 ══════════ */
+let TIYONG_BANK=[], BAGUA_XIANG={}, XIANG_FROM_GUA=[], GUA_FROM_XIANG=[];
 async function loadQuestions(){
   try{
-    const res=await fetch('questions.json');
-    const data=await res.json();
-    TIYONG_BANK=data.tiyong||[];
-    XIANG_FROM_GUA=data.xiang_from_gua||[];
-    GUA_FROM_XIANG=data.gua_from_xiang||[];
-    // 重建BAGUA_XIANG供现有函数使用
+    const res = await fetch('questions.json');
+    const data = await res.json();
+    TIYONG_BANK = data.tiyong||[];
+    XIANG_FROM_GUA = data.xiang_from_gua||[];
+    GUA_FROM_XIANG = data.gua_from_xiang||[];
     const bx={};
     XIANG_FROM_GUA.forEach(q=>{
       if(!bx[q.guaNum])bx[q.guaNum]={name:BI[q.guaNum].name,xiang:{}};
       if(!bx[q.guaNum].xiang[q.cat])bx[q.guaNum].xiang[q.cat]=q.allItems;
     });
-    BAGUA_XIANG=bx;
-    questionsLoaded=true;
-  }catch(e){
-    console.error('题库加载失败:',e);
-    // 加载失败时使用内置备用数据
-    questionsLoaded=true;
-  }
+    BAGUA_XIANG = bx;
+    initFlashcards();
+    renderGuide();
+  }catch(e){ console.error('题库加载失败',e); initFlashcards(); renderGuide(); }
 }
 
-/* ─── 卦→类象题 ─── */
+/* ══════════ Tab 切换 ══════════ */
+function switchTab(tab){
+  if(currentTab === tab) return;
+  currentTab = tab;
+  document.querySelectorAll('.dock-btn[id^="tab-"]').forEach(b=>b.classList.remove('active'));
+  const tabBtn = document.getElementById('tab-'+tab);
+  if(tabBtn) tabBtn.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  hideBackBtn();
+  if(tab==='flashcard') updateFcStats();
+  if(tab==='test') renderTestHistory();
+}
+
+/* ══════════ 返回逻辑 ══════════ */
+function goBack(){
+  if(currentTab==='study'){ showStudyHome(); }
+  else if(currentTab==='flashcard'){ quitFlashcards(); }
+  else if(currentTab==='test'){ showTestHome(); }
+  else if(currentTab==='guide'){ closeReader(); return; }
+  hideBackBtn();
+}
+function showBackBtn(){
+  document.getElementById('home-btn').style.display='none';
+  document.getElementById('back-btn').style.display='inline-flex';
+}
+function hideBackBtn(){
+  document.getElementById('home-btn').style.display='inline-flex';
+  document.getElementById('back-btn').style.display='none';
+}
+
+/* ══════════════════════════════
+   智能学习
+══════════════════════════════ */
+function showStudyHome(){
+  document.getElementById('study-home').style.display='block';
+  document.getElementById('quiz-wrap').style.display='none';
+  document.getElementById('result-view').classList.remove('active');
+  hideBackBtn();
+}
+
+function startMode(mode){
+  try{
+    currentMode = mode;
+    questions = genQuestions(mode, 10);
+    currentIdx = 0; correctCount = 0; combo = 0;
+    document.getElementById('study-home').style.display='none';
+    document.getElementById('quiz-wrap').style.display='flex';
+    document.getElementById('result-view').classList.remove('active');
+    const labels={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断',xiang:'万物类象'};
+    document.getElementById('mode-label').textContent = labels[mode]||mode;
+    document.getElementById('q-total').textContent = questions.length;
+    showBackBtn();
+    renderQuestion();
+  }catch(e){ alert('启动失败：'+e.message); }
+}
+
+function retryMode(){ startMode(currentMode); }
+function quitQuiz(){ showStudyHome(); }
+
+/* ── 爻线 ── */
+function yaoLines(uL, dL, dongIdx, size=1){
+  const all=[...dL,...uL], names=['初','二','三','四','五','上'];
+  return`<div class="yao-lines">${all.map((l,i)=>{
+    const isDong=i===dongIdx;
+    return`<div class="yao-row">
+      <div class="yao-num">${names[i]}</div>
+      <div class="yao-line ${l}${isDong?' dong':''}"></div>
+      ${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ── 题目生成 ── */
 function genXiangFromGuaQ(){
-  const n=Math.floor(Math.random()*8)+1;
-  const info=BI[n];
-  const xiang=BAGUA_XIANG[n].xiang;
-  // 随机选一个类别
-  const cats=Object.keys(xiang);
-  const cat=cats[Math.floor(Math.random()*cats.length)];
-  const items=xiang[cat];
-  // 正确答案：随机取一个类象
-  const correct=items[Math.floor(Math.random()*items.length)];
-  // 错误选项：从其他卦的同类别里取，或随机类别
+  if(!XIANG_FROM_GUA.length)return genRecognizeQ();
+  const pool=XIANG_FROM_GUA;
+  const item=pool[Math.floor(Math.random()*pool.length)];
+  const n=item.guaNum, info=BI[n];
+  const correct=item.answer;
   const wrongPool=[];
-  Object.entries(BAGUA_XIANG).forEach(([k,v])=>{
-    if(Number(k)!==n){
-      const w=v.xiang[cat]||Object.values(v.xiang).flat();
-      wrongPool.push(...w);
-    }
-  });
-  const wrongs=shuffle([...new Set(wrongPool)].filter(x=>!items.includes(x))).slice(0,3);
+  XIANG_FROM_GUA.forEach(q=>{ if(q.guaNum!==n&&q.cat===item.cat) wrongPool.push(q.answer); });
+  const wrongs=shuffle([...new Set(wrongPool)].filter(x=>x!==correct)).slice(0,3);
   const opts=shuffle([correct,...wrongs]);
-  return{
-    type:'xiang_from_gua',
-    guaNum:n,
-    lines:BL[n],
-    cat,
-    answer:correct,
+  return{type:'xiang_from_gua',guaNum:n,lines:BL[n],cat:item.cat,answer:correct,
     options:opts.map(o=>({val:o,label:o})),
-    explain:`${info.name}卦（${info.attr}·${info.wx}）在"${cat}"类象中包含：${items.join('、')}等。`,
-  };
+    explain:`${info.name}卦（${info.attr}·${info.wx}）在「${item.cat}」类象中包含：${(item.allItems||[correct]).join('、')}等。`};
 }
-
-/* ─── 类象→卦题 ─── */
 function genGuaFromXiangQ(){
-  const n=Math.floor(Math.random()*8)+1;
-  const info=BI[n];
-  const xiang=BAGUA_XIANG[n].xiang;
-  const cats=Object.keys(xiang);
-  const cat=cats[Math.floor(Math.random()*cats.length)];
-  const items=xiang[cat];
-  const item=items[Math.floor(Math.random()*items.length)];
-  // 错误选项：其他3个卦
+  if(!GUA_FROM_XIANG.length)return genRecognizeQ();
+  const item=GUA_FROM_XIANG[Math.floor(Math.random()*GUA_FROM_XIANG.length)];
+  const n=item.guaNum, info=BI[n];
   const others=Object.keys(BI).map(Number).filter(k=>k!==n);
   shuffle(others);
-  const wrongs=others.slice(0,3);
-  const opts=shuffle([n,...wrongs]);
-  return{
-    type:'gua_from_xiang',
-    item,cat,
+  const opts=shuffle([n,...others.slice(0,3)]);
+  return{type:'gua_from_xiang',item:item.item,cat:item.cat,answer:String(n),
     options:opts.map(k=>({val:String(k),label:BI[k].name,sub:`${BI[k].attr}·${BI[k].wx}`})),
-    explain:`"${item}"属于${info.name}卦（${info.attr}·${info.wx}）的"${cat}"类象。${info.name}卦还包含：${items.filter(x=>x!==item).slice(0,3).join('、')}等。`,
-    answer:String(n),
-  };
+    explain:`「${item.item}」属于${info.name}卦（${info.attr}·${info.wx}）的「${item.cat}」类象。`};
 }
-
-/* ─── 题目生成 ─── */
 function genRecognizeQ(){
-  // 随机选一个卦
-  const n=Math.floor(Math.random()*8)+1;
-  const info=BI[n];
-  const lines=BL[n];
-  // 错误选项
+  const n=Math.floor(Math.random()*8)+1, info=BI[n], lines=BL[n];
   const others=Object.keys(BI).map(Number).filter(k=>k!==n);
   shuffle(others);
   const wrong=others.slice(0,3);
   const opts=shuffle([n,...wrong]);
-  return{
-    type:'recognize',
-    lines,
-    answer:n,
+  return{type:'lines2name',guaNum:n,answer:n,lines,
     options:opts.map(k=>({val:k,label:BI[k].name,sub:`${BI[k].attr}·${BI[k].wx}·${BI[k].nat}`})),
-    explain:`${info.name}卦，象征"${info.attr}"，五行属${info.wx}，卦性${info.nat}。记忆口诀：乾三连，坤六断，震仰盂，艮覆碗，离中虚，坎中满，兑上缺，巽下断。`
-  };
+    explain:`${info.name}卦：${info.attr}·${info.wx}·${info.nat}`};
 }
-
-
 function genTiyongQ(){
-  if(!TIYONG_BANK.length)return null;
+  if(!TIYONG_BANK.length)return genRecognizeQ();
   const item=TIYONG_BANK[Math.floor(Math.random()*TIYONG_BANK.length)];
   const wrongOpts=["你为体，对方为用","对方为体，你为用","上卦为体，下卦为用","下卦为体，上卦为用","物件为体，你为用","男方为上卦（体），女方为下卦（用）","男方为上卦（用），女方为下卦（体）"];
   const wrongs=shuffle(wrongOpts.filter(o=>o!==item.answer)).slice(0,3);
   const opts=shuffle([item.answer,...wrongs]);
-  return{
-    type:'tiyong',
-    qText:item.q,
-    answer:item.answer,
-    options:opts.map(o=>({val:o,label:o})),
-    explain:item.explain,
-  };
+  return{type:'tiyong',qText:item.q,answer:item.answer,
+    options:opts.map(o=>({val:o,label:o})),explain:item.explain};
 }
-
 function genJixiongQ(){
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  const tiN=g.d, yongN=g.u;
-  const tiI=BI[tiN],yongI=BI[tiN===g.d?g.u:g.d];
-  // 重新确定体用
-  const tiInfo=BI[g.d],yongInfo=BI[g.u];
-  const tiWx=tiInfo.wx,yongWx=yongInfo.wx;
-  let rel='',answer='',explain='';
-  if(WX_SHENG[yongWx]===tiWx){rel='用生体';answer='good';explain=`用卦${yongInfo.name}（${yongWx}）生体卦${tiInfo.name}（${tiWx}），用生体，所问之事有贵人相助，较为有利。`;}
-  else if(WX_SHENG[tiWx]===yongWx){rel='体生用';answer='bad';explain=`体卦${tiInfo.name}（${tiWx}）生用卦${yongInfo.name}（${yongWx}），体生用，体卦泄气于用卦，付出多收获少，属小凶，不利。`;}
-  else if(WX_KE[yongWx]===tiWx){rel='用克体';answer='bad';explain=`用卦${yongInfo.name}（${yongWx}）克体卦${tiInfo.name}（${tiWx}），用克体，所问之事受阻，需谨慎应对。`;}
-  else if(WX_KE[tiWx]===yongWx){rel='体克用';answer='good';explain=`体卦${tiInfo.name}（${tiWx}）克用卦${yongInfo.name}（${yongWx}），体克用，主动有力，所问之事可成。`;}
-  else{rel='体用比和';answer='mid';explain=`体卦${tiInfo.name}与用卦${yongInfo.name}同属${tiWx}，比和平衡，事情平稳，无大起伏。`;}
-
+  const tiI=BI[g.u], yongI=BI[g.d];
+  const tiWx=tiI.wx, yongWx=yongI.wx;
+  let answer='mid', rel='', explain='';
+  if(WX_SHENG[yongWx]===tiWx){answer='good';rel='用生体';explain=`用卦${yongI.name}（${yongWx}）生体卦${tiI.name}（${tiWx}），用生体，较为有利。`;}
+  else if(WX_SHENG[tiWx]===yongWx){answer='bad';rel='体生用';explain=`体卦${tiI.name}（${tiWx}）生用卦${yongI.name}（${yongWx}），体生用，体卦泄气，不利。`;}
+  else if(WX_KE[yongWx]===tiWx){answer='bad';rel='用克体';explain=`用卦${yongI.name}（${yongWx}）克体卦${tiI.name}（${tiWx}），用克体，不利。`;}
+  else if(WX_KE[tiWx]===yongWx){answer='good';rel='体克用';explain=`体卦${tiI.name}（${tiWx}）克用卦${yongI.name}（${yongWx}），体克用，有利。`;}
+  else{rel='比和';explain=`体卦${tiI.name}与用卦${yongI.name}同属${tiWx}，比和平稳。`;}
   const opts=shuffle([
     {val:'good',label:'有利',sub:'用生体 或 体克用'},
     {val:'bad',label:'不利',sub:'用克体 或 体生用'},
     {val:'mid',label:'平稳',sub:'比和'},
   ]);
-  return{
-    type:'jixiong',
-    g,tiInfo,yongInfo,tiWx,yongWx,rel,
-    answer,options:opts,explain
-  };
+  return{type:'jixiong',g,tiI,yongI,tiWx,yongWx,rel,answer,options:opts,explain};
 }
-
-/* ─── 工具：爻线数组转八卦编号（初→上顺序，与BL一致）─── */
 function lines2num(ls){
-  const m={
-    'y,y,y':1, // 乾：初阳二阳三阳
-    'y,y,n':2, // 兑：初阳二阳三阴
-    'y,n,y':3, // 离：初阳二阴三阳
-    'y,n,n':4, // 震：初阳二阴三阴
-    'n,y,y':5, // 巽：初阴二阳三阳
-    'n,y,n':6, // 坎：初阴二阳三阴
-    'n,n,y':7, // 艮：初阴二阴三阳
-    'n,n,n':8, // 坤：初阴二阴三阴
-  };
+  const m={'y,y,y':1,'y,y,n':2,'y,n,y':3,'y,n,n':4,'n,y,y':5,'n,y,n':6,'n,n,y':7,'n,n,n':8};
   return m[ls.join(',')]||1;
 }
-
-/* ─── 猜互卦题 ─── */
 function genHuGuaQ(){
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
-  // BL已经是初→上顺序，直接拼接
   const all=[...BL[g.d],...BL[g.u]];
-  // 互卦：index 1,2,3为下互；index 2,3,4为上互
-  const huDL=[all[1],all[2],all[3]];
-  const huUL=[all[2],all[3],all[4]];
-  const huD=lines2num(huDL);
-  const huU=lines2num(huUL);
+  const huDL=[all[1],all[2],all[3]], huUL=[all[2],all[3],all[4]];
+  const huD=lines2num(huDL), huU=lines2num(huUL);
   const huInfo=GUA64.find(x=>x.u===huU&&x.d===huD);
   const huName=huInfo?huInfo.n:'未知卦';
   const others=GUA64.filter(x=>!(x.u===huU&&x.d===huD));
   shuffle(others);
   const wrongs=others.slice(0,3).map(x=>x.n);
   const opts=shuffle([huName,...wrongs]);
-  return{
-    type:'hugua',
-    benGua:g,
-    all,huD,huU,
-    answer:huName,
+  return{type:'hugua',benGua:g,all,huD,huU,answer:huName,
     options:opts.map(o=>({val:o,label:o})),
-    explain:`互卦取本卦第2、3、4爻组成下互卦（${BI[huD].name}），第3、4、5爻组成上互卦（${BI[huU].name}），合为${huName}。`,
-  };
+    explain:`互卦取第2、3、4爻组成下互卦（${BI[huD].name}），第3、4、5爻组成上互卦（${BI[huU].name}），合为${huName}。`};
 }
-
-/* ─── 猜变卦题 ─── */
 function genBianGuaQ(){
   const g=GUA64[Math.floor(Math.random()*GUA64.length)];
   const all=[...BL[g.d],...BL[g.u]];
   const dong=Math.floor(Math.random()*6);
   const bAll=all.map((l,i)=>i===dong?(l==='y'?'n':'y'):l);
-  // 下卦=index 0-2，上卦=index 3-5，BL是初→上所以需要reverse给lines2num
-  const bDL=bAll.slice(0,3);
-  const bUL=bAll.slice(3);
-  const bD=lines2num(bDL);
-  const bU=lines2num(bUL);
+  const bD=lines2num(bAll.slice(0,3)), bU=lines2num(bAll.slice(3));
   const bianInfo=GUA64.find(x=>x.u===bU&&x.d===bD);
   const bianName=bianInfo?bianInfo.n:'未知卦';
   const dongNames=['初','二','三','四','五','上'];
@@ -461,17 +750,11 @@ function genBianGuaQ(){
   shuffle(others);
   const wrongs=others.slice(0,3).map(x=>x.n);
   const opts=shuffle([bianName,...wrongs]);
-  return{
-    type:'biangua',
-    benGua:g,
-    all,dong,bAll,bD,bU,
-    answer:bianName,
+  return{type:'biangua',benGua:g,all,dong,bAll,bD,bU,answer:bianName,
     options:opts.map(o=>({val:o,label:o})),
-    explain:`第${dongNames[dong]}爻为动爻，${all[dong]==='y'?'阳爻变阴爻':'阴爻变阳爻'}，上卦变为${BI[bU].name}，下卦变为${BI[bD].name}，合为变卦${bianName}。`,
-  };
+    explain:`第${dongNames[dong]}爻为动爻，${all[dong]==='y'?'阳爻变阴爻':'阴爻变阳爻'}，上卦变为${BI[bU].name}，下卦变为${BI[bD].name}，合为变卦${bianName}。`};
 }
-
-function genQuestions(mode,count=10){
+function genQuestions(mode, count=10){
   const qs=[];
   for(let i=0;i<count;i++){
     if(mode==='recognize'){
@@ -481,212 +764,126 @@ function genQuestions(mode,count=10){
       else if(r<0.75)qs.push(genBianGuaQ());
       else qs.push(Math.random()<0.5?genXiangFromGuaQ():genGuaFromXiangQ());
     }
-    else if(mode==='xiang'){
-      qs.push(Math.random()<0.5?genXiangFromGuaQ():genGuaFromXiangQ());
-    }
-    else if(mode==='tiyong')qs.push(genTiyongQ());
+    else if(mode==='xiang') qs.push(Math.random()<0.5?genXiangFromGuaQ():genGuaFromXiangQ());
+    else if(mode==='tiyong') qs.push(genTiyongQ());
     else qs.push(genJixiongQ());
   }
   return qs;
 }
 
-/* ─── 开始模式 ─── */
-function startMode(mode){
-  try{
-    currentMode=mode;
-    questions=genQuestions(mode,10);
-    currentIdx=0;
-    correctCount=0;
-    combo=0;
-    document.getElementById('mode-view').style.display='none';
-    document.getElementById('result-view').classList.remove('active');
-    document.getElementById('quiz-view').classList.add('active');
-    document.getElementById('back-btn').style.display='inline-flex';
-    const labels={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断',xiang:'万物类象'};
-    document.getElementById('mode-label').textContent=labels[mode];
-    document.getElementById('q-total').textContent=questions.length;
-    renderQuestion();
-  }catch(e){
-    alert('启动失败：'+e.message);
-    console.error(e);
-  }
-}
-
-/* ─── 渲染题目 ─── */
+/* ── 渲染题目 ── */
 function renderQuestion(){
   const q=questions[currentIdx];
-  const idx=currentIdx;
-  document.getElementById('q-current').textContent=idx+1;
-  document.getElementById('progress-fill').style.width=`${((idx+1)/questions.length)*100}%`;
-  document.getElementById('explain-card').classList.remove('show');
-  document.getElementById('next-btn').classList.remove('show');
+  if(!q){ showResult(); return; }
+  const pct=((currentIdx)/questions.length*100);
+  document.getElementById('q-current').textContent = currentIdx+1;
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('explain-card').className='explain-card';
+  document.getElementById('next-btn').className='next-btn';
 
   const qEl=document.getElementById('quiz-question');
   const optsEl=document.getElementById('options-grid');
+  let qHtml='';
 
-  if(q.type==='recognize'){
-    const lines=q.lines;
-    const linesHtml=lines.map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:50px"></div><div style="width:10px"></div></div>`).join('');
-    qEl.innerHTML=`
-      <div class="quiz-q-label">看爻线，选出对应的卦名</div>
-      <div class="quiz-gua-display">
-        <div class="quiz-gua-item">
-          <div class="yao-lines" style="gap:5px">${linesHtml}</div>
-        </div>
-      </div>
-      <div class="quiz-hint">提示：从下往上数，阳爻（实线）= 奇数，阴爻（断线）= 偶数</div>
-    `;
-    optsEl.className='options-grid';
-    optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" onclick="selectAnswer('${o.val}','${q.answer}')">
-        <span>${o.label}</span>
-        <span class="option-sub">${o.sub}</span>
-      </button>
-    `).join('');
-  }
-
-  else if(q.type==='hugua'||q.type==='biangua'){
-    const {benGua,all,dong}=q;
-    const dongNames=['初','二','三','四','五','上'];
-    const isHu=q.type==='hugua';
-    // all是初→上，yao-lines用column-reverse，所以直接传入即可正确显示上→下
-    const linesHtml=all.map((l,i)=>{
+  if(q.type==='lines2name'){
+    const lHtml=BL[q.answer].map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}"></div></div>`).join('');
+    qHtml=`<div class="quiz-q-label">看爻线，选出对应的卦名</div>
+      <div class="quiz-gua-display"><div class="quiz-gua-item">
+        <div class="yao-lines">${lHtml}</div>
+      </div></div>`;
+  } else if(q.type==='hugua'||q.type==='biangua'){
+    const {benGua,all,dong}=q, dongNames=['初','二','三','四','五','上'], isHu=q.type==='hugua';
+    const lHtml=all.map((l,i)=>{
       const isDong=!isHu&&i===dong;
-      const cls=`yao-line ${l==='y'?'yang':'yin'}${isDong?' dong':''}`;
       return`<div class="yao-row">
-        <div class="yao-num" style="width:14px;text-align:right;font-size:10px;color:var(--ink4);font-family:'Noto Serif SC',serif;">${dongNames[i]}</div>
-        <div class="${cls}" style="width:50px"></div>
+        <div class="yao-num" style="font-size:9px;color:var(--ink4);width:14px;">${dongNames[i]}</div>
+        <div class="yao-line ${l==='y'?'yang':'yin'}${isDong?' dong':''}"></div>
         ${isDong?'<div class="dong-mark">●</div>':'<div style="width:10px"></div>'}
       </div>`;
     }).join('');
-    qEl.innerHTML=`
-      <div class="quiz-q-label">${isHu?'看本卦，选出互卦':'看本卦和动爻，选出变卦'}</div>
-      <div class="quiz-gua-display">
-        <div class="quiz-gua-item">
-          <div class="quiz-gua-label">本卦：${benGua.n}</div>
-          <div class="yao-lines" style="gap:5px;margin-top:8px;">${linesHtml}</div>
-        </div>
-      </div>
-      <div class="quiz-hint">${isHu?'互卦：取第2、3、4爻为下卦，第3、4、5爻为上卦':`第${dongNames[dong]}爻为动爻（红色），阴阳互换后得变卦`}</div>
-    `;
-    optsEl.className='options-grid';
-    optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" onclick="selectAnswer('${o.val}','${q.answer}')">
-        <span>${o.label}</span>
-      </button>
-    `).join('');
-  }
-
-  else if(q.type==='xiang_from_gua'){
-    const linesHtml=q.lines.map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:44px"></div><div style="width:10px"></div></div>`).join('');
-    qEl.innerHTML=`
-      <div class="quiz-q-label">看卦象，选出对应的${q.cat}类象</div>
-      <div class="quiz-gua-display">
-        <div class="quiz-gua-item">
-          <div class="yao-lines" style="gap:5px">${linesHtml}</div>
-          <div class="quiz-gua-name">${BI[q.guaNum].name}</div>
-          <div class="quiz-gua-attr">${BI[q.guaNum].attr}·${BI[q.guaNum].wx}</div>
-        </div>
-      </div>
-      <div class="quiz-hint">从以下选项中选出属于此卦「${q.cat}」的类象</div>
-    `;
-    optsEl.className='options-grid';
-    optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" data-val="${o.val.replace(/"/g,'&quot;')}" onclick="selectTiyongAnswer(this)">
-        <span>${o.label}</span>
-      </button>
-    `).join('');
-  }
-
-  else if(q.type==='gua_from_xiang'){
-    qEl.innerHTML=`
-      <div class="quiz-q-label">根据类象，选出对应的卦</div>
-      <div class="quiz-question-text" style="font-size:18px;text-align:center;padding:16px 0;font-weight:500;">「${q.item}」</div>
-      <div class="quiz-hint">以上事物属于哪个卦的「${q.cat}」类象？</div>
-    `;
-    optsEl.className='options-grid';
-    optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" data-val="${o.val}" onclick="selectTiyongAnswer(this)">
-        <span>${o.label}</span>
-        <span class="option-sub">${o.sub}</span>
-      </button>
-    `).join('');
-  }
-
-  else if(q.type==='tiyong'){
-    const {qText}=q;
-    qEl.innerHTML=`
-      <div class="quiz-q-label">判断体用关系</div>
-      <div class="quiz-question-text" style="font-size:15px;line-height:2;margin-top:8px;">${qText}</div>
-      <div class="quiz-hint" style="margin-top:12px;">核心原则：以不动的为体，动的为用</div>
-    `;
-    optsEl.className='options-grid single';
-    optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" data-val="${o.label.replace(/"/g,'&quot;')}" onclick="selectTiyongAnswer(this)">
-        <span>${o.label}</span>
-      </button>
-    `).join('');
-  }
-
-  else if(q.type==='jixiong'){
-    const {g,tiInfo,yongInfo,tiWx,yongWx,rel}=q;
-    qEl.innerHTML=`
-      <div class="quiz-q-label">判断吉凶走向</div>
+    qHtml=`<div class="quiz-q-label">${isHu?'看本卦，选出互卦':'看本卦和动爻，选出变卦'}</div>
+      <div class="quiz-gua-display"><div class="quiz-gua-item">
+        <div class="quiz-gua-label">本卦：${benGua.n}</div>
+        <div class="yao-lines">${lHtml}</div>
+      </div></div>
+      <div class="quiz-hint">${isHu?'互卦：取第2、3、4爻为下卦，第3、4、5爻为上卦':`第${dongNames[dong]}爻为动爻（红色）`}</div>`;
+  } else if(q.type==='xiang_from_gua'){
+    const lHtml=BL[q.guaNum].map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}"></div></div>`).join('');
+    qHtml=`<div class="quiz-q-label">看卦象，选出「${q.cat}」类象</div>
+      <div class="quiz-gua-display"><div class="quiz-gua-item">
+        <div class="yao-lines">${lHtml}</div>
+        <div class="quiz-gua-name">${BI[q.guaNum].name}</div>
+        <div class="quiz-gua-attr">${BI[q.guaNum].attr}·${BI[q.guaNum].wx}</div>
+      </div></div>`;
+  } else if(q.type==='gua_from_xiang'){
+    qHtml=`<div class="quiz-q-label">根据类象，选出对应的卦</div>
+      <div style="font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;text-align:center;padding:16px 0;color:var(--gold);">「${q.item}」</div>
+      <div class="quiz-hint">以上事物属于哪个卦的「${q.cat}」类象？</div>`;
+  } else if(q.type==='tiyong'){
+    qHtml=`<div class="quiz-q-label">判断体用关系</div>
+      <div class="quiz-question-text">${q.qText}</div>
+      <div class="quiz-hint">核心原则：以不动的为体，动的为用</div>`;
+  } else if(q.type==='jixiong'){
+    const {tiI,yongI,tiWx,yongWx}=q;
+    const tiLines=BL[q.g.u].map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px"></div></div>`).join('');
+    const yoLines=BL[q.g.d].map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:36px"></div></div>`).join('');
+    qHtml=`<div class="quiz-q-label">判断吉凶走向</div>
       <div class="quiz-gua-display">
         <div class="quiz-gua-item">
           <div class="quiz-gua-label">体卦（主）</div>
-          <div class="yao-lines" style="gap:5px">
-            ${BL[g.d].map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:44px"></div></div>`).join('')}
-          </div>
-          <div class="quiz-gua-name">${tiInfo.name}</div>
-          <div class="quiz-gua-attr">${tiInfo.attr}·${tiWx}</div>
+          <div class="yao-lines">${tiLines}</div>
+          <div class="quiz-gua-name">${tiI.name}</div>
+          <div class="quiz-gua-attr">${tiI.attr}·${tiWx}</div>
         </div>
-        <div style="font-size:18px;color:var(--ink4);align-self:center;padding-bottom:20px;">⇌</div>
+        <div style="font-size:20px;color:var(--ink4);align-self:center;">⇌</div>
         <div class="quiz-gua-item">
           <div class="quiz-gua-label">用卦（客）</div>
-          <div class="yao-lines" style="gap:5px">
-            ${BL[g.u].map(l=>`<div class="yao-row"><div class="yao-line ${l==='y'?'yang':'yin'}" style="width:44px"></div></div>`).join('')}
-          </div>
-          <div class="quiz-gua-name">${yongInfo.name}</div>
-          <div class="quiz-gua-attr">${yongInfo.attr}·${yongWx}</div>
+          <div class="yao-lines">${yoLines}</div>
+          <div class="quiz-gua-name">${yongI.name}</div>
+          <div class="quiz-gua-attr">${yongI.attr}·${yongWx}</div>
         </div>
       </div>
-      <div class="quiz-question-text">五行关系：<strong>${tiWx} vs ${yongWx}</strong></div>
-      <div class="quiz-hint">用生体/体克用→有利，用克体/体生用→不利，比和→平稳</div>
-    `;
+      <div class="quiz-hint">五行关系：<strong>${tiWx} vs ${yongWx}</strong>　用生体/体克用→有利，用克体/体生用→不利，比和→平稳</div>`;
+  }
+
+  qEl.innerHTML = qHtml;
+
+  // 选项
+  const shuffledOpts = shuffle([...q.options]);
+  const isGua = q.type==='xiang_from_gua'&&false;
+  if(q.type==='gua_from_xiang'){
     optsEl.className='options-grid';
-    optsEl.innerHTML=q.options.map(o=>`
-      <button class="option-btn" onclick="selectAnswer('${o.val}','${q.answer}')">
-        <span>${o.label}</span>
-        <span class="option-sub">${o.sub}</span>
-      </button>
-    `).join('');
+    optsEl.innerHTML=shuffledOpts.map(o=>`
+      <button class="option-btn" data-val="${o.val}" data-answer="${q.answer}" data-explain="${(q.explain||'').replace(/"/g,'&quot;')}" onclick="selectOpt(this)">
+        <span>${o.label}</span>${o.sub?`<span class="option-sub">${o.sub}</span>`:''}
+      </button>`).join('');
+  } else if(q.type==='tiyong'||q.type==='xiang_from_gua'||q.type==='hugua'||q.type==='biangua'){
+    optsEl.className='options-grid single';
+    optsEl.innerHTML=shuffledOpts.map(o=>`
+      <button class="option-btn" data-val="${(o.val+'').replace(/"/g,'&quot;')}" data-answer="${(q.answer+'').replace(/"/g,'&quot;')}" data-explain="${(q.explain||'').replace(/"/g,'&quot;')}" onclick="selectOpt(this)">
+        <span>${o.label}</span>${o.sub?`<span class="option-sub">${o.sub}</span>`:''}
+      </button>`).join('');
+  } else {
+    optsEl.className='options-grid';
+    optsEl.innerHTML=shuffledOpts.map(o=>`
+      <button class="option-btn" data-val="${(o.val+'').replace(/"/g,'&quot;')}" data-answer="${(q.answer+'').replace(/"/g,'&quot;')}" data-explain="${(q.explain||'').replace(/"/g,'&quot;')}" onclick="selectOpt(this)">
+        <span>${o.label}</span>${o.sub?`<span class="option-sub">${o.sub}</span>`:''}
+      </button>`).join('');
   }
 }
 
-function selectTiyongAnswer(btn){
+function selectOpt(btn){
   const val=btn.getAttribute('data-val');
-  const q=questions[currentIdx];
-  selectAnswer(val, q.answer);
-}
-
-/* ─── 选择答案 ─── */
-function selectAnswer(val,answer){
-  const btns=document.querySelectorAll('.option-btn');
-  btns.forEach(b=>b.disabled=true);
-
-  const isCorrect=val===answer;
-  btns.forEach(b=>{
-    // 支持 data-val（体用题）和 onclick（其他题）两种方式
-    const bVal=b.getAttribute('data-val')||
-      (b.getAttribute('onclick')||'').match(/'([^']+)'/)?.[1]||'';
-    if(bVal===answer)b.classList.add(isCorrect?'correct':'reveal');
-    else if(bVal===val&&!isCorrect)b.classList.add('wrong');
+  const answer=btn.getAttribute('data-answer');
+  const explain=btn.getAttribute('data-explain')||'';
+  document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+  const isCorrect=String(val)===String(answer);
+  document.querySelectorAll('.option-btn').forEach(b=>{
+    const bv=b.getAttribute('data-val');
+    if(String(bv)===String(answer)) b.classList.add(isCorrect?'correct':'reveal');
+    else if(b===btn&&!isCorrect) b.classList.add('wrong');
   });
-
-  const q=questions[currentIdx];
-  const explainEl=document.getElementById('explain-card');
-
+  const ec=document.getElementById('explain-card');
   if(isCorrect){
     correctCount++;
     combo++;
@@ -694,127 +891,435 @@ function selectAnswer(val,answer){
     totalScore+=pts;
     localStorage.setItem('learn_score',totalScore);
     document.getElementById('total-score').textContent=totalScore;
-    if(combo>=2)showCombo(combo,pts);
-    explainEl.innerHTML=`
-      <div class="explain-result"><span class="result-icon">✓</span><span class="result-text correct">回答正确 +${pts}分</span></div>
-      <div class="explain-body">${q.explain}</div>
-    `;
+    if(combo>=2) showCombo(combo,pts);
+    ec.innerHTML=`<div class="explain-result"><span class="result-icon">✓</span><span class="result-text correct">回答正确 +${pts}分</span></div><div class="explain-body">${explain}</div>`;
   } else {
     combo=0;
-    explainEl.innerHTML=`
-      <div class="explain-result"><span class="result-icon">✗</span><span class="result-text wrong">回答错误</span></div>
-      <div class="explain-body">${q.explain}</div>
-    `;
+    ec.innerHTML=`<div class="explain-result"><span class="result-icon">✗</span><span class="result-text wrong">回答错误</span></div><div class="explain-body">${explain}</div>`;
   }
-
-  explainEl.classList.add('show');
+  ec.classList.add('show');
   document.getElementById('next-btn').classList.add('show');
-  document.getElementById('next-btn').textContent=currentIdx===questions.length-1?'查看结果 →':'下一题 →';
 }
 
-/* ─── 下一题 ─── */
 function nextQuestion(){
   currentIdx++;
-  if(currentIdx>=questions.length){
-    showResult();
-  } else {
-    renderQuestion();
-  }
+  if(currentIdx>=questions.length){ showResult(); return; }
+  renderQuestion();
 }
 
-/* ─── 结算 ─── */
 function showResult(){
-  document.getElementById('quiz-view').classList.remove('active');
+  document.getElementById('quiz-wrap').style.display='none';
   const rv=document.getElementById('result-view');
-  rv.classList.add('active');
   const pct=Math.round((correctCount/questions.length)*100);
-  const stars=pct>=90?'★★★':pct>=70?'★★☆':'★☆☆';
-  const titles={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断'};
-  const comments=pct>=90?'卦理精通，令人叹服！':pct>=70?'掌握扎实，继续精进。':pct>=50?'初有所得，多加练习。':'尚需努力，温故知新。';
-  rv.innerHTML=`
-    <div class="result-circle">
-      <div class="result-big">${correctCount}</div>
-      <div class="result-of">/ ${questions.length} 题</div>
-    </div>
-    <div class="result-stars">${stars}</div>
-    <div class="result-title">${titles[currentMode]}完成</div>
-    <div class="result-desc">${comments}<br>正确率 ${pct}%</div>
-    <div class="result-btns">
-      <button class="result-btn secondary" onclick="showModes()">返回选择</button>
-      <button class="result-btn primary" onclick="startMode('${currentMode}')">再来一轮</button>
-    </div>
-  `;
-}
-
-/* ─── 工具 ─── */
-function goBack(){
-  showModes();
-}
-
-function showModes(){
-  document.getElementById('result-view').classList.remove('active');
-  document.getElementById('quiz-view').classList.remove('active');
-  document.getElementById('mode-view').style.display='flex';
-  document.getElementById('back-btn').style.display='none';
-}
-
-function quitQuiz(){
-  showModes();
+  const stars=pct===100?3:pct>=67?2:1;
+  document.getElementById('r-score').textContent=`${correctCount}/${questions.length}`;
+  document.getElementById('r-stars').textContent=['★','★★','★★★'][stars-1];
+  document.getElementById('r-title').textContent=pct===100?'完美！':pct>=67?'不错！':'继续加油！';
+  document.getElementById('r-desc').textContent=pct===100?'全部答对，继续保持！':pct>=67?`答对 ${correctCount} 题，再练练剩余的。`:`答对 ${correctCount} 题，建议多加练习。`;
+  rv.classList.add('active');
+  hideBackBtn();
 }
 
 function showCombo(n,pts){
   const el=document.getElementById('combo-toast');
-  el.textContent=`连击 ${n}× · +${pts}分`;
+  el.textContent=`连击 ${n}× +${pts}分`;
   el.classList.add('show');
   clearTimeout(comboTimer);
-  comboTimer=setTimeout(()=>el.classList.remove('show'),1800);
+  comboTimer=setTimeout(()=>el.classList.remove('show'),1500);
 }
 
+/* ══════════════════════════════
+   闪卡
+══════════════════════════════ */
+// 闪卡数据
+const FC_CARDS = [
+  // 八卦基础
+  {id:'fc_qian',front:'乾',frontSub:'第一卦',back:'天・金・刚健\n父亲・马・西北',backSub:'乾三连：三条阳爻',cat:'八卦基础'},
+  {id:'fc_kun',front:'坤',frontSub:'第二卦',back:'地・土・柔顺\n母亲・牛・西南',backSub:'坤六断：六条阴爻',cat:'八卦基础'},
+  {id:'fc_zhen',front:'震',frontSub:'第四卦',back:'雷・木・震动\n长男・龙・东方',backSub:'震仰盂：下阳上阴',cat:'八卦基础'},
+  {id:'fc_xun',front:'巽',frontSub:'第五卦',back:'风・木・柔顺\n长女・鸡・东南',backSub:'巽下断：下阴上阳',cat:'八卦基础'},
+  {id:'fc_kan',front:'坎',frontSub:'第六卦',back:'水・水・险陷\n中男・猪・北方',backSub:'坎中满：中间阳爻',cat:'八卦基础'},
+  {id:'fc_li',front:'离',frontSub:'第三卦',back:'火・火・光明\n中女・雉・南方',backSub:'离中虚：中间阴爻',cat:'八卦基础'},
+  {id:'fc_gen',front:'艮',frontSub:'第七卦',back:'山・土・静止\n少男・狗・东北',backSub:'艮覆碗：上阳下阴',cat:'八卦基础'},
+  {id:'fc_dui',front:'兑',frontSub:'第二卦',back:'泽・金・喜悦\n少女・羊・西方',backSub:'兑上缺：上阴下阳',cat:'八卦基础'},
+  // 五行生克
+  {id:'fc_wx1',front:'五行相生',frontSub:'顺序',back:'金→水→木→火→土→金',backSub:'生：金生水，水生木，木生火，火生土，土生金',cat:'五行'},
+  {id:'fc_wx2',front:'五行相克',frontSub:'顺序',back:'金→木→土→水→火→金',backSub:'克：金克木，木克土，土克水，水克火，火克金',cat:'五行'},
+  {id:'fc_wx3',front:'用生体',frontSub:'体用关系',back:'有利',backSub:'用卦生助体卦，如同获得贵人相助',cat:'体用'},
+  {id:'fc_wx4',front:'体生用',frontSub:'体用关系',back:'不利（小凶）',backSub:'体卦泄气于用卦，付出多收获少',cat:'体用'},
+  {id:'fc_wx5',front:'用克体',frontSub:'体用关系',back:'不利（凶）',backSub:'用卦克制体卦，所问之事受阻',cat:'体用'},
+  {id:'fc_wx6',front:'体克用',frontSub:'体用关系',back:'有利',backSub:'体卦克制用卦，主动有力，事可成',cat:'体用'},
+  {id:'fc_wx7',front:'体用比和',frontSub:'体用关系',back:'平稳',backSub:'体用同一五行，平衡无大起伏',cat:'体用'},
+  // 互卦变卦
+  {id:'fc_hu1',front:'互卦',frontSub:'取法',back:'取第2、3、4爻为下互卦\n取第3、4、5爻为上互卦',backSub:'揭示事物内在原因与过程',cat:'互变卦'},
+  {id:'fc_bian1',front:'变卦',frontSub:'取法',back:'动爻阴阳互换\n形成新的六十四卦',backSub:'预示未来发展方向',cat:'互变卦'},
+  {id:'fc_san',front:'本卦・互卦・变卦',frontSub:'三卦含义',back:'本卦：当前形势\n互卦：内在过程\n变卦：未来走向',backSub:'三卦综合解读，缺一不可',cat:'互变卦'},
+];
+
+let fcState = JSON.parse(localStorage.getItem('fc_state')||'{}');
+let fcQueue = [];
+let fcCurrentIdx = 0;
+let fcFlipped = false;
+
+function initFlashcards(){
+  FC_CARDS.forEach(c=>{
+    if(!fcState[c.id]) fcState[c.id]={status:'new',interval:1,ef:2.5,due:0};
+  });
+  updateFcStats();
+  renderFcCategories();
+}
+
+function updateFcStats(){
+  const now=Date.now();
+  let learning=0, review=0, mastered=0;
+  FC_CARDS.forEach(c=>{
+    const s=fcState[c.id];
+    if(!s||s.status==='new') learning++;
+    else if(s.status==='mastered') mastered++;
+    else if(s.due<=now) review++;
+    else mastered++;
+  });
+  document.getElementById('fc-learning').textContent=learning;
+  document.getElementById('fc-review').textContent=review;
+  document.getElementById('fc-mastered').textContent=mastered;
+  document.getElementById('fc-total').textContent=FC_CARDS.length;
+  const btn=document.getElementById('fc-start-btn')||null;
+  if(btn) btn.disabled=learning+review===0;
+}
+
+function renderFcCategories(){
+  const cats={};
+  FC_CARDS.forEach(c=>{ if(!cats[c.cat])cats[c.cat]=0; cats[c.cat]++; });
+  const el=document.getElementById('fc-categories');
+  el.innerHTML=Object.entries(cats).map(([cat,count])=>`
+    <div class="fc-category" onclick="startFlashcardsCat('${cat}')">
+      <div class="fc-cat-name">${cat}</div>
+      <div class="fc-cat-count">${count} 张</div>
+    </div>`).join('');
+}
+
+function startFlashcards(){
+  const now=Date.now();
+  fcQueue=FC_CARDS.filter(c=>{
+    const s=fcState[c.id];
+    return !s||s.status==='new'||s.due<=now;
+  });
+  if(!fcQueue.length){ alert('暂无需要复习的卡片！'); return; }
+  shuffle(fcQueue);
+  fcCurrentIdx=0;
+  document.getElementById('fc-home').style.display='none';
+  document.getElementById('fc-session').style.display='block';
+  showBackBtn();
+  renderFcCard();
+}
+
+function startFlashcardsCat(cat){
+  fcQueue=FC_CARDS.filter(c=>c.cat===cat);
+  shuffle(fcQueue);
+  fcCurrentIdx=0;
+  document.getElementById('fc-home').style.display='none';
+  document.getElementById('fc-session').style.display='block';
+  showBackBtn();
+  renderFcCard();
+}
+
+function renderFcCard(){
+  if(fcCurrentIdx>=fcQueue.length){ quitFlashcards(); updateFcStats(); return; }
+  const c=fcQueue[fcCurrentIdx];
+  fcFlipped=false;
+  document.getElementById('fc-card').classList.remove('flipped');
+  document.getElementById('fc-front-main').textContent=c.front;
+  document.getElementById('fc-front-sub').textContent=c.frontSub||'';
+  document.getElementById('fc-back-main').innerHTML=c.back.replace(/\n/g,'<br>');
+  document.getElementById('fc-back-sub').textContent=c.backSub||'';
+  document.getElementById('fc-cur').textContent=fcCurrentIdx+1;
+  document.getElementById('fc-total-s').textContent=fcQueue.length;
+  document.getElementById('fc-prog-fill').style.width=(fcCurrentIdx/fcQueue.length*100)+'%';
+  document.getElementById('fc-ratings').style.display='none';
+  document.getElementById('fc-flip-hint').textContent='点击卡片查看答案';
+}
+
+function flipCard(){
+  if(fcFlipped) return;
+  fcFlipped=true;
+  document.getElementById('fc-card').classList.add('flipped');
+  document.getElementById('fc-ratings').style.display='flex';
+  document.getElementById('fc-flip-hint').textContent='根据掌握程度评分';
+}
+
+function rateCard(rating){
+  const c=fcQueue[fcCurrentIdx];
+  const s=fcState[c.id];
+  // 简化SM-2
+  if(rating===2){ s.status='mastered'; s.interval=Math.max(s.interval*2,1); s.due=Date.now()+s.interval*24*3600*1000; }
+  else if(rating===1){ s.status='review'; s.interval=1; s.due=Date.now()+3600*1000; }
+  else { s.status='review'; s.interval=1; s.due=Date.now()+600*1000; }
+  localStorage.setItem('fc_state',JSON.stringify(fcState));
+  fcCurrentIdx++;
+  renderFcCard();
+}
+
+function quitFlashcards(){
+  document.getElementById('fc-home').style.display='block';
+  document.getElementById('fc-session').style.display='none';
+  hideBackBtn();
+  updateFcStats();
+}
+
+/* ══════════════════════════════
+   测试
+══════════════════════════════ */
+let testTime=10, testCount=10;
+let testTimer=null, testSecondsLeft=0, testTotalSeconds=0;
+let testQuestions=[], testHistory=[];
+
+function adjustTime(d){ testTime=Math.max(5,Math.min(60,testTime+d)); document.getElementById('test-time-val').textContent=testTime; }
+function adjustCount(d){ testCount=Math.max(5,Math.min(30,testCount+d)); document.getElementById('test-count-val').textContent=testCount; }
+
+function startTest(){
+  testQuestions=[];
+  const modes=['recognize','xiang','tiyong','jixiong'];
+  for(let i=0;i<testCount;i++) testQuestions.push(genQuestions(modes[i%modes.length],1)[0]);
+  testSecondsLeft=testTime*60;
+  testTotalSeconds=testSecondsLeft;
+  document.getElementById('test-home').style.display='none';
+  document.getElementById('test-result-view').style.display='none';
+  document.getElementById('test-session').style.display='block';
+  showBackBtn();
+  renderTestQuestions();
+  startTestTimer();
+}
+
+function renderTestQuestions(){
+  const list=document.getElementById('test-q-list');
+  list.innerHTML=testQuestions.map((q,i)=>renderTestQ(q,i)).join('');
+}
+
+function renderTestQ(q,i){
+  const opts=shuffle([...q.options]);
+  let optsHtml='';
+  if(q.type==='tiyong'||q.type==='xiang_from_gua'||q.type==='hugua'||q.type==='biangua'){
+    optsHtml=opts.map(o=>`
+      <div class="test-opt" onclick="selectTestOpt(this,${i},'${(o.val+'').replace(/'/g,"\\'")}','${(q.answer+'').replace(/'/g,"\\'")}')">
+        <div class="test-opt-dot"><div class="test-opt-dot-inner"></div></div>
+        <div class="test-opt-text">${o.label}</div>
+      </div>`).join('');
+  } else {
+    optsHtml=opts.map(o=>`
+      <div class="test-opt" onclick="selectTestOpt(this,${i},'${(o.val+'').replace(/'/g,"\\'")}','${(q.answer+'').replace(/'/g,"\\'")}')">
+        <div class="test-opt-dot"><div class="test-opt-dot-inner"></div></div>
+        <div class="test-opt-text">${o.label}${o.sub?` <span style="color:var(--ink4);font-size:12px;">·${o.sub}</span>`:''}</div>
+      </div>`).join('');
+  }
+  const typeLabel={lines2name:'识卦',hugua:'互卦',biangua:'变卦',xiang_from_gua:'类象',gua_from_xiang:'类象',tiyong:'体用',jixiong:'吉凶'}[q.type]||'练习';
+  return`<div class="test-q-item" id="tq-${i}">
+    <div class="test-q-meta">${i+1} / ${testQuestions.length} — ${typeLabel}</div>
+    <div class="test-q-text">${getTestQText(q)}</div>
+    <div class="test-opts" id="topts-${i}">${optsHtml}</div>
+    <div class="test-feedback" id="tfb-${i}"></div>
+  </div>`;
+}
+
+function getTestQText(q){
+  if(q.type==='tiyong') return q.qText;
+  if(q.type==='xiang_from_gua') return `${BI[q.guaNum].name}卦的「${q.cat}」类象是哪个？`;
+  if(q.type==='gua_from_xiang') return `「${q.item}」属于哪个卦的「${q.cat}」类象？`;
+  if(q.type==='lines2name') return '看爻线，这是哪个卦？';
+  if(q.type==='hugua') return `${q.benGua.n}的互卦是？`;
+  if(q.type==='biangua'){const d=['初','二','三','四','五','上'][q.dong];return `${q.benGua.n}第${d}爻动，变卦是？`;}
+  if(q.type==='jixiong') return `${q.tiI.name}（体）vs ${q.yongI.name}（用），五行关系如何？`;
+  return '判断以下哪个是正确答案？';
+}
+
+function selectTestOpt(el,qi,val,answer){
+  const opts=document.querySelectorAll(`#topts-${qi} .test-opt`);
+  // 如果已选择就不再改变
+  if([...opts].some(o=>o.classList.contains('selected'))) return;
+  el.classList.add('selected');
+  const fb=document.getElementById(`tfb-${qi}`);
+  const q=testQuestions[qi];
+  if(String(val)===String(answer)){
+    el.classList.add('correct');
+    fb.textContent='✓ '+q.explain;
+  } else {
+    el.classList.add('wrong');
+    opts.forEach(o=>{ if(o.querySelector('.test-opt-text').textContent.startsWith(answer)||o.getAttribute('onclick')?.includes(answer)) o.classList.add('correct'); });
+    fb.textContent='✗ '+q.explain;
+  }
+  fb.classList.add('show');
+}
+
+function startTestTimer(){
+  clearInterval(testTimer);
+  updateTimerDisplay();
+  testTimer=setInterval(()=>{
+    testSecondsLeft--;
+    updateTimerDisplay();
+    if(testSecondsLeft<=0){ clearInterval(testTimer); finishTest(); }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const m=Math.floor(testSecondsLeft/60), s=testSecondsLeft%60;
+  const str=`${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('test-timer').textContent=str;
+  const pct=(testSecondsLeft/testTotalSeconds)*100;
+  document.getElementById('test-timer-fill').style.width=pct+'%';
+  const urgent=testSecondsLeft<60;
+  document.getElementById('test-timer').classList.toggle('urgent',urgent);
+  document.getElementById('test-timer-fill').classList.toggle('urgent',urgent);
+}
+
+function finishTest(){
+  clearInterval(testTimer);
+  let correct=0, wrong=0, skip=0;
+  testQuestions.forEach((q,i)=>{
+    const opts=document.querySelectorAll(`#topts-${i} .test-opt`);
+    const selected=[...opts].find(o=>o.classList.contains('selected'));
+    if(!selected) skip++;
+    else if(selected.classList.contains('correct')) correct++;
+    else wrong++;
+  });
+  const total=testQuestions.length;
+  const pct=Math.round((correct/total)*100);
+  // 保存记录
+  testHistory.unshift({date:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),score:pct,correct,total});
+  if(testHistory.length>10) testHistory=testHistory.slice(0,10);
+  localStorage.setItem('test_history',JSON.stringify(testHistory));
+
+  document.getElementById('test-session').style.display='none';
+  document.getElementById('test-result-view').style.display='block';
+  document.getElementById('test-result-pct').textContent=pct+'%';
+  document.getElementById('tr-correct').textContent=correct;
+  document.getElementById('tr-wrong').textContent=wrong;
+  document.getElementById('tr-skip').textContent=skip;
+}
+
+function showTestHome(){
+  clearInterval(testTimer);
+  document.getElementById('test-home').style.display='block';
+  document.getElementById('test-session').style.display='none';
+  document.getElementById('test-result-view').style.display='none';
+  hideBackBtn();
+  renderTestHistory();
+}
+
+function renderTestHistory(){
+  testHistory=JSON.parse(localStorage.getItem('test_history')||'[]');
+  const list=document.getElementById('test-history-list');
+  const wrap=document.getElementById('test-history-wrap');
+  if(!testHistory.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML=`<div class="test-history">${testHistory.map((h,i)=>`
+    <div class="test-hist-row">
+      <div class="test-hist-num">测试 ${i+1}</div>
+      <div class="test-hist-info">
+        <div class="test-hist-score">${h.score}%</div>
+        <div class="test-hist-meta">${h.correct}/${h.total} 题 · ${h.date}</div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+/* ══════════════════════════════
+   学习指南
+══════════════════════════════ */
+/* ══════════════════════════════
+   学习指南 — 从 GitHub 动态加载
+══════════════════════════════ */
+const REPO_BASE = 'https://raw.githubusercontent.com/xenodovidio/Meihua_Yishu/main/lesson_document';
+
+const LESSON_CATEGORIES = [
+  {
+    title: '万物类象',
+    icon: '🌿',
+    files: [
+      { name:'八卦类象歌', icon:'📜', url:`${REPO_BASE}/lesson_BaguaSymbols/%E5%85%AB%E5%8D%A6%E7%B1%BB%E8%B1%A1%E6%AD%8C.docx` },
+    ]
+  },
+  {
+    title: '六十四卦',
+    icon: '📐',
+    files: [
+      { name:'乾宫象法', icon:'☰', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E4%B9%BE%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'兑宫象法', icon:'☱', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E5%85%91%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'坤宫象法', icon:'☷', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E5%9D%A4%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'巽宫象法', icon:'☴', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E5%B7%BD%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'离宫象法', icon:'☲', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E7%A6%BB%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'艮宫象法', icon:'☶', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E8%89%AE%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'震宫象法', icon:'☳', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E7%A5%9E%E9%80%9A%E4%B9%8B%E9%9C%87%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+      { name:'坎宫象法', icon:'☵', url:`${REPO_BASE}/lesson_64Gua/%E5%85%AD%E5%8D%81%E5%9B%9B%E5%8D%A6%E9%80%9A%E7%A5%9E%E4%B9%8B%E5%9D%8E%E5%AE%AB%E8%B1%A1%E6%B3%95.docx` },
+    ]
+  },
+];
+
+const guideCache = {};
+
+async function fetchDocx(url) {
+  if (guideCache[url]) return guideCache[url];
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const arrayBuffer = await res.arrayBuffer();
+  const out = await mammoth.extractRawText({ arrayBuffer });
+  guideCache[url] = out.value;
+  return out.value;
+}
+
+function renderGuide() {
+  const el = document.getElementById('guide-categories');
+  el.innerHTML = LESSON_CATEGORIES.map(cat => `
+    <div class="guide-category">
+      <div class="guide-cat-title">${cat.icon} ${cat.title}</div>
+      <div class="guide-grid">
+        ${cat.files.map(f => `
+          <div class="guide-file" onclick="openReader('${encodeURIComponent(f.name)}','${encodeURIComponent(f.url)}')">
+            <div class="guide-file-icon">${f.icon}</div>
+            <div class="guide-file-name">${f.name}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+async function openReader(encodedName, encodedUrl) {
+  const name = decodeURIComponent(encodedName);
+  const url = decodeURIComponent(encodedUrl);
+  document.getElementById('guide-home').style.display = 'none';
+  const rv = document.getElementById('reader-view');
+  rv.classList.add('active');
+  document.getElementById('reader-title').textContent = name;
+  document.getElementById('reader-body').innerHTML = '<div class="reader-loading">加载中...</div>';
+  // 不显示header返回键，阅读器自带返回
+  hideBackBtn();
+  try {
+    const text = await fetchDocx(url);
+    const paras = text.split('\n').filter(l => l.trim());
+    document.getElementById('reader-body').innerHTML = paras.map(p =>
+      `<p>${p.trim()}</p>`
+    ).join('');
+  } catch (e) {
+    document.getElementById('reader-body').innerHTML = `<div class="reader-error">加载失败：${e.message}</div>`;
+  }
+}
+
+function closeReader() {
+  document.getElementById('reader-view').classList.remove('active');
+  document.getElementById('guide-home').style.display = 'block';
+  hideBackBtn();
+}
+
+/* ══════════ 工具 ══════════ */
 function shuffle(arr){
   const a=[...arr];
   for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
 
-/* ─── 初始化 ─── */
+/* ── 初始化 ── */
 loadQuestions();
+renderTestHistory();
+// 默认显示指南
+currentTab = 'guide';
+document.getElementById('view-guide').classList.add('active');
+document.getElementById('tab-guide').classList.add('active');
 </script>
-  <!-- Dock -->
-  <nav class="dock">
-    <button class="dock-btn" onclick="window.location.href='index.html'">
-      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-        <line x1="4" y1="7" x2="20" y2="7"/>
-        <line x1="4" y1="12" x2="12" y2="12"/>
-        <line x1="15" y1="12" x2="20" y2="12"/>
-        <line x1="4" y1="17" x2="20" y2="17"/>
-      </svg>
-      <span>起卦</span>
-    </button>
-    <button class="dock-btn" onclick="window.location.href='index.html#guadian'">
-      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="4" y="3" width="16" height="18" rx="2"/>
-        <line x1="8" y1="8" x2="16" y2="8"/>
-        <line x1="8" y1="12" x2="16" y2="12"/>
-        <line x1="8" y1="16" x2="12" y2="16"/>
-      </svg>
-      <span>卦典</span>
-    </button>
-    <button class="dock-btn" onclick="window.location.href='index.html#records'">
-      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="15" x2="12" y2="16"/>
-      </svg>
-      <span>记录</span>
-    </button>
-    <button class="dock-btn active">
-      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
-      </svg>
-      <span>习卦</span>
-    </button>
-  </nav>
 </body>
 </html>
