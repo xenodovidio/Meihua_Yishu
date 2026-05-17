@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.43</title>
+<title>梅花易数 v1.44</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -462,7 +462,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.43</span>
+      <span class="logo-ver">v1.44</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -1995,6 +1995,15 @@ function init(){
   initInsightSpeech();
   initQuestionSpeech();
   // loadRecords 改为切换到记录tab时才加载
+  // 处理从其他页面跳转过来的hash
+  const hash=window.location.hash;
+  if(hash==='#guadian'){
+    showView('guadian',document.getElementById('dock-guadian'));
+    history.replaceState(null,'',window.location.pathname);
+  } else if(hash==='#records'){
+    showView('records',document.getElementById('dock-records'));
+    history.replaceState(null,'',window.location.pathname);
+  }
 }
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',init);
