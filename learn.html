@@ -1092,7 +1092,12 @@ function renderFcCard(){
   if(fcCurrentIdx>=fcQueue.length){ quitFlashcards(); updateFcStats(); return; }
   const c=fcQueue[fcCurrentIdx];
   fcFlipped=false;
-  document.getElementById('fc-card').classList.remove('flipped');
+  const card=document.getElementById('fc-card');
+  // 先禁用过渡动画，立即重置到正面，再恢复动画
+  card.style.transition='none';
+  card.classList.remove('flipped');
+  void card.offsetWidth; // 强制重绘，确保transition:none生效
+  card.style.transition='';
   document.getElementById('fc-front-main').textContent=c.front;
   document.getElementById('fc-front-sub').textContent=c.frontSub||'';
   document.getElementById('fc-back-main').innerHTML=c.back.replace(/\n/g,'<br>');
