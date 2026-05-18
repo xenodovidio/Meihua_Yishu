@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.39</title>
+<title>梅花易数 · 习卦 v1.42</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -35,13 +35,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .view{display:none;}.view.active{display:block;}
 
 /* ── 智能学习设置弹窗 ── */
-.study-settings-btn{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:20px;z-index:60;background:none;border:1px solid var(--paper3);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;display:none;align-items:center;gap:5px;}
+.study-settings-btn{background:none;border:1px solid var(--paper3);border-radius:6px;padding:4px 8px;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;display:none;align-items:center;}
 .study-settings-btn.show{display:flex;}
 .study-settings-btn:hover{border-color:var(--gold2);color:var(--gold);}
-.settings-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.5);z-index:200;align-items:flex-end;justify-content:center;}
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .settings-overlay.show{display:flex;}
-.settings-panel{background:var(--paper);border-radius:16px 16px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;animation:slideUp .3s ease;}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.settings-panel{background:var(--paper);border-radius:14px;padding:24px 20px;width:100%;max-width:380px;}
 .settings-title{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
 .settings-close{background:none;border:none;font-size:20px;color:var(--ink4);cursor:pointer;padding:0 4px;}
 .settings-section{margin-bottom:18px;}
@@ -302,18 +301,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.39</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.42</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
 
 <div class="main">
   <div class="combo-toast" id="combo-toast"></div>
-
-  <!-- 设置按钮（答题时显示） -->
-  <button class="study-settings-btn" id="settings-btn" onclick="openSettings()">
-    ⚙️ 设置
-  </button>
 
   <!-- 设置弹窗 -->
   <div class="settings-overlay" id="settings-overlay" onclick="closeSettingsOutside(event)">
@@ -345,12 +339,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <!-- ══ 智能学习 ══ -->
   <div class="view" id="view-study">
-    <!-- 题目区（直接显示） -->
+    <!-- 题目区 -->
     <div class="quiz-wrap" id="quiz-wrap">
       <div class="progress-bar-wrap">
         <div class="progress-info">
           <div class="progress-label" id="mode-label">智能学习</div>
-          <div class="progress-count"><span id="q-current">1</span> / <span id="q-total">10</span></div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="progress-count"><span id="q-current">1</span> / <span id="q-total">10</span></div>
+            <button class="study-settings-btn show" id="settings-btn" onclick="openSettings()">⚙️</button>
+          </div>
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
       </div>
@@ -639,7 +636,6 @@ let studySettings = { cats:['recognize','xiang','tiyong','jixiong'], count:10 };
 function showStudyHome(){ startModeWithSettings(); }
 
 function startStudy(){
-  document.getElementById('settings-btn').classList.add('show');
   startModeWithSettings();
 }
 
