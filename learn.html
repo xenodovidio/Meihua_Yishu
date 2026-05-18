@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.44</title>
+<title>梅花易数 · 习卦 v1.45</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -301,7 +301,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.44</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.45</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -563,7 +563,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="data.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/xenodovidio/Meihua_Yishu@main/data.js"></script>
 <script>
 /* ══════════ 状态 ══════════ */
 let currentTab = 'study';
@@ -966,39 +966,7 @@ function showCombo(n,pts){
 /* ══════════════════════════════
    闪卡
 ══════════════════════════════ */
-// 闪卡数据 — 从 GitHub Excel 动态加载
-let FC_CARDS = [];
-const FC_XLSX_URL = 'https://raw.githubusercontent.com/xenodovidio/Meihua_Yishu/main/lesson_document/test/Test_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B0.xlsx';
-
-async function loadFlashcards(){
-  try{
-    const res = await fetch(FC_XLSX_URL);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const buffer = await res.arrayBuffer();
-    const wb = XLSX.read(buffer, {type:'array'});
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, {header:1});
-    const headers = rows[0]; // front,frontSub,back,backSub,cat
-    FC_CARDS = rows.slice(1).filter(r=>r[0]).map((r,i)=>({
-      id: 'fc_'+i,
-      front:   String(r[0]||''),
-      frontSub:String(r[1]||''),
-      back:    String(r[2]||'').replace(/\//g,'\n'),
-      backSub: String(r[3]||''),
-      cat:     String(r[4]||'其他'),
-    }));
-    initFlashcards();
-    renderFcCategories();
-  }catch(e){
-    console.error('闪卡加载失败',e);
-    // 加载失败时用内置备用数据
-    FC_CARDS = FC_CARDS_FALLBACK;
-    initFlashcards();
-    renderFcCategories();
-  }
-}
-
-// 备用数据（网络失败时使用）
+// 备用闪卡数据
 const FC_CARDS_FALLBACK = [
   {id:'fc_qian',front:'乾',frontSub:'第一卦',back:'天・金・刚健\n父亲・马・西北',backSub:'乾三连：三条阳爻',cat:'八卦基础'},
   {id:'fc_kun',front:'坤',frontSub:'第八卦',back:'地・土・柔顺\n母亲・牛・西南',backSub:'坤六断：六条阴爻',cat:'八卦基础'},
@@ -1019,6 +987,36 @@ const FC_CARDS_FALLBACK = [
   {id:'fc_bian1',front:'变卦',frontSub:'取法',back:'动爻阴阳互换\n形成新的六十四卦',backSub:'预示未来发展方向',cat:'互变卦'},
   {id:'fc_san',front:'本卦・互卦・变卦',frontSub:'三卦含义',back:'本卦：当前形势\n互卦：内在过程\n变卦：未来走向',backSub:'三卦综合解读，缺一不可',cat:'互变卦'},
 ];
+
+// 闪卡数据 — 从 GitHub Excel 动态加载，失败时用备用数据
+let FC_CARDS = [...FC_CARDS_FALLBACK];
+const FC_XLSX_URL = 'https://raw.githubusercontent.com/xenodovidio/Meihua_Yishu/main/lesson_document/test/Test_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B0.xlsx';
+
+async function loadFlashcards(){
+  try{
+    const res = await fetch(FC_XLSX_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const buffer = await res.arrayBuffer();
+    const wb = XLSX.read(buffer, {type:'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+    FC_CARDS = rows.slice(1).filter(r=>r[0]).map((r,i)=>({
+      id: 'fc_'+i,
+      front:   String(r[0]||''),
+      frontSub:String(r[1]||''),
+      back:    String(r[2]||'').replace(/\//g,'\n'),
+      backSub: String(r[3]||''),
+      cat:     String(r[4]||'其他'),
+    }));
+    initFlashcards();
+    renderFcCategories();
+  }catch(e){
+    console.error('闪卡加载失败，使用备用数据',e);
+    FC_CARDS = [...FC_CARDS_FALLBACK];
+    initFlashcards();
+    renderFcCategories();
+  }
+}
 
 let fcState = JSON.parse(localStorage.getItem('fc_state')||'{}');
 let fcQueue = [];
