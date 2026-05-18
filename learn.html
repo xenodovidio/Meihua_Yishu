@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.42</title>
+<title>梅花易数 · 习卦 v1.43</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -301,7 +301,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.42</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.43</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -605,7 +605,7 @@ function switchTab(tab){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+tab).classList.add('active');
   hideBackBtn();
-  if(tab==='flashcard') updateFcStats();
+  if(tab==='flashcard'){ updateFcStats(); startFlashcards(); }
   if(tab==='test') renderTestHistory();
   if(tab==='study') startStudy();
 }
@@ -1038,7 +1038,11 @@ function startFlashcards(){
     const s=fcState[c.id];
     return !s||s.status==='new'||s.due<=now;
   });
-  if(!fcQueue.length){ alert('暂无需要复习的卡片！'); return; }
+  if(!fcQueue.length){
+    document.getElementById('fc-home').style.display='block';
+    document.getElementById('fc-session').style.display='none';
+    return;
+  }
   shuffle(fcQueue);
   fcCurrentIdx=0;
   document.getElementById('fc-home').style.display='none';
