@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.25</title>
+<title>梅花易数 · 习卦 v1.29</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -151,12 +151,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fc-prog-nums{font-size:12px;color:var(--ink4);white-space:nowrap;}
 .fc-prog-bar{flex:1;height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;}
 .fc-prog-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--jade2));border-radius:2px;transition:width .4s;}
-.fc-card-wrap{width:100%;perspective:1000px;}
-.fc-card{width:100%;min-height:260px;border-radius:16px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s ease;}
+.fc-card-wrap{width:100%;perspective:1000px;position:relative;}
+.fc-card{width:100%;min-height:260px;border-radius:16px;cursor:grab;position:relative;transform-style:preserve-3d;transition:box-shadow .2s;user-select:none;}
 .fc-card.flipped{transform:rotateY(180deg);}
-.fc-card-front,.fc-card-back{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.fc-card.dragging{cursor:grabbing;transition:none;}
+.fc-card-front,.fc-card-back{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:box-shadow .15s;}
 .fc-card-front{background:rgba(237,231,216,.8);border:1px solid var(--paper3);}
 .fc-card-back{background:rgba(45,110,90,.06);border:1px solid rgba(45,110,90,.2);transform:rotateY(180deg);}
+.fc-card.glow-bad .fc-card-front,.fc-card.glow-bad .fc-card-back{box-shadow:0 0 0 3px rgba(220,38,38,.6),0 0 40px rgba(220,38,38,.25);}
+.fc-card.glow-good .fc-card-front,.fc-card.glow-good .fc-card-back{box-shadow:0 0 0 3px rgba(45,110,90,.7),0 0 40px rgba(45,110,90,.25);}
+.fc-drag-hint{display:flex;justify-content:space-between;width:100%;padding:0 4px;pointer-events:none;}
+.fc-drag-label{font-size:12px;font-family:'Noto Sans SC',sans-serif;padding:4px 12px;border-radius:20px;opacity:0;transition:opacity .2s;}
+.fc-drag-label.bad{color:#dc2626;background:rgba(220,38,38,.1);}
+.fc-drag-label.good{color:var(--jade);background:rgba(45,110,90,.1);}
+.fc-drag-label.show{opacity:1;}
 .fc-card-label{font-size:11px;color:var(--ink4);letter-spacing:.12em;margin-bottom:16px;}
 .fc-card-main{font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;color:var(--ink);text-align:center;line-height:1.4;}
 .fc-card-sub{font-size:13px;color:var(--ink3);margin-top:10px;text-align:center;line-height:1.8;}
@@ -273,7 +281,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.25</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.29</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -393,12 +401,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="fc-prog-bar"><div class="fc-prog-fill" id="fc-prog-fill" style="width:10%"></div></div>
         </div>
         <div class="fc-card-wrap">
-          <div class="fc-card" id="fc-card" onclick="flipCard()">
+          <div class="fc-drag-hint">
+            <span class="fc-drag-label bad" id="fc-label-bad">😞 不熟悉</span>
+            <span class="fc-drag-label good" id="fc-label-good">😊 掌握了</span>
+          </div>
+          <div class="fc-card" id="fc-card">
             <div class="fc-card-front">
-              <div class="fc-card-label">点击翻转</div>
+              <div class="fc-card-label">点击翻转 · 拖拽评分</div>
               <div class="fc-card-main" id="fc-front-main"></div>
               <div class="fc-card-sub" id="fc-front-sub"></div>
-              <div class="fc-card-hint">👆 点击查看答案</div>
+              <div class="fc-card-hint">👈 不熟悉　👆 翻转　👉 掌握了</div>
             </div>
             <div class="fc-card-back">
               <div class="fc-card-label">答案</div>
@@ -520,13 +532,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
     </svg>
-    <span>指南</span>
+    <span>学习指南</span>
   </button>
   <button class="dock-btn" id="tab-study" onclick="switchTab('study')">
     <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
     </svg>
-    <span>练习</span>
+    <span>智能学习</span>
   </button>
   <button class="dock-btn" id="tab-flashcard" onclick="switchTab('flashcard')">
     <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1011,6 +1023,7 @@ function startFlashcards(){
   document.getElementById('fc-session').style.display='block';
   showBackBtn();
   renderFcCard();
+  setTimeout(initCardDrag, 100); // 等DOM渲染完再绑定
 }
 
 function startFlashcardsCat(cat){
@@ -1021,6 +1034,7 @@ function startFlashcardsCat(cat){
   document.getElementById('fc-session').style.display='block';
   showBackBtn();
   renderFcCard();
+  setTimeout(initCardDrag, 100);
 }
 
 function renderFcCard(){
@@ -1040,11 +1054,138 @@ function renderFcCard(){
 }
 
 function flipCard(){
-  if(fcFlipped) return;
-  fcFlipped=true;
-  document.getElementById('fc-card').classList.add('flipped');
-  document.getElementById('fc-ratings').style.display='flex';
-  document.getElementById('fc-flip-hint').textContent='根据掌握程度评分';
+  fcFlipped = !fcFlipped;
+  const card = document.getElementById('fc-card');
+  card.classList.toggle('flipped', fcFlipped);
+  document.getElementById('fc-ratings').style.display = fcFlipped ? 'flex' : 'none';
+  document.getElementById('fc-flip-hint').textContent = fcFlipped ? '根据掌握程度评分，或左右拖拽' : '点击翻转 · 左右拖拽评分';
+}
+
+/* ── 拖拽手势 ── */
+let dragStartX = 0, dragStartY = 0, dragCurX = 0, isDragging = false, dragMoved = false;
+const DRAG_THRESHOLD = 80; // 触发评分的最小拖拽距离
+
+function initCardDrag() {
+  const card = document.getElementById('fc-card');
+  if (!card) return;
+
+  // Touch
+  card.addEventListener('touchstart', e => {
+    dragStartX = e.touches[0].clientX;
+    dragStartY = e.touches[0].clientY;
+    isDragging = true; dragMoved = false;
+    card.classList.add('dragging');
+  }, { passive: true });
+
+  card.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    dragCurX = e.touches[0].clientX - dragStartX;
+    const dragCurY = e.touches[0].clientY - dragStartY;
+    if (Math.abs(dragCurX) > Math.abs(dragCurY) && Math.abs(dragCurX) > 10) {
+      e.preventDefault();
+      dragMoved = true;
+      updateDragVisual(dragCurX);
+    }
+  }, { passive: false });
+
+  card.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    card.classList.remove('dragging');
+    if (dragMoved) {
+      handleDragEnd(dragCurX);
+    } else {
+      flipCard();
+    }
+    resetDragVisual();
+    dragMoved = false; dragCurX = 0;
+  });
+
+  // Mouse
+  card.addEventListener('mousedown', e => {
+    dragStartX = e.clientX;
+    isDragging = true; dragMoved = false;
+    card.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    dragCurX = e.clientX - dragStartX;
+    if (Math.abs(dragCurX) > 10) {
+      dragMoved = true;
+      updateDragVisual(dragCurX);
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    document.getElementById('fc-card')?.classList.remove('dragging');
+    if (dragMoved) {
+      handleDragEnd(dragCurX);
+    } else {
+      flipCard();
+    }
+    resetDragVisual();
+    dragMoved = false; dragCurX = 0;
+  });
+}
+
+function updateDragVisual(dx) {
+  const card = document.getElementById('fc-card');
+  const badLabel = document.getElementById('fc-label-bad');
+  const goodLabel = document.getElementById('fc-label-good');
+  if (!card) return;
+
+  // 卡片跟随移动 + 旋转
+  const rotate = dx * 0.08;
+  card.style.transform = fcFlipped
+    ? `rotateY(180deg) translateX(${-dx}px) rotate(${-rotate}deg)`
+    : `translateX(${dx}px) rotate(${rotate}deg)`;
+
+  if (dx < -10) {
+    card.classList.add('glow-bad'); card.classList.remove('glow-good');
+    badLabel.classList.add('show'); goodLabel.classList.remove('show');
+  } else if (dx > 10) {
+    card.classList.add('glow-good'); card.classList.remove('glow-bad');
+    goodLabel.classList.add('show'); badLabel.classList.remove('show');
+  } else {
+    card.classList.remove('glow-bad','glow-good');
+    badLabel.classList.remove('show'); goodLabel.classList.remove('show');
+  }
+}
+
+function resetDragVisual() {
+  const card = document.getElementById('fc-card');
+  if (!card) return;
+  // 带弹回动画
+  card.style.transition = 'transform .3s cubic-bezier(.34,1.56,.64,1)';
+  card.style.transform = fcFlipped ? 'rotateY(180deg)' : '';
+  setTimeout(() => { if(card) card.style.transition = ''; }, 320);
+  card.classList.remove('glow-bad','glow-good');
+  document.getElementById('fc-label-bad')?.classList.remove('show');
+  document.getElementById('fc-label-good')?.classList.remove('show');
+}
+
+function handleDragEnd(dx) {
+  if (Math.abs(dx) < DRAG_THRESHOLD) return;
+  const card = document.getElementById('fc-card');
+  if (card) {
+    const dir = dx < 0 ? -1 : 1;
+    card.style.transition = 'transform .3s ease, opacity .3s ease';
+    card.style.transform = (fcFlipped ? 'rotateY(180deg) ' : '') + `translateX(${dir * 400}px) rotate(${dir * 20}deg)`;
+    card.style.opacity = '0';
+    setTimeout(() => {
+      card.style.transition = '';
+      card.style.transform = '';
+      card.style.opacity = '';
+      if (dx < 0) rateCard(0);
+      else rateCard(2);
+    }, 280);
+  } else {
+    if (dx < 0) rateCard(0);
+    else rateCard(2);
+  }
 }
 
 function rateCard(rating){
