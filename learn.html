@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.33</title>
+<title>梅花易数 · 习卦 v1.39</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -172,10 +172,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fc-card.flipped{transform:rotateY(180deg);}
 .fc-card.dragging{cursor:grabbing;transition:box-shadow .2s;}
 .fc-card-front,.fc-card-back{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:box-shadow .15s;overflow:hidden;}
-/* 反光层 */
-.fc-card-front::after,.fc-card-back::after{content:'';position:absolute;inset:0;border-radius:16px;background:linear-gradient(105deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 70%);transform:translateX(-150%);transition:transform 0s;pointer-events:none;}
-.fc-card.flipping .fc-card-front::after{transform:translateX(150%);transition:transform 1.5s cubic-bezier(.4,0,.2,1);}
-.fc-card.flipping .fc-card-back::after{transform:translateX(150%);transition:transform 1.5s cubic-bezier(.4,0,.2,1);}
+/* 反光层 — 独立div */
+.fc-card-front::after{display:none;}
+.fc-card-back::after{display:none;}
+.fc-shine{position:absolute;inset:0;border-radius:16px;background:linear-gradient(105deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 70%);transform:translateX(-150%);pointer-events:none;z-index:10;transition:none;}
+.fc-shine.active{transform:translateX(150%);transition:transform .6s ease-out;}
 .fc-card-front{background:rgba(237,231,216,.8);border:1px solid var(--paper3);}
 .fc-card-back{background:rgba(45,110,90,.06);border:1px solid rgba(45,110,90,.2);transform:rotateY(180deg);}
 .fc-card.glow-bad .fc-card-front,.fc-card.glow-bad .fc-card-back{box-shadow:0 0 0 3px rgba(220,38,38,.6),0 0 40px rgba(220,38,38,.25);}
@@ -301,7 +302,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.33</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.39</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -407,12 +408,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           </div>
           <div class="fc-card" id="fc-card">
             <div class="fc-card-front">
+              <div class="fc-shine" id="fc-shine-front"></div>
               <div class="fc-card-label">点击翻转 · 拖拽评分</div>
               <div class="fc-card-main" id="fc-front-main"></div>
               <div class="fc-card-sub" id="fc-front-sub"></div>
               <div class="fc-card-hint">👈 不熟悉　👆 翻转　👉 掌握了</div>
             </div>
             <div class="fc-card-back">
+              <div class="fc-shine" id="fc-shine"></div>
               <div class="fc-card-label">答案</div>
               <div class="fc-card-main" id="fc-back-main"></div>
               <div class="fc-card-sub" id="fc-back-sub"></div>
@@ -1079,12 +1082,29 @@ function renderFcCard(){
 function flipCard(){
   fcFlipped = !fcFlipped;
   const card = document.getElementById('fc-card');
-  // 加flipping类触发反光，翻转完后移除
-  card.classList.add('flipping');
-  setTimeout(() => card.classList.remove('flipping'), 1550);
   card.classList.toggle('flipped', fcFlipped);
   document.getElementById('fc-ratings').style.display = fcFlipped ? 'flex' : 'none';
   document.getElementById('fc-flip-hint').textContent = fcFlipped ? '根据掌握程度评分，或左右拖拽' : '点击翻转 · 左右拖拽评分';
+  // 翻转到答案面时，翻转完成后触发闪光
+  if(fcFlipped){
+    setTimeout(()=>{
+      const shine = document.getElementById('fc-shine');
+      if(!shine) return;
+      shine.classList.remove('active');
+      void shine.offsetWidth;
+      shine.classList.add('active');
+      setTimeout(()=>shine.classList.remove('active'), 700);
+    }, 0);
+  } else {
+    setTimeout(()=>{
+      const shine = document.getElementById('fc-shine-front');
+      if(!shine) return;
+      shine.classList.remove('active');
+      void shine.offsetWidth;
+      shine.classList.add('active');
+      setTimeout(()=>shine.classList.remove('active'), 700);
+    }, 0);
+  }
 }
 
 /* ── 拖拽手势 ── */
