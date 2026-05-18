@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.29</title>
+<title>梅花易数 · 习卦 v1.33</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -34,9 +34,25 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .main{max-width:520px;margin:0 auto;padding:calc(68px + env(safe-area-inset-top,0px)) 20px calc(90px + env(safe-area-inset-bottom,0px));}
 .view{display:none;}.view.active{display:block;}
 
-/* ════════════════════
-   智能学习 View
-════════════════════ */
+/* ── 智能学习设置弹窗 ── */
+.study-settings-btn{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:20px;z-index:60;background:none;border:1px solid var(--paper3);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;display:none;align-items:center;gap:5px;}
+.study-settings-btn.show{display:flex;}
+.study-settings-btn:hover{border-color:var(--gold2);color:var(--gold);}
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.5);z-index:200;align-items:flex-end;justify-content:center;}
+.settings-overlay.show{display:flex;}
+.settings-panel{background:var(--paper);border-radius:16px 16px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.settings-title{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+.settings-close{background:none;border:none;font-size:20px;color:var(--ink4);cursor:pointer;padding:0 4px;}
+.settings-section{margin-bottom:18px;}
+.settings-label{font-size:12px;color:var(--ink4);letter-spacing:.1em;margin-bottom:10px;}
+.settings-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--paper3);background:rgba(237,231,216,.6);font-size:13px;color:var(--ink3);cursor:pointer;transition:all .2s;font-family:'Noto Sans SC',sans-serif;}
+.chip.active{border-color:var(--gold);background:rgba(184,145,42,.1);color:var(--gold);}
+.settings-count{display:flex;align-items:center;gap:14px;}
+.settings-count-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--paper3);background:none;font-size:18px;color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.settings-count-val{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);min-width:30px;text-align:center;}
+.settings-start-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:10px;padding:14px;font-family:'Noto Serif SC',serif;font-size:15px;cursor:pointer;margin-top:4px;letter-spacing:.1em;}
 .study-home{display:flex;flex-direction:column;gap:14px;}
 .study-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);margin:8px 0 2px;}
 .study-sub{font-size:13px;color:var(--ink3);line-height:1.8;margin-bottom:4px;}
@@ -151,11 +167,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fc-prog-nums{font-size:12px;color:var(--ink4);white-space:nowrap;}
 .fc-prog-bar{flex:1;height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;}
 .fc-prog-fill{height:100%;background:linear-gradient(90deg,var(--jade),var(--jade2));border-radius:2px;transition:width .4s;}
-.fc-card-wrap{width:100%;perspective:1000px;position:relative;}
-.fc-card{width:100%;min-height:260px;border-radius:16px;cursor:grab;position:relative;transform-style:preserve-3d;transition:box-shadow .2s;user-select:none;}
+.fc-card-wrap{width:100%;perspective:1200px;position:relative;}
+.fc-card{width:100%;min-height:260px;border-radius:16px;cursor:grab;position:relative;transform-style:preserve-3d;transition:transform 1.5s cubic-bezier(.4,0,.2,1),box-shadow .2s;user-select:none;}
 .fc-card.flipped{transform:rotateY(180deg);}
-.fc-card.dragging{cursor:grabbing;transition:none;}
-.fc-card-front,.fc-card-back{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:box-shadow .15s;}
+.fc-card.dragging{cursor:grabbing;transition:box-shadow .2s;}
+.fc-card-front,.fc-card-back{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:box-shadow .15s;overflow:hidden;}
+/* 反光层 */
+.fc-card-front::after,.fc-card-back::after{content:'';position:absolute;inset:0;border-radius:16px;background:linear-gradient(105deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 70%);transform:translateX(-150%);transition:transform 0s;pointer-events:none;}
+.fc-card.flipping .fc-card-front::after{transform:translateX(150%);transition:transform 1.5s cubic-bezier(.4,0,.2,1);}
+.fc-card.flipping .fc-card-back::after{transform:translateX(150%);transition:transform 1.5s cubic-bezier(.4,0,.2,1);}
 .fc-card-front{background:rgba(237,231,216,.8);border:1px solid var(--paper3);}
 .fc-card-back{background:rgba(45,110,90,.06);border:1px solid rgba(45,110,90,.2);transform:rotateY(180deg);}
 .fc-card.glow-bad .fc-card-front,.fc-card.glow-bad .fc-card-back{box-shadow:0 0 0 3px rgba(220,38,38,.6),0 0 40px rgba(220,38,38,.25);}
@@ -281,7 +301,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.29</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.33</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -289,63 +309,46 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="main">
   <div class="combo-toast" id="combo-toast"></div>
 
-  <!-- ══ 智能学习 ══ -->
-  <div class="view" id="view-study">
+  <!-- 设置按钮（答题时显示） -->
+  <button class="study-settings-btn" id="settings-btn" onclick="openSettings()">
+    ⚙️ 设置
+  </button>
 
-    <!-- 首页 -->
-    <div id="study-home">
-      <div class="study-title">智能学习</div>
-      <div class="study-sub">通过主动回忆练习，强化梅花易数知识记忆</div>
-
-      <div class="study-home">
-        <div class="mode-card featured" onclick="window.location.href='journey.html'">
-          <div class="mode-icon">🗺️</div>
-          <div class="mode-info">
-            <div class="mode-name">学习之旅</div>
-            <div class="mode-desc">从零开始，系统学习梅花易数基础知识</div>
-          </div>
-          <div class="mode-badge new">新</div>
-        </div>
-        <div class="mode-card" onclick="startMode('recognize')">
-          <div class="mode-icon">☰</div>
-          <div class="mode-info">
-            <div class="mode-name">识卦练习</div>
-            <div class="mode-desc">看爻线，猜卦名、互卦、变卦</div>
-          </div>
-          <div class="mode-badge">入门</div>
-        </div>
-        <div class="mode-card" onclick="startMode('xiang')">
-          <div class="mode-icon">🌿</div>
-          <div class="mode-info">
-            <div class="mode-name">万物类象</div>
-            <div class="mode-desc">根据卦象选类象，或根据事物找对应的卦</div>
-          </div>
-          <div class="mode-badge mid">进阶</div>
-        </div>
-        <div class="mode-card" onclick="startMode('tiyong')">
-          <div class="mode-icon">⚖️</div>
-          <div class="mode-info">
-            <div class="mode-name">体用判断</div>
-            <div class="mode-desc">判断所问事项中哪个是体卦哪个是用卦</div>
-          </div>
-          <div class="mode-badge mid">进阶</div>
-        </div>
-        <div class="mode-card" onclick="startMode('jixiong')">
-          <div class="mode-icon">🔮</div>
-          <div class="mode-info">
-            <div class="mode-name">吉凶判断</div>
-            <div class="mode-desc">根据体用五行关系判断吉凶走向</div>
-          </div>
-          <div class="mode-badge hard">高阶</div>
+  <!-- 设置弹窗 -->
+  <div class="settings-overlay" id="settings-overlay" onclick="closeSettingsOutside(event)">
+    <div class="settings-panel">
+      <div class="settings-title">
+        自定义题目
+        <button class="settings-close" onclick="closeSettings()">✕</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">题目类别</div>
+        <div class="settings-chips" id="settings-cats">
+          <div class="chip active" data-cat="recognize" onclick="toggleChip(this)">识卦</div>
+          <div class="chip active" data-cat="xiang" onclick="toggleChip(this)">万物类象</div>
+          <div class="chip active" data-cat="tiyong" onclick="toggleChip(this)">体用关系</div>
+          <div class="chip active" data-cat="jixiong" onclick="toggleChip(this)">吉凶判断</div>
         </div>
       </div>
+      <div class="settings-section">
+        <div class="settings-label">题目数量</div>
+        <div class="settings-count">
+          <button class="settings-count-btn" onclick="adjustStudyCount(-5)">−</button>
+          <span class="settings-count-val" id="settings-count-val">10</span>
+          <button class="settings-count-btn" onclick="adjustStudyCount(5)">+</button>
+        </div>
+      </div>
+      <button class="settings-start-btn" onclick="applySettings()">开始练习</button>
     </div>
+  </div>
 
-    <!-- 题目区 -->
-    <div class="quiz-wrap" id="quiz-wrap" style="display:none">
+  <!-- ══ 智能学习 ══ -->
+  <div class="view" id="view-study">
+    <!-- 题目区（直接显示） -->
+    <div class="quiz-wrap" id="quiz-wrap">
       <div class="progress-bar-wrap">
         <div class="progress-info">
-          <div class="progress-label" id="mode-label">识卦练习</div>
+          <div class="progress-label" id="mode-label">智能学习</div>
           <div class="progress-count"><span id="q-current">1</span> / <span id="q-total">10</span></div>
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
@@ -354,7 +357,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="options-grid" id="options-grid"></div>
       <div class="explain-card" id="explain-card"></div>
       <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 →</button>
-      <button class="quit-btn" onclick="quitQuiz()">退出</button>
     </div>
 
     <!-- 结算 -->
@@ -367,11 +369,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="result-title" id="r-title">完美！</div>
       <div class="result-desc" id="r-desc"></div>
       <div class="result-btns">
-        <button class="result-btn secondary" onclick="showStudyHome()">返回</button>
         <button class="result-btn primary" id="r-retry-btn" onclick="retryMode()">再来一次</button>
       </div>
     </div>
-
   </div>
 
   <!-- ══ 闪卡 ══ -->
@@ -607,11 +607,12 @@ function switchTab(tab){
   hideBackBtn();
   if(tab==='flashcard') updateFcStats();
   if(tab==='test') renderTestHistory();
+  if(tab==='study') startStudy();
 }
 
 /* ══════════ 返回逻辑 ══════════ */
 function goBack(){
-  if(currentTab==='study'){ showStudyHome(); }
+  if(currentTab==='study'){ /* 无首页，不做处理 */ }
   else if(currentTab==='flashcard'){ quitFlashcards(); }
   else if(currentTab==='test'){ showTestHome(); }
   else if(currentTab==='guide'){ closeReader(); return; }
@@ -629,31 +630,53 @@ function hideBackBtn(){
 /* ══════════════════════════════
    智能学习
 ══════════════════════════════ */
-function showStudyHome(){
-  document.getElementById('study-home').style.display='block';
-  document.getElementById('quiz-wrap').style.display='none';
-  document.getElementById('result-view').classList.remove('active');
-  hideBackBtn();
+/* ══ 智能学习设置 ══ */
+let studySettings = { cats:['recognize','xiang','tiyong','jixiong'], count:10 };
+
+function showStudyHome(){ startModeWithSettings(); }
+
+function startStudy(){
+  document.getElementById('settings-btn').classList.add('show');
+  startModeWithSettings();
 }
 
-function startMode(mode){
+function startModeWithSettings(){
   try{
-    currentMode = mode;
-    questions = genQuestions(mode, 10);
-    currentIdx = 0; correctCount = 0; combo = 0;
-    document.getElementById('study-home').style.display='none';
+    const {cats, count} = studySettings;
+    questions = [];
+    for(let i=0;i<count;i++){
+      const cat = cats[i % cats.length];
+      questions.push(genQuestions(cat,1)[0]);
+    }
+    shuffle(questions);
+    currentIdx=0; correctCount=0; combo=0;
     document.getElementById('quiz-wrap').style.display='flex';
     document.getElementById('result-view').classList.remove('active');
-    const labels={recognize:'识卦练习',tiyong:'体用判断',jixiong:'吉凶判断',xiang:'万物类象'};
-    document.getElementById('mode-label').textContent = labels[mode]||mode;
-    document.getElementById('q-total').textContent = questions.length;
-    showBackBtn();
+    document.getElementById('mode-label').textContent='智能学习';
+    document.getElementById('q-total').textContent=questions.length;
     renderQuestion();
-  }catch(e){ alert('启动失败：'+e.message); }
+  }catch(e){ console.error('启动失败',e); }
 }
 
-function retryMode(){ startMode(currentMode); }
-function quitQuiz(){ showStudyHome(); }
+function startMode(mode){ currentMode=mode; startModeWithSettings(); }
+function retryMode(){ startModeWithSettings(); }
+function quitQuiz(){}
+
+function openSettings(){ document.getElementById('settings-overlay').classList.add('show'); }
+function closeSettings(){ document.getElementById('settings-overlay').classList.remove('show'); }
+function closeSettingsOutside(e){ if(e.target===document.getElementById('settings-overlay')) closeSettings(); }
+function toggleChip(el){
+  const chips=document.querySelectorAll('#settings-cats .chip');
+  const active=[...chips].filter(c=>c.classList.contains('active'));
+  if(el.classList.contains('active')&&active.length===1) return;
+  el.classList.toggle('active');
+  studySettings.cats=[...chips].filter(c=>c.classList.contains('active')).map(c=>c.dataset.cat);
+}
+function adjustStudyCount(d){
+  studySettings.count=Math.max(5,Math.min(30,studySettings.count+d));
+  document.getElementById('settings-count-val').textContent=studySettings.count;
+}
+function applySettings(){ closeSettings(); startModeWithSettings(); }
 
 /* ── 爻线 ── */
 function yaoLines(uL, dL, dongIdx, size=1){
@@ -1056,6 +1079,9 @@ function renderFcCard(){
 function flipCard(){
   fcFlipped = !fcFlipped;
   const card = document.getElementById('fc-card');
+  // 加flipping类触发反光，翻转完后移除
+  card.classList.add('flipping');
+  setTimeout(() => card.classList.remove('flipping'), 1550);
   card.classList.toggle('flipped', fcFlipped);
   document.getElementById('fc-ratings').style.display = fcFlipped ? 'flex' : 'none';
   document.getElementById('fc-flip-hint').textContent = fcFlipped ? '根据掌握程度评分，或左右拖拽' : '点击翻转 · 左右拖拽评分';
