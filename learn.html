@@ -314,7 +314,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.51</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.52</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -946,6 +946,7 @@ function selectOpt(btn){
     totalScore+=pts;
     localStorage.setItem('learn_score',totalScore);
     document.getElementById('total-score').textContent=totalScore;
+    scheduleSync();
     if(combo>=2) showCombo(combo,pts);
     ec.innerHTML=`<div class="explain-result"><span class="result-icon">✓</span><span class="result-text correct">回答正确 +${pts}分</span></div><div class="explain-body">${explain}</div>`;
   } else {
@@ -1307,11 +1308,11 @@ function handleDragEnd(dx) {
 function rateCard(rating){
   const c=fcQueue[fcCurrentIdx];
   const s=fcState[c.id];
-  // 简化SM-2
   if(rating===2){ s.status='mastered'; s.interval=Math.max(s.interval*2,1); s.due=Date.now()+s.interval*24*3600*1000; }
   else if(rating===1){ s.status='review'; s.interval=1; s.due=Date.now()+3600*1000; }
   else { s.status='review'; s.interval=1; s.due=Date.now()+600*1000; }
   localStorage.setItem('fc_state',JSON.stringify(fcState));
+  scheduleSync();
   fcCurrentIdx++;
   renderFcCard();
 }
@@ -1567,15 +1568,150 @@ function shuffle(arr){
   return a;
 }
 
+/* ══════════ COS 云同步 ══════════ */
+const COS_CONFIG = {
+  SecretId:  'AKID9B8sOgliV8ZoqeIk074oKcjiV7ZrPuDJ',
+  SecretKey: 'znOlura5MRK4as0viYIrJXXM0fBao11n',
+  Bucket:    'meihua-yishu-1433827621',
+  Region:    'ap-shanghai',
+};
+
+let currentUser = null;
+let syncTimer = null;
+
+function cosUrl(key){
+  return `https://${COS_CONFIG.Bucket}.cos.${COS_CONFIG.Region}.myqcloud.com/${key}`;
+}
+
+async function hmacSHA1(key, msg){
+  const enc = new TextEncoder();
+  const k = await crypto.subtle.importKey('raw', enc.encode(key), {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', k, enc.encode(msg));
+  return btoa(String.fromCharCode(...new Uint8Array(sig)));
+}
+
+async function sha1Hex(msg){
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function cosSign(method, path, params={}){
+  const now = Math.floor(Date.now()/1000);
+  const expire = now + 600;
+  const keyTime = `${now};${expire}`;
+  const signKey = await hmacSHA1(COS_CONFIG.SecretKey, keyTime);
+  const sortedParams = Object.keys(params).sort().map(k=>`${k.toLowerCase()}=${encodeURIComponent(params[k])}`).join('&');
+  const httpString = `${method.toLowerCase()}\n${path}\n${sortedParams}\n\n`;
+  const strToSign = `sha1\n${keyTime}\n${await sha1Hex(httpString)}\n`;
+  const signature = await hmacSHA1(signKey, strToSign);
+  const paramKeys = Object.keys(params).sort().map(k=>k.toLowerCase()).join(';');
+  return `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=${paramKeys}&q-signature=${signature}`;
+}
+
+async function cosGet(key){
+  const path = `/${key}`;
+  const auth = await cosSign('GET', path);
+  const res = await fetch(`${cosUrl(key)}?${auth}`);
+  if(!res.ok) return null;
+  return await res.json();
+}
+
+async function cosPut(key, data){
+  const path = `/${key}`;
+  const body = JSON.stringify(data);
+  const auth = await cosSign('PUT', path);
+  const res = await fetch(`${cosUrl(key)}?${auth}`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body,
+  });
+  return res.ok;
+}
+
+// 从云端加载用户数据
+async function loadUserData(){
+  if(!currentUser) return;
+  try{
+    const data = await cosGet(`userdata/${currentUser.username}.json`);
+    if(data){
+      // 恢复积分
+      if(data.score !== undefined){
+        totalScore = data.score;
+        document.getElementById('total-score').textContent = totalScore;
+        localStorage.setItem('meihua_score', totalScore);
+      }
+      // 恢复闪卡进度
+      if(data.fcState){
+        fcState = data.fcState;
+        localStorage.setItem('fc_state', JSON.stringify(fcState));
+      }
+    }
+  }catch(e){
+    console.warn('云端数据加载失败，使用本地数据', e);
+  }
+}
+
+// 同步数据到云端（防抖，3秒后执行）
+function scheduleSync(){
+  if(!currentUser) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncUserData, 3000);
+}
+
+async function syncUserData(){
+  if(!currentUser) return;
+  try{
+    await cosPut(`userdata/${currentUser.username}.json`, {
+      username: currentUser.username,
+      score: totalScore,
+      fcState: fcState,
+      updatedAt: new Date().toISOString(),
+    });
+  }catch(e){
+    console.warn('云端同步失败', e);
+  }
+}
+
+/* ── 登录检查 ── */
+function checkLogin(){
+  const stored = sessionStorage.getItem('meihua_user');
+  if(!stored){
+    window.location.href = 'login.html';
+    return false;
+  }
+  currentUser = JSON.parse(stored);
+  // 显示用户名
+  const scoreEl = document.getElementById('total-score');
+  if(scoreEl){
+    const parent = scoreEl.parentElement;
+    if(parent) parent.title = currentUser.nickname || currentUser.username;
+  }
+  return true;
+}
+
+/* ── 积分变动时触发同步 ── */
+const _origAddScore = window.addScore;
+function addScore(pts, reason){
+  if(typeof _origAddScore === 'function') _origAddScore(pts, reason);
+  scheduleSync();
+}
+
 /* ── 初始化 ── */
 loadQuestions();
 renderTestHistory();
 renderGuide();
 loadFlashcards();
-// 默认显示指南
 currentTab = 'guide';
 document.getElementById('view-guide').classList.add('active');
 document.getElementById('tab-guide').classList.add('active');
+
+// 登录检查 + 加载云端数据
+if(checkLogin()){
+  loadUserData();
+}
+
+// 页面关闭前同步
+window.addEventListener('beforeunload', ()=>{ syncUserData(); });
 </script>
 </body>
 </html>
