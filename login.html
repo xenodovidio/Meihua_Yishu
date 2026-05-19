@@ -202,8 +202,9 @@ async function sha1Hex(msg){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// 生成 COS 签名
-async function cosSign(method, path){
+// 生成预签名 URL
+async function cosPresignUrl(method, key){
+  const path = `/${key}`;
   const now = Math.floor(Date.now()/1000);
   const expire = now + 600;
   const keyTime = `${now};${expire}`;
@@ -211,32 +212,24 @@ async function cosSign(method, path){
   const httpString = `${method.toLowerCase()}\n${path}\n\n\n`;
   const strToSign = `sha1\n${keyTime}\n${await sha1Hex(httpString)}\n`;
   const signature = await hmacSHA1(signKey, strToSign);
-  return `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=&q-signature=${signature}`;
+  const auth = `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=&q-signature=${signature}`;
+  return `${cosUrl(key)}?${auth}`;
 }
 
 // 读取 COS 文件
 async function cosGet(key){
-  const path = `/${key}`;
-  const auth = await cosSign('GET', path);
-  const res = await fetch(cosUrl(key), {
-    headers: { 'Authorization': auth }
-  });
+  const url = await cosPresignUrl('GET', key);
+  const res = await fetch(url);
   if(!res.ok) return null;
   return await res.json();
 }
 
 // 写入 COS 文件
 async function cosPut(key, data){
-  const path = `/${key}`;
-  const body = JSON.stringify(data);
-  const auth = await cosSign('PUT', path);
-  const res = await fetch(cosUrl(key), {
+  const url = await cosPresignUrl('PUT', key);
+  const res = await fetch(url, {
     method: 'PUT',
-    headers: {
-      'Authorization': auth,
-      'Content-Type': 'application/json'
-    },
-    body,
+    body: JSON.stringify(data),
   });
   return res.ok;
 }
