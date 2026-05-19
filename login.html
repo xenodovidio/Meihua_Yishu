@@ -203,28 +203,24 @@ async function sha1Hex(msg){
 }
 
 // 生成 COS 签名
-async function cosSign(method, path, params={}){
+async function cosSign(method, path){
   const now = Math.floor(Date.now()/1000);
   const expire = now + 600;
   const keyTime = `${now};${expire}`;
-
   const signKey = await hmacSHA1(COS_CONFIG.SecretKey, keyTime);
-
-  // 参数排序
-  const sortedParams = Object.keys(params).sort().map(k=>`${k.toLowerCase()}=${encodeURIComponent(params[k])}`).join('&');
-  const httpString = `${method.toLowerCase()}\n${path}\n${sortedParams}\n\n`;
+  const httpString = `${method.toLowerCase()}\n${path}\n\n\n`;
   const strToSign = `sha1\n${keyTime}\n${await sha1Hex(httpString)}\n`;
   const signature = await hmacSHA1(signKey, strToSign);
-
-  const paramKeys = Object.keys(params).sort().map(k=>k.toLowerCase()).join(';');
-  return `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=${paramKeys}&q-signature=${signature}`;
+  return `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=&q-signature=${signature}`;
 }
 
 // 读取 COS 文件
 async function cosGet(key){
   const path = `/${key}`;
   const auth = await cosSign('GET', path);
-  const res = await fetch(`${cosUrl(key)}?${auth}`);
+  const res = await fetch(cosUrl(key), {
+    headers: { 'Authorization': auth }
+  });
   if(!res.ok) return null;
   return await res.json();
 }
@@ -234,11 +230,16 @@ async function cosPut(key, data){
   const path = `/${key}`;
   const body = JSON.stringify(data);
   const auth = await cosSign('PUT', path);
-  const res = await fetch(`${cosUrl(key)}?${auth}`, {
+  const res = await fetch(cosUrl(key), {
     method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/json'
+    },
     body,
   });
+  return res.ok;
+}
   return res.ok;
 }
 

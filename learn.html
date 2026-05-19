@@ -1595,23 +1595,23 @@ async function sha1Hex(msg){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-async function cosSign(method, path, params={}){
+async function cosSign(method, path){
   const now = Math.floor(Date.now()/1000);
   const expire = now + 600;
   const keyTime = `${now};${expire}`;
   const signKey = await hmacSHA1(COS_CONFIG.SecretKey, keyTime);
-  const sortedParams = Object.keys(params).sort().map(k=>`${k.toLowerCase()}=${encodeURIComponent(params[k])}`).join('&');
-  const httpString = `${method.toLowerCase()}\n${path}\n${sortedParams}\n\n`;
+  const httpString = `${method.toLowerCase()}\n${path}\n\n\n`;
   const strToSign = `sha1\n${keyTime}\n${await sha1Hex(httpString)}\n`;
   const signature = await hmacSHA1(signKey, strToSign);
-  const paramKeys = Object.keys(params).sort().map(k=>k.toLowerCase()).join(';');
-  return `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=${paramKeys}&q-signature=${signature}`;
+  return `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=&q-signature=${signature}`;
 }
 
 async function cosGet(key){
   const path = `/${key}`;
   const auth = await cosSign('GET', path);
-  const res = await fetch(`${cosUrl(key)}?${auth}`);
+  const res = await fetch(cosUrl(key), {
+    headers: { 'Authorization': auth }
+  });
   if(!res.ok) return null;
   return await res.json();
 }
@@ -1620,9 +1620,12 @@ async function cosPut(key, data){
   const path = `/${key}`;
   const body = JSON.stringify(data);
   const auth = await cosSign('PUT', path);
-  const res = await fetch(`${cosUrl(key)}?${auth}`, {
+  const res = await fetch(cosUrl(key), {
     method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/json'
+    },
     body,
   });
   return res.ok;
