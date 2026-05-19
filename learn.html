@@ -314,9 +314,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.55</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.56</span></div>
   </div>
-  <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
+    <button onclick="logout()" style="background:none;border:1px solid var(--paper3);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--ink4);cursor:pointer;">退出</button>
+  </div>
 </header>
 
 <div class="main">
@@ -1652,6 +1655,11 @@ async function syncUserData(){
   }catch(e){
     console.warn('云端同步失败', e);
   }
+}
+
+function logout(){
+  sessionStorage.removeItem('meihua_user');
+  window.location.href = 'login.html';
 }
 
 /* ── 登录检查 ── */
