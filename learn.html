@@ -160,8 +160,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fc-cat-name{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink);}
 .fc-cat-count{font-size:12px;color:var(--ink4);}
 
+/* 闪卡内部Tab */
+.fc-tabs{display:flex;gap:0;margin-bottom:20px;}
+.fc-tab{background:none;border:none;font-family:'Noto Sans SC',sans-serif;font-size:14px;color:var(--ink4);cursor:pointer;padding:6px 16px 8px;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;}
+.fc-tab.active{color:var(--ink);border-bottom-color:var(--ink);}
+.fc-tab:hover{color:var(--ink2);}
+
 /* 闪卡练习 */
-.fc-session{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:calc(100vh - 160px);margin-top:-20px;}
+.fc-session{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:calc(100vh - 160px);margin-top:-40px;}
 .fc-progress{width:100%;display:flex;align-items:center;gap:12px;}
 .fc-prog-nums{font-size:12px;color:var(--ink4);white-space:nowrap;}
 .fc-prog-bar{flex:1;height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;}
@@ -301,7 +307,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.48</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.49</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -375,8 +381,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <!-- ══ 闪卡 ══ -->
   <div class="view" id="view-flashcard">
 
+    <!-- 内部 Tab -->
+    <div class="fc-tabs" id="fc-tabs">
+      <button class="fc-tab" id="fc-tab-home" onclick="switchFcTab('home')">卡组</button>
+      <button class="fc-tab active" id="fc-tab-session" onclick="switchFcTab('session')">闪卡</button>
+    </div>
+
     <!-- 首页 -->
-    <div id="fc-home">
+    <div id="fc-home" style="display:none">
       <div class="study-title" style="margin-bottom:16px;">闪卡</div>
       <div class="fc-stats">
         <div class="fc-stat"><span class="fc-stat-num learning" id="fc-learning">0</span><span class="fc-stat-label">学习中</span></div>
@@ -392,7 +404,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     </div>
 
     <!-- 闪卡练习 -->
-    <div id="fc-session" style="display:none">
+    <div id="fc-session" style="display:block">
       <div class="fc-session">
         <div class="fc-card-wrap">
           <div class="fc-card" id="fc-card">
@@ -593,12 +605,27 @@ function switchTab(tab){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+tab).classList.add('active');
   hideBackBtn();
-  if(tab==='flashcard'){ updateFcStats(); startFlashcards(); }
+  if(tab==='flashcard'){ updateFcStats(); switchFcTab('session'); }
   if(tab==='test') renderTestHistory();
   if(tab==='study') startStudy();
 }
 
-/* ══════════ 返回逻辑 ══════════ */
+function switchFcTab(tab){
+  document.querySelectorAll('.fc-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fc-tab-'+tab).classList.add('active');
+  if(tab==='session'){
+    document.getElementById('fc-home').style.display='none';
+    document.getElementById('fc-session').style.display='block';
+    startFlashcards();
+  } else {
+    document.getElementById('fc-home').style.display='block';
+    document.getElementById('fc-session').style.display='none';
+    updateFcStats();
+    renderFcCategories();
+    hideBackBtn();
+  }
+}
+
 function goBack(){
   if(currentTab==='study'){ /* 无首页，不做处理 */ }
   else if(currentTab==='flashcard'){ quitFlashcards(); }
@@ -1051,17 +1078,16 @@ function startFlashcards(){
     return !s||s.status==='new'||s.due<=now;
   });
   if(!fcQueue.length){
-    document.getElementById('fc-home').style.display='block';
-    document.getElementById('fc-session').style.display='none';
+    switchFcTab('home');
     return;
   }
   shuffle(fcQueue);
   fcCurrentIdx=0;
   document.getElementById('fc-home').style.display='none';
   document.getElementById('fc-session').style.display='block';
-  showBackBtn();
+  hideBackBtn();
   renderFcCard();
-  setTimeout(initCardDrag, 100); // 等DOM渲染完再绑定
+  setTimeout(initCardDrag, 100);
 }
 
 function startFlashcardsCat(cat){
@@ -1070,7 +1096,8 @@ function startFlashcardsCat(cat){
   fcCurrentIdx=0;
   document.getElementById('fc-home').style.display='none';
   document.getElementById('fc-session').style.display='block';
-  showBackBtn();
+  switchFcTab('session');
+  hideBackBtn();
   renderFcCard();
   setTimeout(initCardDrag, 100);
 }
@@ -1259,10 +1286,7 @@ function rateCard(rating){
 }
 
 function quitFlashcards(){
-  document.getElementById('fc-home').style.display='block';
-  document.getElementById('fc-session').style.display='none';
-  hideBackBtn();
-  updateFcStats();
+  switchFcTab('home');
 }
 
 /* ══════════════════════════════
