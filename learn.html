@@ -156,9 +156,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fc-start-btn{width:100%;background:var(--jade);color:white;border:none;border-radius:12px;padding:16px;font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.1em;}
 .fc-start-btn:hover{background:var(--jade2);}
 .fc-start-btn:disabled{opacity:.5;cursor:default;}
-.fc-category{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
-.fc-cat-name{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink);}
+.fc-cat-grid{display:flex;flex-direction:column;gap:10px;}
+.fc-category{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .2s;}
+.fc-category:hover{border-color:var(--gold2);}
+.fc-cat-name{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink);}
 .fc-cat-count{font-size:12px;color:var(--ink4);}
+.fc-cat-arrow{font-size:18px;color:var(--ink4);transition:transform .2s;}
+.fc-card-list{display:flex;flex-direction:column;gap:6px;margin-top:12px;border-top:1px solid var(--paper3);padding-top:12px;}
+.fc-card-item{background:rgba(245,240,232,.8);border-radius:8px;padding:10px 12px;}
+.fc-card-item-front{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink);}
+.fc-card-item-sub{font-size:12px;color:var(--ink4);margin-top:2px;}
 
 /* 闪卡内部Tab */
 .fc-tabs{display:flex;gap:0;margin-bottom:20px;}
@@ -307,7 +314,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.49</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.51</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -396,10 +403,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="fc-stat"><span class="fc-stat-num mastered" id="fc-mastered">0</span><span class="fc-stat-label">已掌握</span></div>
         <div class="fc-stat"><span class="fc-stat-num" id="fc-total">0</span><span class="fc-stat-label">总计</span></div>
       </div>
-      <button class="fc-start-btn" onclick="startFlashcards()">开始复习</button>
       <div style="margin-top:20px;">
         <div class="test-section-title">卡组</div>
-        <div style="display:flex;flex-direction:column;gap:10px;" id="fc-categories"></div>
+        <div class="fc-cat-grid" id="fc-categories"></div>
       </div>
     </div>
 
@@ -1065,10 +1071,35 @@ function renderFcCategories(){
   FC_CARDS.forEach(c=>{ if(!cats[c.cat])cats[c.cat]=0; cats[c.cat]++; });
   const el=document.getElementById('fc-categories');
   el.innerHTML=Object.entries(cats).map(([cat,count])=>`
-    <div class="fc-category" onclick="startFlashcardsCat('${cat}')">
-      <div class="fc-cat-name">${cat}</div>
-      <div class="fc-cat-count">${count} 张</div>
+    <div class="fc-category" onclick="toggleFcCat(this,'${cat}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="fc-cat-name">${cat}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="fc-cat-count">${count} 张</div>
+          <div class="fc-cat-arrow">›</div>
+        </div>
+      </div>
+      <div class="fc-cat-list" style="display:none;"></div>
     </div>`).join('');
+}
+
+function toggleFcCat(el, cat){
+  const list=el.querySelector('.fc-cat-list');
+  const arrow=el.querySelector('.fc-cat-arrow');
+  const isOpen=list.style.display!=='none';
+  if(isOpen){
+    list.style.display='none';
+    arrow.style.transform='';
+  } else {
+    const cards=FC_CARDS.filter(c=>c.cat===cat);
+    list.innerHTML=`<div class="fc-card-list">${cards.map(c=>`
+      <div class="fc-card-item">
+        <div class="fc-card-item-front">${c.front}</div>
+        ${c.frontSub?`<div class="fc-card-item-sub">${c.frontSub}</div>`:''}
+      </div>`).join('')}</div>`;
+    list.style.display='block';
+    arrow.style.transform='rotate(90deg)';
+  }
 }
 
 function startFlashcards(){
