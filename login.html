@@ -171,9 +171,10 @@ body::before{
     </button>
   </div>
 
-  <div class="footer-deco">观天地之变，知万物之理 <span style="opacity:.5;font-size:11px;">v1.1</span></div>
+  <div class="footer-deco">观天地之变，知万物之理 <span style="opacity:.5;font-size:11px;">v1.2</span></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
 <script>
 /* ── COS 配置 ── */
 const COS_CONFIG = {
@@ -183,58 +184,44 @@ const COS_CONFIG = {
   Region:    'ap-shanghai',
 };
 
-/* ── 工具函数 ── */
-function cosUrl(key){
-  return `https://${COS_CONFIG.Bucket}.cos.${COS_CONFIG.Region}.myqcloud.com/${key}`;
+const cos = new COS({
+  SecretId: COS_CONFIG.SecretId,
+  SecretKey: COS_CONFIG.SecretKey,
+});
+
+// 读取 COS 文件
+function cosGet(key){
+  return new Promise((resolve)=>{
+    cos.getObject({
+      Bucket: COS_CONFIG.Bucket,
+      Region: COS_CONFIG.Region,
+      Key: key,
+    }, (err, data)=>{
+      if(err){ resolve(null); return; }
+      try{ resolve(JSON.parse(data.Body)); }
+      catch(e){ resolve(null); }
+    });
+  });
 }
 
-// HMAC-SHA1 签名（用于 COS 请求鉴权）
-async function hmacSHA1(key, msg){
-  const enc = new TextEncoder();
-  const k = await crypto.subtle.importKey('raw', enc.encode(key), {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', k, enc.encode(msg));
-  return btoa(String.fromCharCode(...new Uint8Array(sig)));
+// 写入 COS 文件
+function cosPut(key, data){
+  return new Promise((resolve)=>{
+    cos.putObject({
+      Bucket: COS_CONFIG.Bucket,
+      Region: COS_CONFIG.Region,
+      Key: key,
+      Body: JSON.stringify(data),
+      ContentType: 'application/json',
+    }, (err)=>{ resolve(!err); });
+  });
 }
 
-// SHA1
+// 密码 hash（SHA-1）
 async function sha1Hex(msg){
   const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(msg));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-
-// 生成预签名 URL
-async function cosPresignUrl(method, key){
-  const path = `/${key}`;
-  const now = Math.floor(Date.now()/1000);
-  const expire = now + 600;
-  const keyTime = `${now};${expire}`;
-  const signKey = await hmacSHA1(COS_CONFIG.SecretKey, keyTime);
-  const httpString = `${method.toLowerCase()}\n${path}\n\n\n`;
-  const strToSign = `sha1\n${keyTime}\n${await sha1Hex(httpString)}\n`;
-  const signature = await hmacSHA1(signKey, strToSign);
-  const auth = `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=&q-signature=${signature}`;
-  return `${cosUrl(key)}?${auth}`;
-}
-
-// 读取 COS 文件
-async function cosGet(key){
-  const url = await cosPresignUrl('GET', key);
-  const res = await fetch(url);
-  if(!res.ok) return null;
-  return await res.json();
-}
-
-// 写入 COS 文件
-async function cosPut(key, data){
-  const url = await cosPresignUrl('PUT', key);
-  const res = await fetch(url, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
-  return res.ok;
-}
-
-// 简单密码 hash（SHA-1）
 async function hashPassword(pwd){
   return await sha1Hex('meihua_' + pwd + '_yishu');
 }

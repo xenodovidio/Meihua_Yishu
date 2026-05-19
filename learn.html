@@ -314,7 +314,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.53</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.54</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -569,8 +569,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
 <script src="data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
 <script>
-/* ══════════ 状态 ══════════ */
 let currentTab = 'study';
 let currentMode = '';
 let questions = [];
@@ -1579,49 +1579,35 @@ const COS_CONFIG = {
 let currentUser = null;
 let syncTimer = null;
 
-function cosUrl(key){
-  return `https://${COS_CONFIG.Bucket}.cos.${COS_CONFIG.Region}.myqcloud.com/${key}`;
-}
+const cos = new COS({
+  SecretId: COS_CONFIG.SecretId,
+  SecretKey: COS_CONFIG.SecretKey,
+});
 
-async function hmacSHA1(key, msg){
-  const enc = new TextEncoder();
-  const k = await crypto.subtle.importKey('raw', enc.encode(key), {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', k, enc.encode(msg));
-  return btoa(String.fromCharCode(...new Uint8Array(sig)));
-}
-
-async function sha1Hex(msg){
-  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(msg));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-async function cosPresignUrl(method, key){
-  const path = `/${key}`;
-  const now = Math.floor(Date.now()/1000);
-  const expire = now + 600;
-  const keyTime = `${now};${expire}`;
-  const signKey = await hmacSHA1(COS_CONFIG.SecretKey, keyTime);
-  const httpString = `${method.toLowerCase()}\n${path}\n\n\n`;
-  const strToSign = `sha1\n${keyTime}\n${await sha1Hex(httpString)}\n`;
-  const signature = await hmacSHA1(signKey, strToSign);
-  const auth = `q-sign-algorithm=sha1&q-ak=${COS_CONFIG.SecretId}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=&q-url-param-list=&q-signature=${signature}`;
-  return `${cosUrl(key)}?${auth}`;
-}
-
-async function cosGet(key){
-  const url = await cosPresignUrl('GET', key);
-  const res = await fetch(url);
-  if(!res.ok) return null;
-  return await res.json();
-}
-
-async function cosPut(key, data){
-  const url = await cosPresignUrl('PUT', key);
-  const res = await fetch(url, {
-    method: 'PUT',
-    body: JSON.stringify(data),
+function cosGet(key){
+  return new Promise((resolve)=>{
+    cos.getObject({
+      Bucket: COS_CONFIG.Bucket,
+      Region: COS_CONFIG.Region,
+      Key: key,
+    }, (err, data)=>{
+      if(err){ resolve(null); return; }
+      try{ resolve(JSON.parse(data.Body)); }
+      catch(e){ resolve(null); }
+    });
   });
-  return res.ok;
+}
+
+function cosPut(key, data){
+  return new Promise((resolve)=>{
+    cos.putObject({
+      Bucket: COS_CONFIG.Bucket,
+      Region: COS_CONFIG.Region,
+      Key: key,
+      Body: JSON.stringify(data),
+      ContentType: 'application/json',
+    }, (err)=>{ resolve(!err); });
+  });
 }
 
 // 从云端加载用户数据
