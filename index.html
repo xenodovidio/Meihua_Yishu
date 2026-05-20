@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.44</title>
+<title>梅花易数 v1.45</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -423,6 +423,31 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .modal-text{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);line-height:2.1;}
 
 /* ══════════════════════════════
+   个人主页
+══════════════════════════════ */
+.profile-wrap{padding:20px;display:flex;flex-direction:column;gap:16px;}
+.profile-hero{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:14px;padding:24px 20px;display:flex;align-items:center;gap:18px;}
+.profile-avatar{width:60px;height:60px;background:rgba(184,145,42,.1);border:1.5px solid rgba(184,145,42,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.profile-info{flex:1;}
+.profile-name{font-family:'Noto Serif SC',serif;font-size:19px;font-weight:700;color:var(--ink);margin-bottom:5px;}
+.profile-score-row{display:flex;align-items:center;gap:6px;}
+.profile-score-label{font-size:12px;color:var(--ink4);}
+.profile-score-val{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--gold);}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.profile-stat{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px 10px;text-align:center;}
+.profile-stat-num{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.profile-stat-label{font-size:11px;color:var(--ink4);}
+.profile-section-title{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:8px;}
+.profile-section-title::before{content:'';display:block;width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+.profile-entry{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s;}
+.profile-entry:hover{border-color:var(--gold2);}
+.profile-entry-left{display:flex;align-items:center;gap:12px;}
+.profile-entry-icon{font-size:20px;}
+.profile-entry-name{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--ink);}
+.profile-entry-sub{font-size:12px;color:var(--ink4);margin-top:2px;}
+.profile-entry-arr{font-size:18px;color:var(--ink4);}
+
+/* ══════════════════════════════
    记录视图
 ══════════════════════════════ */
 .guadian-wrap{padding:24px;}
@@ -462,7 +487,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.44</span>
+      <span class="logo-ver">v1.45</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -496,13 +521,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </svg>
       <span>卦典</span>
     </button>
-    <button class="dock-btn" id="dock-records" onclick="showView('records',this)">
+    <button class="dock-btn" id="dock-profile" onclick="showView('profile',this)">
       <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="15" x2="12" y2="16"/>
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
       </svg>
-      <span>记录</span>
+      <span>我的</span>
     </button>
     <button class="dock-btn" onclick="window.location.href='learn.html'">
       <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -718,6 +742,47 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     </div>
   </div>
 
+  <!-- ══════════════════ 个人主页 ══════════════════ -->
+  <div class="view" id="view-profile">
+    <div class="profile-wrap">
+      <div class="profile-hero">
+        <div class="profile-avatar" id="profile-avatar">易</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profile-name">访客</div>
+          <div class="profile-score-row">
+            <div class="profile-score-label">累计积分</div>
+            <div class="profile-score-val" id="profile-score-val">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="stat-total">0</div>
+          <div class="profile-stat-label">起卦总数</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="stat-this-month">0</div>
+          <div class="profile-stat-label">本月起卦</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="stat-days">0</div>
+          <div class="profile-stat-label">使用天数</div>
+        </div>
+      </div>
+      <div class="profile-section-title">功能</div>
+      <div class="profile-entry" onclick="showRecordsFromProfile()">
+        <div class="profile-entry-left">
+          <div class="profile-entry-icon">📜</div>
+          <div>
+            <div class="profile-entry-name">起卦记录</div>
+            <div class="profile-entry-sub" id="entry-record-sub">共 0 条记录</div>
+          </div>
+        </div>
+        <div class="profile-entry-arr">›</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════════════ 记录视图 ══════════════════ -->
   <div class="view" id="view-records">
     <div class="records-wrap">
@@ -893,8 +958,7 @@ function showView(v,btn){
   document.documentElement.scrollTop=0;
   document.body.scrollTop=0;
 
-  // header 상태 전환
-  const pageTitles={guadian:'六十四卦典',records:'起卦记录'};
+  const pageTitles={guadian:'六十四卦典',records:'起卦记录',profile:'我的'};
   const logo=document.getElementById('header-logo');
   const result=document.getElementById('header-result');
   const pageTitle=document.getElementById('header-page-title');
@@ -910,9 +974,47 @@ function showView(v,btn){
   }
 
   if(v==='guadian')renderGuadian();
+  if(v==='profile')renderProfile();
   if(v==='records'){
     document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
     loadRecords().then(()=>renderRecords());
+  }
+}
+
+function showRecordsFromProfile(){
+  // 从个人主页进入记录，不切换dock
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-records').classList.add('active');
+  const logo=document.getElementById('header-logo');
+  const result=document.getElementById('header-result');
+  const pageTitle=document.getElementById('header-page-title');
+  logo.style.display='none';
+  result.style.display='none';
+  pageTitle.textContent='起卦记录';
+  pageTitle.style.display='block';
+  document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
+  loadRecords().then(()=>renderRecords());
+  document.documentElement.scrollTop=0;
+}
+
+function renderProfile(){
+  const total=records.length;
+  const now=new Date();
+  const thisMonth=records.filter(r=>{
+    const d=new Date(r.id);
+    return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  }).length;
+  const days=new Set(records.map(r=>new Date(r.id).toDateString())).size;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-this-month').textContent=thisMonth;
+  document.getElementById('stat-days').textContent=days;
+  document.getElementById('entry-record-sub').textContent=`共 ${total} 条记录`;
+  const stored=sessionStorage.getItem('meihua_user');
+  if(stored){
+    const user=JSON.parse(stored);
+    const name=user.nickname||user.username;
+    document.getElementById('profile-name').textContent=name;
+    document.getElementById('profile-avatar').textContent=name.slice(-1);
   }
 }
 
