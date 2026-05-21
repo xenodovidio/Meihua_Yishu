@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.47</title>
+<title>梅花易数 v1.48</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -487,7 +487,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.47</span>
+      <span class="logo-ver">v1.48</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -776,6 +776,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
         <div class="profile-entry-arr">›</div>
       </div>
+      <div class="profile-entry" onclick="logout()" style="margin-top:8px;">
+        <div class="profile-entry-left">
+          <div class="profile-entry-icon">🚪</div>
+          <div>
+            <div class="profile-entry-name" style="color:var(--red);">退出账号</div>
+          </div>
+        </div>
+        <div class="profile-entry-arr">›</div>
+      </div>
     </div>
   </div>
 
@@ -991,6 +1000,11 @@ function showRecordsFromProfile(){
   document.getElementById('records-list').innerHTML='<div class="empty-state"><span class="empty-icon">⏳</span>正在加载云端记录…</div>';
   loadRecords().then(()=>renderRecords());
   document.documentElement.scrollTop=0;
+}
+
+function logout(){
+  sessionStorage.removeItem('meihua_user');
+  window.location.href = 'login.html';
 }
 
 function renderProfile(){
