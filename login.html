@@ -171,7 +171,7 @@ body::before{
     </button>
   </div>
 
-  <div class="footer-deco">观天地之变，知万物之理 <span style="opacity:.5;font-size:11px;">v1.3</span></div>
+  <div class="footer-deco">观天地之变，知万物之理 <span style="opacity:.5;font-size:11px;">v1.4</span></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5@1/dist/cos-js-sdk-v5.min.js"></script>
@@ -271,7 +271,7 @@ async function doLogin(){
     }));
 
     // 跳转
-    window.location.href = 'learn.html';
+    window.location.href = 'index.html';
 
   }catch(e){
     console.error(e);
@@ -289,7 +289,7 @@ document.addEventListener('keydown', e=>{
 
 // 已登录则直接跳转
 if(sessionStorage.getItem('meihua_user')){
-  window.location.href = 'learn.html';
+  window.location.href = 'index.html';
 }
 </script>
 </body>
