@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.69</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.70</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2099,7 +2099,7 @@ function jRenderMap(){
 
   const path=document.getElementById('j-lessons-path');
   if(!path)return;
-  path.innerHTML=''; // 每次渲染前清空，防止重复
+  path.innerHTML='';
 
   const chapters = getJChapters();
   const lessons = getJLessons();
@@ -2111,20 +2111,11 @@ function jRenderMap(){
     path.appendChild(chEl);
     const inner=chEl.querySelector('.lessons-path-inner');
 
-  chapters.forEach(chapter=>{
-    const chEl=document.createElement('div');
-    chEl.className='map-chapter';
-    chEl.innerHTML=`<div class="chapter-title">${chapter.title}</div><div class="lessons-path-inner"></div>`;
-    path.appendChild(chEl);
-    const inner=chEl.querySelector('.lessons-path-inner');
-
-    // 找出该章节所有关卡（按lessonIds顺序）
     const chLessons = chapter.lessonIds.map(lid=>lessons.find(x=>String(x.id)===String(lid))).filter(Boolean);
 
     chLessons.forEach((l,i)=>{
       const done=jProgress[String(l.id)]?.done;
       const stars=jProgress[String(l.id)]?.stars||0;
-      // 第一个关卡直接解锁，后续关卡需要前一个完成
       const unlocked = i===0 || jProgress[String(chLessons[i-1]?.id)]?.done;
       const isActive=unlocked&&!done;
       const cls=done?'done':isActive?'active':'locked';
@@ -2145,7 +2136,6 @@ function jRenderMap(){
         </div>`;
       inner.appendChild(node);
     });
-  });
   });
 }
 
