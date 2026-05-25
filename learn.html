@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.61</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.62</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -778,7 +778,7 @@ function switchTab(tab){
   document.getElementById('view-'+tab).classList.add('active');
   hideBackBtn();
   if(tab==='flashcard'){ updateFcStats(); switchFcTab('session'); }
-  if(tab==='journey'){ jRenderMap(); }
+  if(tab==='journey'){ jLoadData().then(()=>jRenderMap()); }
   if(tab==='test') renderTestHistory();
   if(tab==='study') startStudy();
 }
@@ -1867,6 +1867,7 @@ loadFlashcards();
 currentTab = 'journey';
 document.getElementById('view-journey').classList.add('active');
 document.getElementById('tab-journey').classList.add('active');
+jLoadData().then(()=>jRenderMap());
 
 // 登录检查 + 加载云端数据
 if(checkLogin()){
@@ -2027,7 +2028,27 @@ const J_CHAPTERS = [
   {title:'第三章 · 体用生克',lessonIds:[7,8,9]},
 ];
 
-let jProgress = JSON.parse(localStorage.getItem('journey_progress')||'{}');
+let jDataLoaded = false;
+
+async function jLoadData(){
+  if(jDataLoaded) return;
+  try{
+    const data = await cosGet('journey_data.json');
+    if(data && data.chapters && data.lessons){
+      // 把COS数据转换为J_LESSONS和J_CHAPTERS格式
+      window._J_CHAPTERS_COS = data.chapters.map(ch=>({
+        title: ch.title,
+        lessonIds: data.lessons.filter(l=>l.chapterId===ch.id).map(l=>l.id)
+      }));
+      window._J_LESSONS_COS = data.lessons.map(l=>({...l}));
+      jDataLoaded = true;
+    }
+  }catch(e){ console.warn('使用内嵌关卡数据'); }
+}
+
+function getJChapters(){ return window._J_CHAPTERS_COS || J_CHAPTERS; }
+function getJLessons(){ return window._J_LESSONS_COS || J_LESSONS; }
+function getJLesson(id){ return getJLessons().find(l=>l.id===id||l.id===String(id)); }
 let jHearts = 3;
 let jCurrentLessonId = 0;
 let jCurrentStep = 0;
@@ -2056,7 +2077,10 @@ function jRenderMap(){
   if(!path)return;
   path.innerHTML='';
 
-  J_CHAPTERS.forEach(chapter=>{
+  const chapters = getJChapters();
+  const lessons = getJLessons();
+
+  chapters.forEach(chapter=>{
     const chEl=document.createElement('div');
     chEl.className='map-chapter';
     chEl.innerHTML=`<div class="chapter-title">${chapter.title}</div><div class="lessons-path-inner"></div>`;
@@ -2064,12 +2088,12 @@ function jRenderMap(){
     const inner=chEl.querySelector('.lessons-path-inner');
 
     chapter.lessonIds.forEach((lid,i)=>{
-      const l=J_LESSONS.find(x=>x.id===lid);
+      const l=lessons.find(x=>x.id===lid||x.id===String(lid));
       if(!l)return;
-      const allIdx=J_LESSONS.findIndex(x=>x.id===lid);
+      const allIdx=lessons.findIndex(x=>x.id===lid||x.id===String(lid));
       const done=jProgress[l.id]?.done;
       const stars=jProgress[l.id]?.stars||0;
-      const unlocked=allIdx===0||jProgress[J_LESSONS[allIdx-1].id]?.done;
+      const unlocked=allIdx===0||jProgress[lessons[allIdx-1]?.id]?.done;
       const isActive=unlocked&&!done;
       const cls=done?'done':isActive?'active':'locked';
       const statusHtml=done?`<div class="lesson-status status-done">✓ 已完成</div>`:isActive?`<div class="lesson-status status-active">▶ 开始</div>`:`<div class="lesson-status status-lock">🔒</div>`;
@@ -2077,8 +2101,8 @@ function jRenderMap(){
       const node=document.createElement('div');
       node.className='lesson-node';
       node.innerHTML=`
-        ${i>0?`<div class="path-line${jProgress[J_LESSONS[allIdx-1].id]?.done?' done':''}"></div>`:''}
-        <div class="lesson-btn ${cls}" onclick="${unlocked?`jStartLesson(${l.id})`:''}">
+        ${i>0?`<div class="path-line${jProgress[lessons[allIdx-1]?.id]?.done?' done':''}"></div>`:''}
+        <div class="lesson-btn ${cls}" onclick="${unlocked?`jStartLesson('${l.id}')`:''}">
           <div class="lesson-icon">${l.icon}</div>
           <div class="lesson-info">
             <div class="lesson-name">${l.name}</div>
@@ -2094,7 +2118,7 @@ function jRenderMap(){
 
 function jStartLesson(id){
   jCurrentLessonId=id;
-  jCurrentLesson=J_LESSONS.find(l=>l.id===id);
+  jCurrentLesson=getJLesson(id);
   jCurrentStep=0;
   jCorrectCount=0;
   jTotalQuizzes=jCurrentLesson.quizzes.length;
@@ -2259,9 +2283,10 @@ function jShowResult(){
   document.getElementById('j-r-title').textContent=pct===100?'完美通关！':pct>=67?'顺利通关！':'勉强通关';
   document.getElementById('j-r-desc').textContent=pct===100?'全部答对，掌握扎实，继续前进！':pct>=67?'答对大部分，可以继续下一关。':'有些题目需要加强，建议再练习一次。';
   document.getElementById('j-lp-fill').style.width='100%';
-  const allIdx=J_LESSONS.findIndex(l=>l.id===jCurrentLessonId);
+  const lessons=getJLessons();
+  const allIdx=lessons.findIndex(l=>l.id===jCurrentLessonId||l.id===String(jCurrentLessonId));
   const nextBtn=document.getElementById('j-r-next-btn');
-  if(nextBtn)nextBtn.style.display=allIdx<J_LESSONS.length-1?'':'none';
+  if(nextBtn)nextBtn.style.display=allIdx<lessons.length-1?'':'none';
   const prev=jProgress[jCurrentLessonId]||{};
   jProgress[jCurrentLessonId]={done:true,stars:Math.max(stars,prev.stars||0)};
   localStorage.setItem('journey_progress',JSON.stringify(jProgress));
@@ -2269,8 +2294,9 @@ function jShowResult(){
 }
 
 function jGoNextLesson(){
-  const allIdx=J_LESSONS.findIndex(l=>l.id===jCurrentLessonId);
-  const next=J_LESSONS[allIdx+1];
+  const lessons=getJLessons();
+  const allIdx=lessons.findIndex(l=>l.id===jCurrentLessonId||l.id===String(jCurrentLessonId));
+  const next=lessons[allIdx+1];
   if(next)jStartLesson(next.id);
   else jBackToMap();
 }
