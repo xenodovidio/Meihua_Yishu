@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.62</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.63</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2033,9 +2033,12 @@ let jDataLoaded = false;
 async function jLoadData(){
   if(jDataLoaded) return;
   try{
-    const data = await cosGet('journey_data.json');
+    // journey_data.json 已设为公有读，直接fetch不需要签名
+    const url = `https://${COS_CONFIG.Bucket}.cos.${COS_CONFIG.Region}.myqcloud.com/journey_data.json`;
+    const res = await fetch(url+'?t='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
     if(data && data.chapters && data.lessons){
-      // 把COS数据转换为J_LESSONS和J_CHAPTERS格式
       window._J_CHAPTERS_COS = data.chapters.map(ch=>({
         title: ch.title,
         lessonIds: data.lessons.filter(l=>l.chapterId===ch.id).map(l=>l.id)
@@ -2043,7 +2046,12 @@ async function jLoadData(){
       window._J_LESSONS_COS = data.lessons.map(l=>({...l}));
       jDataLoaded = true;
     }
-  }catch(e){ console.warn('使用内嵌关卡数据'); }
+  }catch(e){
+    console.warn('使用内嵌关卡数据', e);
+    // 确保使用内嵌数据
+    window._J_CHAPTERS_COS = null;
+    window._J_LESSONS_COS = null;
+  }
 }
 
 function getJChapters(){ return window._J_CHAPTERS_COS || J_CHAPTERS; }
