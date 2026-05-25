@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.68</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.69</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -791,8 +791,14 @@ function switchTab(tab){
   hideBackBtn();
   if(tab==='flashcard'){ updateFcStats(); switchFcTab('session'); }
   if(tab==='journey'){ 
-    if(jDataLoaded){ jRenderMap(); } 
-    else { jLoadData().then(()=>jRenderMap()); }
+    if(jDataLoaded){ 
+      jRenderMap(); 
+    } else {
+      // 显示loading，等加载完再渲染
+      const path=document.getElementById('j-lessons-path');
+      if(path) path.innerHTML='<div style="text-align:center;padding:40px;color:var(--ink4);font-size:13px;">正在加载…</div>';
+      jLoadData().then(()=>jRenderMap()); 
+    }
   }
   if(tab==='test') renderTestHistory();
   if(tab==='study') startStudy();
@@ -2093,7 +2099,7 @@ function jRenderMap(){
 
   const path=document.getElementById('j-lessons-path');
   if(!path)return;
-  path.innerHTML='';
+  path.innerHTML=''; // 每次渲染前清空，防止重复
 
   const chapters = getJChapters();
   const lessons = getJLessons();
