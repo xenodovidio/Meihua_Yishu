@@ -171,7 +171,7 @@ body::before{
     </button>
   </div>
 
-  <div class="footer-deco">观天地之变，知万物之理 <span style="opacity:.5;font-size:11px;">v1.4</span></div>
+  <div class="footer-deco">观天地之变，知万物之理 <span style="opacity:.5;font-size:11px;">v1.5</span></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5@1/dist/cos-js-sdk-v5.min.js"></script>
@@ -263,12 +263,15 @@ async function doLogin(){
       return;
     }
 
-    // 登录成功，存 session
-    sessionStorage.setItem('meihua_user', JSON.stringify({
+    // 登录成功，存 session（当次）和 localStorage（7天）
+    const userInfo = JSON.stringify({
       username,
       nickname: userData.nickname || username,
       loginTime: Date.now(),
-    }));
+      expireAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7天
+    });
+    sessionStorage.setItem('meihua_user', userInfo);
+    localStorage.setItem('meihua_user_persist', userInfo);
 
     // 跳转
     window.location.href = 'index.html';
@@ -287,10 +290,26 @@ document.addEventListener('keydown', e=>{
   if(e.key === 'Enter') doLogin();
 });
 
-// 已登录则直接跳转
-if(sessionStorage.getItem('meihua_user')){
-  window.location.href = 'index.html';
+// 已登录检查（session 或 7天持久化）
+function checkAutoLogin(){
+  if(sessionStorage.getItem('meihua_user')){
+    window.location.href = 'index.html';
+    return;
+  }
+  const persist = localStorage.getItem('meihua_user_persist');
+  if(persist){
+    try{
+      const info = JSON.parse(persist);
+      if(info.expireAt && Date.now() < info.expireAt){
+        sessionStorage.setItem('meihua_user', persist);
+        window.location.href = 'index.html';
+      } else {
+        localStorage.removeItem('meihua_user_persist');
+      }
+    }catch(e){ localStorage.removeItem('meihua_user_persist'); }
+  }
 }
+checkAutoLogin();
 </script>
 </body>
 </html>

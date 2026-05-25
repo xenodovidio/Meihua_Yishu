@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.58</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.60</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -1823,23 +1823,32 @@ async function syncUserData(){
 
 function logout(){
   sessionStorage.removeItem('meihua_user');
+  localStorage.removeItem('meihua_user_persist');
   window.location.href = 'login.html';
 }
 
 /* ── 登录检查 ── */
 function checkLogin(){
-  const stored = sessionStorage.getItem('meihua_user');
+  let stored = sessionStorage.getItem('meihua_user');
+  if(!stored){
+    const persist = localStorage.getItem('meihua_user_persist');
+    if(persist){
+      try{
+        const info = JSON.parse(persist);
+        if(info.expireAt && Date.now() < info.expireAt){
+          sessionStorage.setItem('meihua_user', persist);
+          stored = persist;
+        } else {
+          localStorage.removeItem('meihua_user_persist');
+        }
+      }catch(e){ localStorage.removeItem('meihua_user_persist'); }
+    }
+  }
   if(!stored){
     window.location.href = 'login.html';
     return false;
   }
   currentUser = JSON.parse(stored);
-  // 显示用户名
-  const scoreEl = document.getElementById('total-score');
-  if(scoreEl){
-    const parent = scoreEl.parentElement;
-    if(parent) parent.title = currentUser.nickname || currentUser.username;
-  }
   return true;
 }
 
@@ -1967,11 +1976,55 @@ const J_LESSONS = [
       {type:'biangua_simple',q:'本卦与变卦的关系是？',answer:'变卦是本卦动爻变化后形成的新卦',opts:['变卦是本卦动爻变化后形成的新卦','变卦是本卦的互卦','变卦是本卦阴阳全部互换','变卦与本卦完全无关']},
     ],
   },
+  // ── 第三章 · 体用生克 ──
+  {id:7,name:'体卦与用卦',desc:'学会判断哪个是体卦哪个是用卦',icon:'⚖️',
+    teaches:[
+      {icon:'🎭',title:'什么是体卦与用卦？',body:`在六十四卦中，将上下两个八卦分为<strong>体卦</strong>和<strong>用卦</strong>。<br><br><strong>体卦</strong>代表<span class="jade">自己、问事者本身</span><br><strong>用卦</strong>代表<span class="red">他人、所问之事、外部环境</span><br><br>体用之分，是梅花易数判断吉凶的核心所在。体用关系决定了所问之事的走向。`,showBagua:false},
+      {icon:'📐',title:'如何判断体用？',body:`判断体用的规则：<br><br><strong>动爻所在的那个卦 → 用卦</strong><br><strong>另一个卦 → 体卦</strong><br><br>例如：本卦为「水天需」（上坎下乾），第三爻动。<br>第三爻在<strong>下卦乾</strong>（初、二、三爻属下卦），所以：<br><span class="red">用卦 = 乾（天·金）</span><br><span class="jade">体卦 = 坎（水·水）</span><br><br>记住：<strong>动爻在哪，用卦在哪</strong>。`,showBagua:false},
+    ],
+    quizzes:[
+      {type:'tiyong_basic',q:'体卦代表的是什么？',answer:'自己、问事者本身',opts:['自己、问事者本身','他人、所问之事','外部环境','动爻所在的卦']},
+      {type:'tiyong_basic',q:'用卦代表的是什么？',answer:'他人、所问之事',opts:['他人、所问之事','自己、问事者本身','体卦对面的卦','静爻所在的卦']},
+      {type:'tiyong_basic',q:'如何判断哪个是用卦？',answer:'动爻所在的卦为用卦',opts:['动爻所在的卦为用卦','上卦永远是用卦','下卦永远是用卦','五行强的为用卦']},
+      {type:'tiyong_basic',q:'如何判断哪个是体卦？',answer:'没有动爻的卦为体卦',opts:['没有动爻的卦为体卦','上卦永远是体卦','下卦永远是体卦','五行弱的为体卦']},
+      {type:'tiyong_judge',q:'本卦「天水讼」第五爻动，第五爻属于上卦，请问体卦是？',answer:'坎（水）',opts:['坎（水）','乾（天）','两卦都是','无法判断']},
+      {type:'tiyong_judge',q:'本卦「地雷复」第二爻动，第二爻属于下卦，请问用卦是？',answer:'震（雷）',opts:['震（雷）','坤（地）','两卦都是','无法判断']},
+    ],
+  },
+  {id:8,name:'五种体用关系',desc:'掌握用生体、体生用等五种关系',icon:'🔄',
+    teaches:[
+      {icon:'🌟',title:'用生体——最吉',body:`<strong class="jade">用卦五行生体卦五行</strong>，称为「用生体」。<br><br>含义：外部环境、他人主动帮助自己，如同得到贵人相助。<br><br>例如：体卦为坎（水），用卦为乾（金）。<br>金生水，用卦生体卦 → <span class="jade">用生体，大吉</span><br><br>口诀：<strong>用生体，贵人来，所求之事顺遂</strong>`,showBagua:false},
+      {icon:'💫',title:'其余四种关系',body:`<strong>体生用</strong>：体卦五行生用卦五行。<br>自己付出，对方受益，<span class="red">付出多收获少，小有不利</span>。<br><br><strong>用克体</strong>：用卦五行克体卦五行。<br>外部克制自己，<span class="red">受阻、受压，凶</span>。<br><br><strong>体克用</strong>：体卦五行克用卦五行。<br>自己主动克制外部，<span class="jade">掌握主动，吉</span>。<br><br><strong>体用比和</strong>：体用五行相同。<br>双方平等，<span class="jade">平稳，无大起伏</span>。`,showBagua:false},
+    ],
+    quizzes:[
+      {type:'tiyong_rel',q:'体卦为坎（水），用卦为乾（金）。金生水，这是哪种关系？',answer:'用生体',opts:['用生体','体生用','用克体','体克用']},
+      {type:'tiyong_rel',q:'体卦为离（火），用卦为坎（水）。水克火，这是哪种关系？',answer:'用克体',opts:['用克体','体克用','用生体','体生用']},
+      {type:'tiyong_rel',q:'体卦为乾（金），用卦为震（木）。金克木，这是哪种关系？',answer:'体克用',opts:['体克用','用克体','用生体','体生用']},
+      {type:'tiyong_rel',q:'体卦为坤（土），用卦为离（火）。火生土，这是哪种关系？',answer:'用生体',opts:['用生体','体生用','体克用','比和']},
+      {type:'tiyong_rel',q:'体卦为震（木），用卦为坤（土）。木克土，这是哪种关系？',answer:'体克用',opts:['体克用','用克体','体生用','比和']},
+      {type:'tiyong_rel',q:'体卦为兑（金），用卦为乾（金）。五行相同，这是哪种关系？',answer:'比和',opts:['比和','用生体','体克用','用克体']},
+    ],
+  },
+  {id:9,name:'吉凶综合判断',desc:'综合运用体用生克判断吉凶',icon:'🔮',
+    teaches:[
+      {icon:'📊',title:'吉凶判断口诀',body:`根据体用关系判断吉凶：<br><br><span class="jade">用生体 → 大吉，贵人相助</span><br><span class="jade">体克用 → 吉，主动有力</span><br><span class="jade">比和 → 平，稳定无大变化</span><br><span class="red">体生用 → 小凶，付出多收获少</span><br><span class="red">用克体 → 凶，受阻受压</span><br><br>记忆顺序：<strong>用生体最好，体克用次之，比和居中，体生用小差，用克体最差</strong>`,showBagua:false},
+      {icon:'🧩',title:'综合解卦思路',body:`完整的解卦步骤：<br><br>1. 确定<strong>动爻位置</strong>（在上卦还是下卦）<br>2. 判断<strong>体卦与用卦</strong>（动爻所在为用卦）<br>3. 看<strong>体用五行关系</strong>（生克比和）<br>4. 结合<strong>卦象含义</strong>综合判断<br>5. 参考<strong>变卦趋势</strong>辅助判断<br><br>例：问求职，得「火天大有」第四爻动。<br>第四爻在上卦离（火）→ 用卦=离（火），体卦=乾（金）<br>火克金 → <span class="red">用克体，求职受阻，需另寻机会</span>`,showBagua:false},
+    ],
+    quizzes:[
+      {type:'jixiong',q:'用生体，吉凶如何？',answer:'大吉，贵人相助',opts:['大吉，贵人相助','小凶，付出多','凶，受阻受压','平，无大变化']},
+      {type:'jixiong',q:'用克体，吉凶如何？',answer:'凶，受阻受压',opts:['凶，受阻受压','大吉，贵人相助','平，无大变化','小凶，付出多']},
+      {type:'jixiong',q:'体克用，吉凶如何？',answer:'吉，主动有力',opts:['吉，主动有力','凶，受阻受压','大吉，贵人相助','小凶，付出多']},
+      {type:'jixiong_full',q:'问事得「地天泰」第二爻动。第二爻在下卦乾（金），体卦为坤（土）。土与金的关系：土生金，这是？',answer:'体生用，小有不利',opts:['体生用，小有不利','用生体，大吉','体克用，吉','用克体，凶']},
+      {type:'jixiong_full',q:'问财运，得「水火既济」第五爻动。第五爻在上卦坎（水），体卦为离（火）。水克火，这是？',answer:'用克体，所问财运受阻',opts:['用克体，所问财运受阻','用生体，财运亨通','体克用，财运主动','比和，财运平稳']},
+      {type:'jixiong_full',q:'问感情，得「天泽履」第一爻动。第一爻在下卦兑（金），体卦为乾（金）。两卦同为金，这是？',answer:'比和，感情平稳无大波折',opts:['比和，感情平稳无大波折','用生体，感情大吉','用克体，感情受阻','体克用，感情主动']},
+    ],
+  },
 ];
 
 const J_CHAPTERS = [
   {title:'第一章 · 认识八卦',lessonIds:[0,1,2,3]},
   {title:'第二章 · 六十四卦',lessonIds:[4,5,6]},
+  {title:'第三章 · 体用生克',lessonIds:[7,8,9]},
 ];
 
 let jProgress = JSON.parse(localStorage.getItem('journey_progress')||'{}');
@@ -2151,6 +2204,11 @@ function jGetExplain(q){
   if(q.type==='xiang')return`${BI[q.guaNum].name}卦的类象：${q.answer}`;
   if(q.type==='attr2gua')return`"${q.q.match(/「(.+?)」/)?.[1]}"对应${BI[q.answer].name}卦（${BI[q.answer].attr}）`;
   if(q.type==='xiang2gua')return`"${q.q.match(/「(.+?)」/)?.[1]}"属于${BI[q.answer].name}卦的类象`;
+  if(q.type==='tiyong_basic')return`正确答案是：${q.answer}`;
+  if(q.type==='tiyong_judge')return`正确答案是：${q.answer}。记住：动爻所在的卦为用卦，另一个卦为体卦。`;
+  if(q.type==='tiyong_rel')return`正确答案是：${q.answer}。五种关系：用生体（吉）、体克用（吉）、比和（平）、体生用（小凶）、用克体（凶）。`;
+  if(q.type==='jixiong')return`正确答案是：${q.answer}`;
+  if(q.type==='jixiong_full')return`正确答案是：${q.answer}`;
   return`正确答案是：${q.answer}`;
 }
 
