@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.65</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.66</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -778,7 +778,10 @@ function switchTab(tab){
   document.getElementById('view-'+tab).classList.add('active');
   hideBackBtn();
   if(tab==='flashcard'){ updateFcStats(); switchFcTab('session'); }
-  if(tab==='journey'){ jLoadData().then(()=>jRenderMap()); }
+  if(tab==='journey'){ 
+    if(jDataLoaded){ jRenderMap(); } 
+    else { jLoadData().then(()=>jRenderMap()); }
+  }
   if(tab==='test') renderTestHistory();
   if(tab==='study') startStudy();
 }
@@ -1867,7 +1870,6 @@ loadFlashcards();
 currentTab = 'journey';
 document.getElementById('view-journey').classList.add('active');
 document.getElementById('tab-journey').classList.add('active');
-jLoadData().then(()=>jRenderMap());
 
 // 登录检查 + 加载云端数据
 if(checkLogin()){
@@ -2039,6 +2041,9 @@ let jCurrentStep = 0;
 let jCorrectCount = 0;
 let jTotalQuizzes = 0;
 let jCurrentLesson = null;
+
+// 初始化加载
+jLoadData().then(()=>jRenderMap());
 
 async function jLoadData(){
   if(jDataLoaded) return;
