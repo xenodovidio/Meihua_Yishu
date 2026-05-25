@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.64</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.65</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2028,27 +2028,39 @@ const J_CHAPTERS = [
   {title:'第三章 · 体用生克',lessonIds:[7,8,9]},
 ];
 
+/* ══════════════════════════════════════
+   学习之旅 — 变量
+══════════════════════════════════════ */
 let jDataLoaded = false;
+let jProgress = JSON.parse(localStorage.getItem('journey_progress')||'{}');
+let jHearts = 3;
+let jCurrentLessonId = 0;
+let jCurrentStep = 0;
+let jCorrectCount = 0;
+let jTotalQuizzes = 0;
+let jCurrentLesson = null;
 
 async function jLoadData(){
   if(jDataLoaded) return;
   try{
-    // journey_data.json 已设为公有读，直接fetch不需要签名
     const url = `https://${COS_CONFIG.Bucket}.cos.${COS_CONFIG.Region}.myqcloud.com/journey_data.json`;
+    console.log('[Journey] 加载URL:', url);
     const res = await fetch(url+'?t='+Date.now());
+    console.log('[Journey] HTTP:', res.status, res.ok);
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
+    console.log('[Journey] 章节数:', data?.chapters?.length, '关卡数:', data?.lessons?.length);
     if(data && data.chapters && data.lessons){
       window._J_CHAPTERS_COS = data.chapters.map(ch=>({
         title: ch.title,
         lessonIds: data.lessons.filter(l=>l.chapterId===ch.id).map(l=>l.id)
       }));
       window._J_LESSONS_COS = data.lessons.map(l=>({...l}));
+      console.log('[Journey] 加载成功');
       jDataLoaded = true;
     }
   }catch(e){
-    console.warn('使用内嵌关卡数据', e);
-    // 确保使用内嵌数据
+    console.error('[Journey] 加载失败:', e.message);
     window._J_CHAPTERS_COS = null;
     window._J_LESSONS_COS = null;
   }
@@ -2057,12 +2069,6 @@ async function jLoadData(){
 function getJChapters(){ return window._J_CHAPTERS_COS || J_CHAPTERS; }
 function getJLessons(){ return window._J_LESSONS_COS || J_LESSONS; }
 function getJLesson(id){ return getJLessons().find(l=>l.id===id||l.id===String(id)); }
-let jHearts = 3;
-let jCurrentLessonId = 0;
-let jCurrentStep = 0;
-let jCorrectCount = 0;
-let jTotalQuizzes = 0;
-let jCurrentLesson = null;
 
 function jUpdateHearts(){
   [1,2,3].forEach(i=>{
