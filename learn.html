@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.67</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.68</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -768,6 +768,18 @@ async function loadQuestions(){
 }
 
 /* ══════════ Tab 切换 ══════════ */
+/* ══════════════════════════════════════
+   学习之旅 — 变量（需在switchTab之前声明）
+══════════════════════════════════════ */
+let jDataLoaded = false;
+let jProgress = JSON.parse(localStorage.getItem('journey_progress')||'{}');
+let jHearts = 3;
+let jCurrentLessonId = 0;
+let jCurrentStep = 0;
+let jCorrectCount = 0;
+let jTotalQuizzes = 0;
+let jCurrentLesson = null;
+
 function switchTab(tab){
   if(currentTab === tab) return;
   currentTab = tab;
@@ -2029,16 +2041,8 @@ const J_CHAPTERS = [
 ];
 
 /* ══════════════════════════════════════
-   学习之旅 — 变量
+   학습之旅 — 函数
 ══════════════════════════════════════ */
-let jDataLoaded = false;
-let jProgress = JSON.parse(localStorage.getItem('journey_progress')||'{}');
-let jHearts = 3;
-let jCurrentLessonId = 0;
-let jCurrentStep = 0;
-let jCorrectCount = 0;
-let jTotalQuizzes = 0;
-let jCurrentLesson = null;
 
 async function jLoadData(){
   if(jDataLoaded) return;
