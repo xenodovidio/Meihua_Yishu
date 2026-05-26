@@ -490,16 +490,24 @@ const GUA_NAMES = {1:'乾',2:'兑',3:'离',4:'震',5:'巽',6:'坎',7:'艮',8:'�
 
 function renderQuizCard(q,i){
   const opts=q.opts||['','','',''];
+  const isGuaType = ['name2lines','lines2name','attr2gua','xiang2gua'].includes(q.type);
+  const showNameToggle = ['name2lines','lines2name'].includes(q.type);
   return `<div class="quiz-card-editor" id="quiz-${i}">
     <div class="card-header"><div class="card-num" style="background:var(--red);">${i+1}</div><div class="card-title-label">题目 ${i+1}</div><span class="quiz-type-badge">${QUIZ_TYPE_LABELS[q.type]||q.type}</span><button class="card-remove" onclick="removeQuiz(${i})">✕</button></div>
     <div class="field" style="margin-bottom:10px;"><div class="field-label">题目类型</div><select class="field-input" onchange="updateQuiz(${i},'type',this.value)">${Object.entries(QUIZ_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${q.type===v?' selected':''}>${l}</option>`).join('')}</select></div>
     <div class="field" style="margin-bottom:10px;"><div class="field-label">题目</div><textarea class="field-input field-textarea" style="min-height:50px;" oninput="updateQuiz(${i},'q',this.value)">${esc(q.q||'')}</textarea></div>
+    ${showNameToggle?`<div class="toggle-row" style="margin-bottom:10px;">
+      <span class="toggle-label">选项显示卦名文字</span>
+      <button class="toggle${q.showOptName?' on':''}" onclick="toggleQuizOptName(${i},this)"></button>
+      <span style="font-size:11px;color:var(--ink4);margin-left:4px;">${q.showOptName?'卦图 + 文字':'仅卦图'}</span>
+    </div>`:''}
     <div class="field-label" style="margin-bottom:6px;">选项（选中正确答案）</div>
     <div class="opts-grid">${opts.map((o,oi)=>`<div class="opt-field${String(o)===String(q.answer)?' correct':''}"><input type="radio" class="opt-radio" name="quiz-ans-${i}" ${String(o)===String(q.answer)?'checked':''} onchange="updateQuizAnswer(${i},'${oi}')"><input class="opt-input" value="${esc(String(o))}" oninput="updateQuizOpt(${i},${oi},this.value)" placeholder="选项 ${oi+1}">${parseInt(o)>=1&&parseInt(o)<=8?`<span style="font-size:11px;color:var(--ink4);flex-shrink:0;">${GUA_NAMES[parseInt(o)]||''}</span>`:''}</div>`).join('')}</div>
-    ${['name2lines','lines2name','attr','wx','xiang','attr2gua','xiang2gua'].includes(q.type)?`<div style="margin-top:8px;padding:7px 10px;background:rgba(184,145,42,.06);border-radius:6px;font-size:11px;color:var(--ink4);">💡 乾=1 兑=2 离=3 震=4 巽=5 坎=6 艮=7 坤=8</div>`:''}
+    ${isGuaType?`<div style="margin-top:8px;padding:7px 10px;background:rgba(184,145,42,.06);border-radius:6px;font-size:11px;color:var(--ink4);">💡 乾=1 兑=2 离=3 震=4 巽=5 坎=6 艮=7 坤=8</div>`:''}
   </div>`;
 }
 
+function toggleQuizOptName(i,btn){ const l=getLesson(); if(!l||!l.quizzes[i])return; l.quizzes[i].showOptName=!l.quizzes[i].showOptName; btn.classList.toggle('on'); btn.nextElementSibling.textContent=l.quizzes[i].showOptName?'卦图 + 文字':'仅卦图'; }
 function updateQuiz(i,key,val){ const l=getLesson(); if(l&&l.quizzes[i]){l.quizzes[i][key]=val; if(key==='type')renderLessonEditor();} }
 function updateQuizOpt(i,oi,val){ const l=getLesson(); if(!l||!l.quizzes[i])return; const q=l.quizzes[i]; const wasAns=String(q.opts[oi])===String(q.answer); q.opts[oi]=val; if(wasAns)q.answer=val; document.querySelectorAll(`#quiz-${i} .opt-field`).forEach((f,fi)=>f.classList.toggle('correct',String(q.opts[fi])===String(q.answer))); }
 function updateQuizAnswer(i,oi){ const l=getLesson(); if(!l||!l.quizzes[i])return; l.quizzes[i].answer=l.quizzes[i].opts[oi]; document.querySelectorAll(`#quiz-${i} .opt-field`).forEach((f,fi)=>f.classList.toggle('correct',fi===parseInt(oi))); }

@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.72</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.74</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2225,10 +2225,19 @@ function jRenderQuiz(q){
   // 打乱选项
   const shuffled=[...q.opts].sort(()=>Math.random()-.5);
   let optsHtml='';
-  if(['name2lines','lines2name'].includes(q.type)){
+  if(q.type==='name2lines'){
+    // 卦名→爻线：根据showOptName决定是否显示卦名
     optsHtml=`<div class="opts">${shuffled.map(n=>{
       const lHtml=BL[n].map(l=>`<div class="j-yao-row"><div class="j-yao-line ${lineClass(l)}" style="width:36px;height:5px;"></div></div>`).join('');
-      return`<button class="opt-btn" data-val="${n}" data-answer="${q.answer}" data-explain="${jGetExplain(q).replace(/"/g,'&quot;')}" onclick="jSelectOpt(this)"><div style="pointer-events:none;"><div class="j-yao-lines" style="gap:4px;">${lHtml}</div><span class="opt-sub">${BI[n].name}</span></div></button>`;
+      const nameHtml=q.showOptName?`<span class="opt-sub">${BI[n].name}</span>`:'';
+      return`<button class="opt-btn" data-val="${n}" data-answer="${q.answer}" data-explain="${jGetExplain(q).replace(/"/g,'&quot;')}" onclick="jSelectOpt(this)"><div style="pointer-events:none;"><div class="j-yao-lines" style="gap:4px;">${lHtml}</div>${nameHtml}</div></button>`;
+    }).join('')}</div>`;
+  } else if(q.type==='lines2name'){
+    // 爻线→卦名：根据showOptName决定是否显示卦名（默认显示）
+    optsHtml=`<div class="opts">${shuffled.map(n=>{
+      const lHtml=BL[n].map(l=>`<div class="j-yao-row"><div class="j-yao-line ${lineClass(l)}" style="width:36px;height:5px;"></div></div>`).join('');
+      const nameHtml=q.showOptName===false?'':`<span class="opt-sub">${BI[n].name}</span>`;
+      return`<button class="opt-btn" data-val="${n}" data-answer="${q.answer}" data-explain="${jGetExplain(q).replace(/"/g,'&quot;')}" onclick="jSelectOpt(this)"><div style="pointer-events:none;"><div class="j-yao-lines" style="gap:4px;">${lHtml}</div>${nameHtml}</div></button>`;
     }).join('')}</div>`;
   } else if(['attr2gua','xiang2gua'].includes(q.type)){
     optsHtml=`<div class="opts">${shuffled.map(n=>{
