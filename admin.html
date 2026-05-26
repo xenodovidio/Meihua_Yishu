@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梅花易数 · 内容管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
+  --paper:#f5f0e8;--paper2:#ede7d8;--paper3:#e0d8c8;
+  --gold:#b8912a;--gold2:#d4aa4a;--red:#8b2020;--jade:#2d6e5a;
+  --sidebar:240px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;}
+
+/* ── 侧边栏 ── */
+.sidebar{width:var(--sidebar);min-height:100vh;background:rgba(237,231,216,.8);border-right:1px solid var(--paper3);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;}
+.sidebar-logo{padding:18px 20px;border-bottom:1px solid var(--paper3);}
+.sidebar-logo-main{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:.1em;}
+.sidebar-logo-sub{font-size:11px;color:var(--ink4);margin-top:3px;}
+
+/* 模块切换 */
+.module-tabs{display:flex;border-bottom:1px solid var(--paper3);}
+.module-tab{flex:1;padding:10px 0;font-size:13px;color:var(--ink4);cursor:pointer;text-align:center;border:none;background:none;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.module-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(184,145,42,.04);}
+.module-tab:hover{color:var(--ink2);}
+
+.sidebar-section{padding:10px 16px 5px;font-size:11px;color:var(--ink4);letter-spacing:.12em;}
+.sidebar-content{flex:1;overflow-y:auto;}
+
+/* 章节/卡组列表 */
+.chapter-item{border-bottom:1px solid var(--paper3);}
+.chapter-header{display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;transition:background .2s;}
+.chapter-header:hover{background:rgba(184,145,42,.06);}
+.chapter-header.active{background:rgba(184,145,42,.08);}
+.chapter-arrow{font-size:10px;color:var(--ink4);transition:transform .2s;flex-shrink:0;}
+.chapter-arrow.open{transform:rotate(90deg);}
+.chapter-name{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chapter-actions{display:flex;gap:4px;opacity:0;transition:opacity .2s;}
+.chapter-header:hover .chapter-actions{opacity:1;}
+.icon-btn{background:none;border:none;cursor:pointer;padding:2px 4px;font-size:12px;color:var(--ink4);border-radius:3px;transition:all .15s;}
+.icon-btn:hover{background:rgba(184,145,42,.12);color:var(--gold);}
+.icon-btn.danger:hover{background:rgba(139,32,32,.08);color:var(--red);}
+.lesson-list{padding:4px 0 8px;}
+.lesson-item{display:flex;align-items:center;gap:6px;padding:6px 16px 6px 32px;cursor:pointer;transition:background .2s;}
+.lesson-item:hover{background:rgba(184,145,42,.05);}
+.lesson-item.active{background:rgba(184,145,42,.1);}
+.lesson-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);flex-shrink:0;}
+.lesson-item.active .lesson-dot{background:var(--gold);}
+.lesson-item-name{font-size:12px;color:var(--ink3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lesson-item.active .lesson-item-name{color:var(--ink);}
+.lesson-item-actions{display:flex;gap:2px;opacity:0;}
+.lesson-item:hover .lesson-item-actions{opacity:1;}
+.add-btn{margin:6px 16px;background:none;border:1px dashed var(--paper3);border-radius:6px;padding:6px;font-size:12px;color:var(--ink4);cursor:pointer;width:calc(100% - 32px);transition:all .2s;text-align:center;}
+.add-btn:hover{border-color:var(--gold2);color:var(--gold);}
+
+/* 闪卡列表 */
+.fc-cat-item{border-bottom:1px solid var(--paper3);}
+.fc-card-item-list{display:flex;align-items:center;gap:6px;padding:6px 16px 6px 32px;cursor:pointer;transition:background .2s;}
+.fc-card-item-list:hover{background:rgba(184,145,42,.05);}
+.fc-card-item-list.active{background:rgba(184,145,42,.1);}
+.fc-card-item-list.active .lesson-dot{background:var(--gold);}
+.fc-card-item-list-name{font-size:12px;color:var(--ink3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fc-card-item-list.active .fc-card-item-list-name{color:var(--ink);}
+
+/* 底部 */
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--paper3);}
+.ai-gen-btn{width:100%;background:linear-gradient(135deg,rgba(184,145,42,.15),rgba(45,110,90,.1));border:1px solid rgba(184,145,42,.3);border-radius:8px;padding:8px;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--gold);cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.ai-gen-btn:hover{background:linear-gradient(135deg,rgba(184,145,42,.25),rgba(45,110,90,.15));}
+.save-all-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:10px;font-family:'Noto Serif SC',serif;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.1em;display:flex;align-items:center;justify-content:center;gap:6px;}
+.save-all-btn:hover{background:var(--ink2);}
+.save-all-btn.saving{background:var(--jade);}
+.save-status{font-size:11px;color:var(--ink4);text-align:center;margin-top:6px;}
+
+/* ── 主内容 ── */
+.main{flex:1;min-height:100vh;overflow-y:auto;}
+.topbar{padding:14px 28px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;gap:14px;background:rgba(245,240,232,.96);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);}
+.topbar-title{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:500;color:var(--ink);flex:1;}
+.topbar-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(184,145,42,.1);color:var(--gold);border:1px solid rgba(184,145,42,.2);}
+.content-area{padding:28px;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:14px;color:var(--ink4);}
+.empty-icon{font-size:40px;opacity:.4;}
+.empty-text{font-family:'Noto Serif SC',serif;font-size:15px;}
+.empty-sub{font-size:12px;}
+
+/* 编辑器 */
+.editor-section{margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.section-title{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';display:block;width:3px;height:15px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+.section-add{margin-left:auto;background:none;border:1px solid var(--paper3);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--ink3);cursor:pointer;transition:all .2s;}
+.section-add:hover{border-color:var(--gold2);color:var(--gold);}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field-label{font-size:11px;color:var(--ink4);letter-spacing:.06em;}
+.field-input{background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:7px;padding:9px 12px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;}
+.field-input:focus{border-color:var(--gold2);}
+.field-textarea{resize:vertical;min-height:70px;line-height:1.7;}
+
+/* 教学/闪卡卡片 */
+.teach-card-editor,.fc-card-editor{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px;margin-bottom:12px;}
+.teach-card-editor:hover,.fc-card-editor:hover{border-color:var(--gold2);}
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.card-num{width:22px;height:22px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:600;flex-shrink:0;}
+.card-title-label{font-size:12px;color:var(--ink3);flex:1;}
+.card-remove{background:none;border:none;cursor:pointer;padding:3px 6px;font-size:13px;color:var(--ink4);border-radius:4px;transition:all .15s;}
+.card-remove:hover{background:rgba(139,32,32,.08);color:var(--red);}
+.card-fields{display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:10px;}
+.card-body-field{grid-column:1/-1;}
+.toggle-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
+.toggle-label{font-size:12px;color:var(--ink3);}
+.toggle{width:36px;height:20px;background:var(--paper3);border-radius:10px;cursor:pointer;position:relative;transition:background .2s;border:none;flex-shrink:0;}
+.toggle.on{background:var(--jade);}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:3px;left:3px;transition:left .2s;}
+.toggle.on::after{left:19px;}
+
+/* 富文本 */
+.rte-wrap{border:1px solid var(--paper3);border-radius:7px;overflow:hidden;background:rgba(245,240,232,.9);}
+.rte-wrap:focus-within{border-color:var(--gold2);}
+.rte-toolbar{display:flex;align-items:center;gap:2px;padding:6px 8px;border-bottom:1px solid var(--paper3);background:rgba(237,231,216,.8);flex-wrap:wrap;}
+.rte-btn{background:none;border:none;cursor:pointer;padding:4px 7px;font-size:13px;color:var(--ink3);border-radius:4px;transition:all .15s;line-height:1;}
+.rte-btn:hover{background:rgba(184,145,42,.12);color:var(--gold);}
+.rte-divider{width:1px;height:16px;background:var(--paper3);margin:0 2px;}
+.rte-editor{min-height:100px;padding:10px 12px;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--ink);line-height:1.8;outline:none;}
+.rte-editor img{max-width:100%;border-radius:8px;margin:6px 0;display:block;}
+.rte-editor strong{color:var(--gold);font-weight:600;}
+.rte-editor .jade{color:var(--jade);}
+.rte-editor .red{color:var(--red);}
+
+/* 题目 */
+.quiz-card-editor{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:16px;margin-bottom:12px;}
+.quiz-card-editor:hover{border-color:rgba(139,32,32,.25);}
+.quiz-type-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(139,32,32,.08);color:var(--red);border:1px solid rgba(139,32,32,.2);}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.opt-field{display:flex;align-items:center;gap:6px;}
+.opt-radio{width:14px;height:14px;accent-color:var(--jade);cursor:pointer;flex-shrink:0;}
+.opt-input{flex:1;background:rgba(245,240,232,.9);border:1px solid var(--paper3);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--ink);outline:none;transition:border-color .2s;}
+.opt-input:focus{border-color:var(--gold2);}
+.opt-field.correct .opt-input{border-color:var(--jade);background:rgba(45,110,90,.04);}
+
+/* 闪卡编辑器 */
+.fc-meta-grid{display:grid;grid-template-columns:60px 1fr 1fr 120px;gap:12px;margin-bottom:16px;}
+.fc-back-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* 弹窗 */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.5);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--paper);border:1px solid var(--paper3);border-radius:12px;padding:24px;width:340px;animation:fadeUp .25s ease;}
+.modal-wide{width:480px;max-width:95vw;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);margin-bottom:16px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-btn{flex:1;border-radius:7px;padding:10px;font-family:'Noto Serif SC',serif;font-size:13px;cursor:pointer;transition:all .2s;}
+.modal-btn.primary{background:var(--ink);color:var(--paper);border:none;}
+.modal-btn.primary:hover{background:var(--ink2);}
+.modal-btn.secondary{background:none;border:1px solid var(--paper3);color:var(--ink3);}
+.modal-btn.secondary:hover{border-color:var(--ink3);}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:200;white-space:nowrap;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- 侧边栏 -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-main">内容管理</div>
+    <div class="sidebar-logo-sub">Meihua Admin</div>
+  </div>
+  <div class="module-tabs">
+    <button class="module-tab active" id="mod-journey" onclick="switchModule('journey')">学习之旅</button>
+    <button class="module-tab" id="mod-flashcard" onclick="switchModule('flashcard')">闪卡</button>
+  </div>
+  <div class="sidebar-content" id="sidebar-content"></div>
+  <div class="sidebar-footer">
+    <button class="ai-gen-btn" id="ai-btn" onclick="showAIModal()">✨ AI 生成内容</button>
+    <button class="save-all-btn" id="save-btn" onclick="saveAll()">
+      <span>💾</span><span id="save-btn-text">保存到 COS</span>
+    </button>
+    <div class="save-status" id="save-status"></div>
+  </div>
+</aside>
+
+<!-- 主内容 -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">选择内容开始编辑</div>
+    <div class="topbar-badge" id="topbar-badge" style="display:none"></div>
+  </div>
+  <div class="content-area" id="content-area">
+    <div class="empty-state">
+      <div class="empty-icon">📖</div>
+      <div class="empty-text">从左侧选择内容开始编辑</div>
+      <div class="empty-sub">学习之旅 · 闪卡</div>
+    </div>
+  </div>
+</div>
+
+<!-- 通用弹窗 -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal()">取消</button>
+      <button class="modal-btn primary" id="modal-confirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI 生成弹窗 -->
+<div class="modal-overlay" id="ai-modal" onclick="closeAIModal(event)">
+  <div class="modal modal-wide">
+    <div class="modal-title" id="ai-modal-title">✨ AI 生成内容</div>
+    <div id="ai-modal-body"></div>
+    <div id="ai-status" style="font-size:12px;color:var(--jade);margin-top:10px;min-height:18px;"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeAIModal()">取消</button>
+      <button class="modal-btn primary" id="ai-gen-confirm" onclick="doAIGenerate()">✨ 开始生成</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5@1/dist/cos-js-sdk-v5.min.js"></script>
+<script>
+/* ════════════════════════════
+   COS 配置
+════════════════════════════ */
+const COS_CONFIG = {
+  SecretId:  'AKID9B8sOgliV8ZoqeIk074oKcjiV7ZrPuDJ',
+  SecretKey: 'znOlura5MRK4as0viYIrJXXM0fBao11n',
+  Bucket:    'meihua-yishu-1433827621',
+  Region:    'ap-shanghai',
+};
+const cos = new COS({ SecretId: COS_CONFIG.SecretId, SecretKey: COS_CONFIG.SecretKey });
+function cosGet(key){ return new Promise(r=>{ cos.getObject({Bucket:COS_CONFIG.Bucket,Region:COS_CONFIG.Region,Key:key},(err,data)=>{ if(err){r(null);return;} try{r(JSON.parse(data.Body));}catch{r(null);} }); }); }
+function cosPut(key,data){ return new Promise(r=>{ cos.putObject({Bucket:COS_CONFIG.Bucket,Region:COS_CONFIG.Region,Key:key,Body:JSON.stringify(data,null,2),ContentType:'application/json'},err=>r(!err)); }); }
+
+/* ════════════════════════════
+   状态
+════════════════════════════ */
+let currentModule = 'journey';
+let journeyData = { chapters:[], lessons:[] };
+let flashcardData = [];
+let currentItemId = null;
+let expandedChapters = new Set();
+let expandedFcCats = new Set();
+
+/* ════════════════════════════
+   工具
+════════════════════════════ */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let toastTimer;
+function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2500); }
+function showModal(title,body,onConfirm){ document.getElementById('modal-title').textContent=title; document.getElementById('modal-body').innerHTML=body; document.getElementById('modal-confirm').onclick=onConfirm; document.getElementById('modal').classList.add('show'); setTimeout(()=>{ const i=document.getElementById('m-input'); if(i){i.focus();i.select();} },100); }
+function closeModal(e){ if(!e||e.target===document.getElementById('modal')) document.getElementById('modal').classList.remove('show'); }
+
+/* ════════════════════════════
+   初始化
+════════════════════════════ */
+async function init(){
+  showToast('正在加载数据…');
+  const [jd, fd] = await Promise.all([cosGet('journey_data.json'), cosGet('flashcards.json')]);
+  if(jd) journeyData = jd;
+  if(fd) flashcardData = fd;
+  showToast('数据加载成功');
+  renderSidebar();
+}
+
+/* ════════════════════════════
+   模块切换
+════════════════════════════ */
+function switchModule(mod){
+  currentModule = mod;
+  currentItemId = null;
+  document.querySelectorAll('.module-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('mod-'+mod).classList.add('active');
+  document.getElementById('topbar-title').textContent = mod==='journey'?'学习之旅管理':'闪卡管理';
+  document.getElementById('topbar-badge').style.display='none';
+  document.getElementById('content-area').innerHTML=`<div class="empty-state"><div class="empty-icon">${mod==='journey'?'📖':'🃏'}</div><div class="empty-text">从左侧选择${mod==='journey'?'关卡':'卡片'}开始编辑</div></div>`;
+  renderSidebar();
+}
+
+/* ════════════════════════════
+   侧边栏
+════════════════════════════ */
+function renderSidebar(){
+  currentModule === 'journey' ? renderJourneySidebar() : renderFcSidebar();
+}
+
+/* ── 学习之旅侧边栏 ── */
+function renderJourneySidebar(){
+  const el = document.getElementById('sidebar-content');
+  let html = '<div class="sidebar-section">章节与关卡</div>';
+  if(!journeyData.chapters.length){
+    html += '<div style="padding:10px 16px;font-size:12px;color:var(--ink4);">暂无章节</div>';
+  } else {
+    html += journeyData.chapters.map(ch=>{
+      const isOpen = expandedChapters.has(ch.id);
+      const lessons = journeyData.lessons.filter(l=>l.chapterId===ch.id);
+      return `<div class="chapter-item">
+        <div class="chapter-header${isOpen?' active':''}" onclick="toggleChapter('${ch.id}')">
+          <span class="chapter-arrow${isOpen?' open':''}">›</span>
+          <span class="chapter-name">${ch.title}</span>
+          <div class="chapter-actions">
+            <button class="icon-btn" onclick="editChapter(event,'${ch.id}')">✎</button>
+            <button class="icon-btn danger" onclick="deleteChapter(event,'${ch.id}')">✕</button>
+          </div>
+        </div>
+        ${isOpen?`<div class="lesson-list">
+          ${lessons.map(l=>`<div class="lesson-item${currentItemId===l.id?' active':''}" onclick="selectItem('${l.id}','lesson')">
+            <div class="lesson-dot"></div>
+            <span class="lesson-item-name">${l.icon||'📖'} ${l.name||'未命名'}</span>
+            <div class="lesson-item-actions"><button class="icon-btn danger" onclick="deleteLesson(event,'${l.id}')">✕</button></div>
+          </div>`).join('')}
+          <button class="add-btn" onclick="addLesson('${ch.id}')">＋ 新增关卡</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }
+  html += `<button class="add-btn" style="margin:8px 16px;" onclick="addChapter()">＋ 新增章节</button>`;
+  el.innerHTML = html;
+}
+
+/* ── 闪卡侧边栏 ── */
+function renderFcSidebar(){
+  const el = document.getElementById('sidebar-content');
+  const cats = {};
+  flashcardData.forEach(c=>{ if(!cats[c.cat]) cats[c.cat]=[]; cats[c.cat].push(c); });
+  let html = '<div class="sidebar-section">卡组</div>';
+  if(!Object.keys(cats).length){
+    html += '<div style="padding:10px 16px;font-size:12px;color:var(--ink4);">暂无卡片</div>';
+  } else {
+    html += Object.entries(cats).map(([cat,cards])=>{
+      const isOpen = expandedFcCats.has(cat);
+      return `<div class="fc-cat-item">
+        <div class="chapter-header${isOpen?' active':''}" onclick="toggleFcCat('${cat}')">
+          <span class="chapter-arrow${isOpen?' open':''}">›</span>
+          <span class="chapter-name">${cat} (${cards.length})</span>
+          <div class="chapter-actions">
+            <button class="icon-btn" onclick="editFcCat(event,'${cat}')">✎</button>
+          </div>
+        </div>
+        ${isOpen?`<div class="lesson-list">
+          ${cards.map(c=>`<div class="fc-card-item-list${currentItemId===c.id?' active':''}" onclick="selectItem('${c.id}','card')">
+            <div class="lesson-dot"></div>
+            <span class="fc-card-item-list-name">${c.front}</span>
+            <div class="lesson-item-actions"><button class="icon-btn danger" onclick="deleteFcCard(event,'${c.id}')">✕</button></div>
+          </div>`).join('')}
+          <button class="add-btn" onclick="addFcCard('${cat}')">＋ 新增卡片</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }
+  html += `<button class="add-btn" style="margin:8px 16px;" onclick="addFcCat()">＋ 新增卡组</button>`;
+  el.innerHTML = html;
+}
+
+function toggleChapter(id){ expandedChapters.has(id)?expandedChapters.delete(id):expandedChapters.add(id); renderSidebar(); }
+function toggleFcCat(cat){ expandedFcCats.has(cat)?expandedFcCats.delete(cat):expandedFcCats.add(cat); renderSidebar(); }
+
+/* ════════════════════════════
+   选择条目
+════════════════════════════ */
+function selectItem(id, type){
+  currentItemId = id;
+  renderSidebar();
+  type==='lesson' ? renderLessonEditor() : renderFcCardEditor();
+}
+
+/* ════════════════════════════
+   学习之旅编辑器
+════════════════════════════ */
+function renderLessonEditor(){
+  const lesson = journeyData.lessons.find(l=>l.id===currentItemId);
+  if(!lesson) return;
+  document.getElementById('topbar-title').textContent = lesson.name||'未命名关卡';
+  document.getElementById('topbar-badge').style.display='';
+  document.getElementById('topbar-badge').textContent = `${(lesson.teaches||[]).length} 教学 · ${(lesson.quizzes||[]).length} 题目`;
+  document.getElementById('content-area').innerHTML = `
+    <div class="editor-section">
+      <div class="section-header"><div class="section-title">基本信息</div></div>
+      <div class="meta-grid">
+        <div class="field"><div class="field-label">关卡名称</div><input class="field-input" value="${esc(lesson.name||'')}" oninput="updateLesson('name',this.value)"></div>
+        <div class="field"><div class="field-label">图标</div><input class="field-input" value="${esc(lesson.icon||'')}" oninput="updateLesson('icon',this.value)" style="font-size:18px;text-align:center;"></div>
+        <div class="field"><div class="field-label">简介</div><input class="field-input" value="${esc(lesson.desc||'')}" oninput="updateLesson('desc',this.value)"></div>
+      </div>
+    </div>
+    <div class="editor-section">
+      <div class="section-header"><div class="section-title">教学内容</div><button class="section-add" onclick="addTeach()">＋ 新增</button></div>
+      <div id="teaches-container">${(lesson.teaches||[]).map((t,i)=>renderTeachCard(t,i)).join('')}</div>
+    </div>
+    <div class="editor-section">
+      <div class="section-header"><div class="section-title">题目</div><button class="section-add" onclick="addQuiz()">＋ 新增</button></div>
+      <div id="quizzes-container">${(lesson.quizzes||[]).map((q,i)=>renderQuizCard(q,i)).join('')}</div>
+    </div>`;
+}
+
+function getLesson(){ return journeyData.lessons.find(l=>l.id===currentItemId); }
+function updateLesson(key,val){ const l=getLesson(); if(l){ l[key]=val; if(key==='name'){document.getElementById('topbar-title').textContent=val; renderSidebar();} } }
+
+/* 教学卡片 */
+function renderTeachCard(t,i){
+  return `<div class="teach-card-editor" id="teach-${i}">
+    <div class="card-header"><div class="card-num">${i+1}</div><div class="card-title-label">教学卡片 ${i+1}</div><button class="card-remove" onclick="removeTeach(${i})">✕</button></div>
+    <div class="card-fields">
+      <div class="field"><div class="field-label">图标</div><input class="field-input" value="${esc(t.icon||'')}" style="font-size:16px;text-align:center;" oninput="updateTeach(${i},'icon',this.value)"></div>
+      <div class="field"><div class="field-label">标题</div><input class="field-input" value="${esc(t.title||'')}" oninput="updateTeach(${i},'title',this.value)"></div>
+      <div class="field card-body-field">
+        <div class="field-label">内容</div>
+        <div class="rte-wrap">
+          <div class="rte-toolbar">
+            <button class="rte-btn" onclick="rteCmd(${i},'bold')" title="加粗"><b>B</b></button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" onclick="rteColor(${i},'gold')" title="金色" style="color:var(--gold);">●</button>
+            <button class="rte-btn" onclick="rteColor(${i},'jade')" title="绿色" style="color:var(--jade);">●</button>
+            <button class="rte-btn" onclick="rteColor(${i},'red')" title="红色" style="color:var(--red);">●</button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" onclick="rteInsertImage(${i})" title="插入图片">🖼</button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" onclick="rteCmd(${i},'insertLineBreak')" title="换行">↵</button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" onclick="rteClear(${i})" style="font-size:11px;">清除</button>
+          </div>
+          <div class="rte-editor" id="rte-${i}" contenteditable="true" oninput="rteUpdate(${i})" onkeydown="rteKeydown(event,${i})">${t.body||''}</div>
+        </div>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">显示八卦图表</span>
+      <button class="toggle${t.showBagua?' on':''}" onclick="toggleTeachBagua(${i},this)"></button>
+    </div>
+  </div>`;
+}
+
+function updateTeach(i,key,val){ const l=getLesson(); if(l&&l.teaches[i]) l.teaches[i][key]=val; }
+function toggleTeachBagua(i,btn){ const l=getLesson(); if(l&&l.teaches[i]){ l.teaches[i].showBagua=!l.teaches[i].showBagua; btn.classList.toggle('on'); } }
+function removeTeach(i){ const l=getLesson(); if(l){ l.teaches.splice(i,1); renderLessonEditor(); } }
+function addTeach(){ const l=getLesson(); if(!l)return; if(!l.teaches)l.teaches=[]; l.teaches.push({icon:'📖',title:'新标题',body:'内容…',showBagua:false}); renderLessonEditor(); setTimeout(()=>document.getElementById(`teach-${l.teaches.length-1}`)?.scrollIntoView({behavior:'smooth',block:'center'}),100); }
+
+/* 富文本 */
+function rteInsertImage(i){
+  showModal('插入图片',`
+    <div class="field" style="margin-bottom:10px;">
+      <div class="field-label">图片 URL（COS 公开链接）</div>
+      <input class="field-input" id="m-input" placeholder="https://..." style="width:100%;">
+    </div>
+    <div class="field" style="margin-bottom:10px;">
+      <div class="field-label">宽度（如 100%、300px）</div>
+      <input class="field-input" id="m-width" placeholder="100%" style="width:100%;">
+    </div>
+    <div class="field">
+      <div class="field-label">对齐方式</div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="radio" name="img-align" value="left" checked> 居左</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="radio" name="img-align" value="center"> 居中</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="radio" name="img-align" value="right"> 居右</label>
+      </div>
+    </div>`,
+    ()=>{
+      const url = document.getElementById('m-input').value.trim();
+      if(!url){ showToast('请输入图片URL'); return; }
+      const width = document.getElementById('m-width').value.trim() || '100%';
+      const align = document.querySelector('input[name="img-align"]:checked')?.value || 'left';
+      const marginStyle = align==='center' ? 'margin:8px auto;' : align==='right' ? 'margin:8px 0 8px auto;' : 'margin:8px 0;';
+      const el = document.getElementById(`rte-${i}`);
+      if(!el){ closeModal(); return; }
+      el.focus();
+      document.execCommand('insertHTML', false, `<img src="${url}" style="width:${width};border-radius:8px;${marginStyle}display:block;">`);
+      rteUpdate(i);
+      closeModal();
+    });
+}
+
+function rteCmd(i,cmd){ const el=document.getElementById(`rte-${i}`); if(!el)return; el.focus(); document.execCommand(cmd,false,null); rteUpdate(i); }
+function rteColor(i,color){ const el=document.getElementById(`rte-${i}`); if(!el)return; el.focus(); const sel=window.getSelection(); if(!sel.rangeCount||sel.isCollapsed)return; const range=sel.getRangeAt(0); const txt=range.toString(); if(!txt)return; const span=document.createElement('span'); span.className=color==='gold'?'':color; if(color==='gold')span.innerHTML=`<strong>${txt}</strong>`; else span.textContent=txt; range.deleteContents(); range.insertNode(span); sel.removeAllRanges(); rteUpdate(i); }
+function rteClear(i){ const el=document.getElementById(`rte-${i}`); if(!el)return; el.focus(); document.execCommand('removeFormat',false,null); el.querySelectorAll('span.jade,span.red').forEach(s=>s.replaceWith(document.createTextNode(s.textContent))); rteUpdate(i); }
+function rteKeydown(e,i){ if(e.key==='Enter'){e.preventDefault();document.execCommand('insertHTML',false,'<br>');rteUpdate(i);} }
+function rteUpdate(i){ const el=document.getElementById(`rte-${i}`); if(!el)return; const l=getLesson(); if(l&&l.teaches[i]) l.teaches[i].body=el.innerHTML; }
+
+/* 题目 */
+const QUIZ_TYPE_LABELS = {'simple':'普通文字题','name2lines':'卦名→爻线','lines2name':'爻线→卦名','attr':'卦名→属性','wx':'卦名→五行','xiang':'卦名→类象','attr2gua':'属性→卦名','xiang2gua':'类象→卦名','tiyong_basic':'体用基础','tiyong_judge':'体用判断','tiyong_rel':'体用生克','jixiong':'吉凶判断','jixiong_full':'综合判断','hugua_simple':'互卦知识','biangua_simple':'变卦知识','biangua_calc':'变卦推算'};
+const GUA_NAMES = {1:'乾',2:'兑',3:'离',4:'震',5:'巽',6:'坎',7:'艮',8:'坤'};
+
+function renderQuizCard(q,i){
+  const opts=q.opts||['','','',''];
+  return `<div class="quiz-card-editor" id="quiz-${i}">
+    <div class="card-header"><div class="card-num" style="background:var(--red);">${i+1}</div><div class="card-title-label">题目 ${i+1}</div><span class="quiz-type-badge">${QUIZ_TYPE_LABELS[q.type]||q.type}</span><button class="card-remove" onclick="removeQuiz(${i})">✕</button></div>
+    <div class="field" style="margin-bottom:10px;"><div class="field-label">题目类型</div><select class="field-input" onchange="updateQuiz(${i},'type',this.value)">${Object.entries(QUIZ_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${q.type===v?' selected':''}>${l}</option>`).join('')}</select></div>
+    <div class="field" style="margin-bottom:10px;"><div class="field-label">题目</div><textarea class="field-input field-textarea" style="min-height:50px;" oninput="updateQuiz(${i},'q',this.value)">${esc(q.q||'')}</textarea></div>
+    <div class="field-label" style="margin-bottom:6px;">选项（选中正确答案）</div>
+    <div class="opts-grid">${opts.map((o,oi)=>`<div class="opt-field${String(o)===String(q.answer)?' correct':''}"><input type="radio" class="opt-radio" name="quiz-ans-${i}" ${String(o)===String(q.answer)?'checked':''} onchange="updateQuizAnswer(${i},'${oi}')"><input class="opt-input" value="${esc(String(o))}" oninput="updateQuizOpt(${i},${oi},this.value)" placeholder="选项 ${oi+1}">${parseInt(o)>=1&&parseInt(o)<=8?`<span style="font-size:11px;color:var(--ink4);flex-shrink:0;">${GUA_NAMES[parseInt(o)]||''}</span>`:''}</div>`).join('')}</div>
+    ${['name2lines','lines2name','attr','wx','xiang','attr2gua','xiang2gua'].includes(q.type)?`<div style="margin-top:8px;padding:7px 10px;background:rgba(184,145,42,.06);border-radius:6px;font-size:11px;color:var(--ink4);">💡 乾=1 兑=2 离=3 震=4 巽=5 坎=6 艮=7 坤=8</div>`:''}
+  </div>`;
+}
+
+function updateQuiz(i,key,val){ const l=getLesson(); if(l&&l.quizzes[i]){l.quizzes[i][key]=val; if(key==='type')renderLessonEditor();} }
+function updateQuizOpt(i,oi,val){ const l=getLesson(); if(!l||!l.quizzes[i])return; const q=l.quizzes[i]; const wasAns=String(q.opts[oi])===String(q.answer); q.opts[oi]=val; if(wasAns)q.answer=val; document.querySelectorAll(`#quiz-${i} .opt-field`).forEach((f,fi)=>f.classList.toggle('correct',String(q.opts[fi])===String(q.answer))); }
+function updateQuizAnswer(i,oi){ const l=getLesson(); if(!l||!l.quizzes[i])return; l.quizzes[i].answer=l.quizzes[i].opts[oi]; document.querySelectorAll(`#quiz-${i} .opt-field`).forEach((f,fi)=>f.classList.toggle('correct',fi===parseInt(oi))); }
+function removeQuiz(i){ const l=getLesson(); if(l){l.quizzes.splice(i,1);renderLessonEditor();} }
+function addQuiz(){ const l=getLesson(); if(!l)return; if(!l.quizzes)l.quizzes=[]; l.quizzes.push({type:'simple',q:'题目',answer:'答案A',opts:['答案A','选项B','选项C','选项D']}); renderLessonEditor(); setTimeout(()=>document.getElementById(`quiz-${l.quizzes.length-1}`)?.scrollIntoView({behavior:'smooth',block:'center'}),100); }
+
+/* 章节管理 */
+function addChapter(){ showModal('新增章节',`<div class="field"><div class="field-label">章节名称</div><input class="field-input" id="m-input" value="第${journeyData.chapters.length+1}章 · 新章节" style="width:100%;"></div>`,()=>{ const t=document.getElementById('m-input').value.trim(); if(!t)return; const id='ch_'+Date.now(); journeyData.chapters.push({id,title:t}); expandedChapters.add(id); renderSidebar(); closeModal(); }); }
+function editChapter(e,id){ e.stopPropagation(); const ch=journeyData.chapters.find(c=>c.id===id); if(!ch)return; showModal('编辑章节',`<div class="field"><div class="field-label">章节名称</div><input class="field-input" id="m-input" value="${esc(ch.title)}" style="width:100%;"></div>`,()=>{ const v=document.getElementById('m-input').value.trim(); if(v){ch.title=v;renderSidebar();} closeModal(); }); }
+function deleteChapter(e,id){ e.stopPropagation(); const ch=journeyData.chapters.find(c=>c.id===id); showModal('删除章节',`<div style="font-size:13px;color:var(--ink3);line-height:1.8;">确定删除「${ch?.title}」？该章节下所有关卡也会删除。</div>`,()=>{ journeyData.chapters=journeyData.chapters.filter(c=>c.id!==id); journeyData.lessons=journeyData.lessons.filter(l=>l.chapterId!==id); if(!journeyData.lessons.find(l=>l.id===currentItemId))currentItemId=null; renderSidebar(); renderLessonEditor(); closeModal(); }); }
+function addLesson(chapterId){ const id='lesson_'+Date.now(); journeyData.lessons.push({id,chapterId,name:'新关卡',icon:'📖',desc:'关卡简介',teaches:[{icon:'📖',title:'标题',body:'内容…',showBagua:false}],quizzes:[{type:'simple',q:'题目',answer:'答案A',opts:['答案A','选项B','选项C','选项D']}]}); selectItem(id,'lesson'); }
+function deleteLesson(e,id){ e.stopPropagation(); const l=journeyData.lessons.find(x=>x.id===id); showModal('删除关卡',`<div style="font-size:13px;color:var(--ink3);">确定删除「${l?.name}」？</div>`,()=>{ journeyData.lessons=journeyData.lessons.filter(x=>x.id!==id); if(currentItemId===id)currentItemId=null; renderSidebar(); closeModal(); }); }
+
+/* ════════════════════════════
+   闪卡编辑器
+════════════════════════════ */
+function renderFcCardEditor(){
+  const card = flashcardData.find(c=>c.id===currentItemId);
+  if(!card) return;
+  document.getElementById('topbar-title').textContent = card.front||'未命名卡片';
+  document.getElementById('topbar-badge').style.display='';
+  document.getElementById('topbar-badge').textContent = card.cat||'未分类';
+  document.getElementById('content-area').innerHTML = `
+    <div class="editor-section">
+      <div class="section-header"><div class="section-title">卡片内容</div></div>
+      <div class="fc-meta-grid">
+        <div class="field"><div class="field-label">图标</div><input class="field-input" value="${esc(card.icon||'')}" style="font-size:18px;text-align:center;" oninput="updateFcCard('icon',this.value)"></div>
+        <div class="field"><div class="field-label">卡组分类</div><input class="field-input" value="${esc(card.cat||'')}" oninput="updateFcCard('cat',this.value)" list="cat-list"><datalist id="cat-list">${[...new Set(flashcardData.map(c=>c.cat))].map(c=>`<option value="${esc(c)}">`).join('')}</datalist></div>
+        <div class="field"><div class="field-label">正面主要内容</div><input class="field-input" value="${esc(card.front||'')}" oninput="updateFcCard('front',this.value)"></div>
+        <div class="field"><div class="field-label">正面副标题</div><input class="field-input" value="${esc(card.frontSub||'')}" oninput="updateFcCard('frontSub',this.value)"></div>
+      </div>
+      <div class="fc-back-grid">
+        <div class="field"><div class="field-label">背面主要内容（用 \\n 换行）</div><textarea class="field-input field-textarea" oninput="updateFcCard('back',this.value)">${esc(card.back||'')}</textarea></div>
+        <div class="field"><div class="field-label">背面副标题/记忆提示</div><textarea class="field-input field-textarea" oninput="updateFcCard('backSub',this.value)">${esc(card.backSub||'')}</textarea></div>
+      </div>
+    </div>
+    <div class="editor-section">
+      <div class="section-header"><div class="section-title">预览</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:24px;text-align:center;">
+          <div style="font-size:11px;color:var(--ink4);margin-bottom:8px;">正面</div>
+          <div style="font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--ink);">${esc(card.front||'')}</div>
+          ${card.frontSub?`<div style="font-size:13px;color:var(--ink3);margin-top:6px;">${esc(card.frontSub)}</div>`:''}
+        </div>
+        <div style="background:rgba(45,110,90,.04);border:1px solid rgba(45,110,90,.2);border-radius:12px;padding:24px;text-align:center;">
+          <div style="font-size:11px;color:var(--ink4);margin-bottom:8px;">背面</div>
+          <div style="font-family:'Noto Serif SC',serif;font-size:18px;font-weight:500;color:var(--ink);">${esc(card.back||'').replace(/\\n/g,'<br>')}</div>
+          ${card.backSub?`<div style="font-size:12px;color:var(--ink4);margin-top:8px;">${esc(card.backSub)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function updateFcCard(key,val){
+  const card = flashcardData.find(c=>c.id===currentItemId);
+  if(!card) return;
+  card[key]=val;
+  if(key==='front'){ document.getElementById('topbar-title').textContent=val; renderSidebar(); }
+  if(key==='cat'){ document.getElementById('topbar-badge').textContent=val; renderSidebar(); }
+}
+
+/* 闪卡管理 */
+function addFcCat(){ showModal('新增卡组',`<div class="field"><div class="field-label">卡组名称</div><input class="field-input" id="m-input" value="新卡组" style="width:100%;"></div>`,()=>{ const cat=document.getElementById('m-input').value.trim(); if(!cat)return; const id='fc_'+Date.now(); flashcardData.push({id,cat,front:'新卡片',frontSub:'',back:'答案',backSub:'',icon:''}); expandedFcCats.add(cat); selectItem(id,'card'); closeModal(); }); }
+function editFcCat(e,oldCat){ e.stopPropagation(); showModal('重命名卡组',`<div class="field"><div class="field-label">卡组名称</div><input class="field-input" id="m-input" value="${esc(oldCat)}" style="width:100%;"></div>`,()=>{ const newCat=document.getElementById('m-input').value.trim(); if(!newCat)return; flashcardData.forEach(c=>{ if(c.cat===oldCat)c.cat=newCat; }); expandedFcCats.delete(oldCat); expandedFcCats.add(newCat); renderSidebar(); closeModal(); }); }
+function addFcCard(cat){ const id='fc_'+Date.now(); flashcardData.push({id,cat,front:'新卡片',frontSub:'',back:'答案',backSub:'',icon:''}); selectItem(id,'card'); }
+function deleteFcCard(e,id){ e.stopPropagation(); showModal('删除卡片',`<div style="font-size:13px;color:var(--ink3);">确定删除这张卡片？</div>`,()=>{ flashcardData=flashcardData.filter(c=>c.id!==id); if(currentItemId===id)currentItemId=null; renderSidebar(); closeModal(); }); }
+
+/* ════════════════════════════
+   保存
+════════════════════════════ */
+async function saveAll(){
+  const btn=document.getElementById('save-btn');
+  const txt=document.getElementById('save-btn-text');
+  const status=document.getElementById('save-status');
+  btn.classList.add('saving'); txt.textContent='保存中…';
+  const key = currentModule==='journey' ? 'journey_data.json' : 'flashcards.json';
+  const data = currentModule==='journey' ? journeyData : flashcardData;
+  const ok = await cosPut(key, data);
+  btn.classList.remove('saving');
+  if(ok){ txt.textContent='保存到 COS'; status.textContent='✓ 已保存 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); showToast('保存成功！'); }
+  else{ txt.textContent='保存到 COS'; status.textContent='✗ 保存失败'; showToast('保存失败，请重试'); }
+}
+
+/* ════════════════════════════
+   AI 生成
+════════════════════════════ */
+const SF_URL = 'https://api.siliconflow.cn/v1/chat/completions';
+const SF_KEY = 'sk-xkpnmyggpwveikqbizhaclvcnjfaqkuedzrgcxydwnrsrxwr';
+
+async function callAI(prompt, maxTokens=4000){
+  const res = await fetch(SF_URL, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+SF_KEY}, body:JSON.stringify({model:'deepseek-ai/DeepSeek-V3',max_tokens:maxTokens,messages:[{role:'user',content:prompt}]}) });
+  if(!res.ok) throw new Error('请求失败('+res.status+')');
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content||'';
+}
+
+function showAIModal(){
+  document.getElementById('ai-modal-title').textContent = currentModule==='journey'?'✨ AI 生成关卡':'✨ AI 生成闪卡';
+  if(currentModule==='journey'){
+    const chOpts = journeyData.chapters.map(ch=>`<option value="${ch.id}">${ch.title}</option>`).join('');
+    document.getElementById('ai-modal-body').innerHTML = `
+      <div class="field" style="margin-bottom:12px;"><div class="field-label">目标章节（可选）</div><select class="field-input" id="ai-chapter"><option value="">— 自动新建章节 —</option>${chOpts}</select></div>
+      <div class="field" style="margin-bottom:12px;"><div class="field-label">描述想要的关卡内容</div><textarea class="field-input field-textarea" id="ai-prompt" rows="4" placeholder="例如：生成一个关于旺衰休囚死的关卡…"></textarea></div>
+      <div class="field"><div class="field-label">数量</div><div style="display:flex;gap:12px;"><label style="font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;"><input type="radio" name="ai-count" value="1" checked> 1个</label><label style="font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;"><input type="radio" name="ai-count" value="3"> 3个</label></div></div>`;
+  } else {
+    const catOpts = [...new Set(flashcardData.map(c=>c.cat))].map(c=>`<option value="${c}">${c}</option>`).join('');
+    document.getElementById('ai-modal-body').innerHTML = `
+      <div class="field" style="margin-bottom:12px;"><div class="field-label">目标卡组（可选）</div><select class="field-input" id="ai-fc-cat"><option value="">— 自动新建卡组 —</option>${catOpts}</select></div>
+      <div class="field" style="margin-bottom:12px;"><div class="field-label">描述想要的闪卡内容</div><textarea class="field-input field-textarea" id="ai-prompt" rows="4" placeholder="例如：生成5张关于八卦方位的闪卡…"></textarea></div>
+      <div class="field"><div class="field-label">数量</div><div style="display:flex;gap:12px;"><label style="font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;"><input type="radio" name="ai-count" value="5" checked> 5张</label><label style="font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;"><input type="radio" name="ai-count" value="10"> 10张</label></div></div>`;
+  }
+  document.getElementById('ai-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('ai-prompt')?.focus(),100);
+}
+function closeAIModal(e){ if(!e||e.target===document.getElementById('ai-modal')) document.getElementById('ai-modal').classList.remove('show'); }
+
+async function doAIGenerate(){
+  const prompt = document.getElementById('ai-prompt')?.value.trim();
+  if(!prompt){ showToast('请输入描述'); return; }
+  const count = document.querySelector('input[name="ai-count"]:checked')?.value||'1';
+  const btn=document.getElementById('ai-gen-confirm');
+  const status=document.getElementById('ai-status');
+  btn.disabled=true; btn.textContent='生成中…'; status.textContent='🤔 AI 正在思考…';
+  try{
+    if(currentModule==='journey'){
+      const chapterId = document.getElementById('ai-chapter')?.value||'';
+      const sysPrompt=`你是梅花易数课程设计专家。生成${count}个学习关卡JSON数组。每个关卡：name(关卡名),icon(emoji),desc(简介),teaches(2-3个:{icon,title,body支持<strong><br><span class="jade"><span class="red">},showBagua:false),quizzes(4-6个:{type:"simple",q,answer,opts:[4个选项含正确答案]})。只输出JSON数组。\n用户需求：${prompt}`;
+      const result = await callAI(sysPrompt);
+      status.textContent='📝 解析中…';
+      const lessons = JSON.parse(result.replace(/```json\n?|\n?```/g,'').trim());
+      let tid = chapterId;
+      if(!tid){ tid='ch_'+Date.now(); journeyData.chapters.push({id:tid,title:`新章节·${lessons[0]?.name||''}`}); expandedChapters.add(tid); }
+      const newIds=[];
+      lessons.forEach((l,i)=>{ const id='lesson_'+Date.now()+'_'+i; journeyData.lessons.push({id,chapterId:tid,name:l.name||'新关卡',icon:l.icon||'📖',desc:l.desc||'',teaches:l.teaches||[],quizzes:l.quizzes||[]}); newIds.push(id); });
+      renderSidebar(); if(newIds.length)selectItem(newIds[0],'lesson');
+      showToast(`✨ 生成 ${lessons.length} 个关卡`);
+    } else {
+      const catInput = document.getElementById('ai-fc-cat')?.value||'';
+      const sysPrompt=`你是梅花易数闪卡设计专家。生成${count}张闪卡JSON数组。每张：front(正面文字),frontSub(副标题,可空),back(背面答案,多行用\\n),backSub(记忆提示),cat(卡组名称),icon(emoji,可空)。只输出JSON数组。\n用户需求：${prompt}${catInput?`\n卡组名：${catInput}`:''}`;
+      const result = await callAI(sysPrompt);
+      status.textContent='📝 解析中…';
+      const cards = JSON.parse(result.replace(/```json\n?|\n?```/g,'').trim());
+      const newIds=[];
+      cards.forEach((c,i)=>{ const id='fc_'+Date.now()+'_'+i; const cat=catInput||c.cat||'新卡组'; flashcardData.push({id,cat,front:c.front||'',frontSub:c.frontSub||'',back:c.back||'',backSub:c.backSub||'',icon:c.icon||''}); expandedFcCats.add(cat); newIds.push(id); });
+      renderSidebar(); if(newIds.length)selectItem(newIds[0],'card');
+      showToast(`✨ 生成 ${cards.length} 张闪卡`);
+    }
+    closeAIModal();
+  }catch(e){ console.error(e); status.textContent=`❌ 失败：${e.message}`; showToast('生成失败，请重试'); }
+  finally{ btn.disabled=false; btn.textContent='✨ 开始生成'; }
+}
+
+/* ════════════════════════════
+   初始化
+════════════════════════════ */
+init();
+</script>
+</body>
+</html>
