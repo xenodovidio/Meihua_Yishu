@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.71</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.72</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2057,7 +2057,11 @@ async function jLoadData(){
     console.log('[Journey] 加载URL:', url);
     const res = await fetch(url+'?t='+Date.now());
     console.log('[Journey] HTTP:', res.status, res.ok);
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok){
+      const errText = await res.text().catch(()=>'');
+      console.error('[Journey] 响应内容:', errText);
+      throw new Error('HTTP '+res.status);
+    }
     const data = await res.json();
     console.log('[Journey] 章节数:', data?.chapters?.length, '关卡数:', data?.lessons?.length);
     if(data && data.chapters && data.lessons){
@@ -2142,6 +2146,11 @@ function jRenderMap(){
 function jStartLesson(id){
   jCurrentLessonId=id;
   jCurrentLesson=getJLesson(id);
+  if(!jCurrentLesson){
+    console.warn('找不到关卡:',id);
+    showToast('关卡数据加载中，请稍候再试');
+    return;
+  }
   jCurrentStep=0;
   jCorrectCount=0;
   jTotalQuizzes=jCurrentLesson.quizzes.length;
