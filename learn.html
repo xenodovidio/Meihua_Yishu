@@ -427,7 +427,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.75</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.76</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -825,6 +825,7 @@ function goBack(){
   else if(currentTab==='flashcard'){ quitFlashcards(); }
   else if(currentTab==='test'){ showTestHome(); }
   else if(currentTab==='guide'){ closeReader(); return; }
+  else if(currentTab==='journey'){ jBackToMap(); return; }
   hideBackBtn();
 }
 function showBackBtn(){
@@ -2160,6 +2161,7 @@ function jStartLesson(id){
   document.getElementById('j-lesson-view').style.display='block';
   document.getElementById('j-result-view').classList.remove('active');
   document.getElementById('j-fail-view').classList.remove('active');
+  showBackBtn();
   document.getElementById('j-lp-label').textContent=jCurrentLesson.name;
   document.getElementById('j-lp-total').textContent=jCurrentLesson.teaches.length+jTotalQuizzes;
   jRenderStep();
@@ -2349,6 +2351,14 @@ function jGoNextLesson(){
   const next = allOrdered[curIdx+1];
   if(next) jStartLesson(next.id);
   else jBackToMap();
+}
+
+function jBackToMap(){
+  document.getElementById('j-lesson-view').style.display='none';
+  document.getElementById('j-result-view').classList.remove('active');
+  document.getElementById('j-fail-view').classList.remove('active');
+  hideBackBtn();
+  jRenderMap();
 }
 
 // 页面关闭前同步
