@@ -421,10 +421,32 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fail-icon{font-size:52px;}
 .fail-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--red);}
 .fail-desc{font-size:13px;color:var(--ink3);line-height:2;max-width:280px;}
-.j-chapter-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;margin-right:12px;}
-.j-ch-tab{background:none;border:1px solid var(--paper3);border-radius:20px;padding:5px 12px;font-family:'Noto Serif SC',serif;font-size:11px;color:var(--ink4);cursor:pointer;transition:all .2s;white-space:nowrap;}
-.j-ch-tab:hover{border-color:var(--gold2);color:var(--gold);}
-.j-ch-tab.active{border-color:var(--gold);background:rgba(184,145,42,.08);color:var(--gold);}
+/* 章节按钮 */
+.j-chapter-btn{display:flex;align-items:center;gap:8px;background:rgba(184,145,42,.1);border:1.5px solid rgba(184,145,42,.3);border-radius:12px;padding:8px 14px;cursor:pointer;transition:all .2s;flex:1;max-width:220px;}
+.j-chapter-btn:hover{background:rgba(184,145,42,.16);border-color:var(--gold);}
+.j-chapter-btn-label{font-size:10px;color:var(--gold);letter-spacing:.08em;flex-shrink:0;}
+.j-chapter-btn-title{font-family:'Noto Serif SC',serif;font-size:13px;font-weight:500;color:var(--ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;}
+.j-chapter-btn-arrow{font-size:13px;color:var(--ink4);flex-shrink:0;}
+
+/* 章节面板 */
+.j-chapter-panel-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.45);z-index:80;align-items:flex-end;justify-content:center;}
+.j-chapter-panel-overlay.show{display:flex;}
+.j-chapter-panel{background:var(--paper);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:75vh;overflow-y:auto;animation:slideUp .3s ease;padding-bottom:env(safe-area-inset-bottom,0px);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.j-panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--paper3);position:sticky;top:0;background:var(--paper);z-index:1;}
+.j-panel-title{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);}
+.j-panel-close{background:none;border:1px solid var(--paper3);border-radius:50%;width:28px;height:28px;font-size:13px;cursor:pointer;color:var(--ink4);display:flex;align-items:center;justify-content:center;}
+.j-panel-list{padding:12px 16px 20px;}
+.j-panel-item{background:rgba(237,231,216,.5);border:1.5px solid var(--paper3);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s;}
+.j-panel-item:hover{border-color:var(--gold2);}
+.j-panel-item.active{border-color:var(--gold);background:rgba(184,145,42,.07);}
+.j-panel-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.j-panel-item-num{font-size:11px;color:var(--ink4);letter-spacing:.1em;}
+.j-panel-item-pct{font-size:11px;color:var(--jade);}
+.j-panel-item-title{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:8px;}
+.j-panel-progress{height:6px;background:var(--paper3);border-radius:3px;overflow:hidden;}
+.j-panel-progress-fill{height:100%;background:linear-gradient(90deg,var(--jade),#3d8a6e);border-radius:3px;transition:width .4s ease;}
+
 @keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 .heart-beat{animation:heartbeat .3s ease;}
 </style>
@@ -435,7 +457,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.78</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.79</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -652,10 +674,24 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <!-- ══ 学习之旅 ══ -->
   <div class="view" id="view-journey">
+    <!-- 章节选择面板（遮罩） -->
+    <div class="j-chapter-panel-overlay" id="j-chapter-overlay" onclick="closeChapterPanel()">
+      <div class="j-chapter-panel" id="j-chapter-panel" onclick="event.stopPropagation()">
+        <div class="j-panel-header">
+          <div class="j-panel-title">选择章节</div>
+          <button class="j-panel-close" onclick="closeChapterPanel()">✕</button>
+        </div>
+        <div class="j-panel-list" id="j-panel-list"></div>
+      </div>
+    </div>
     <div class="journey-wrap">
-      <!-- 章节tab + 心 -->
+      <!-- 章节按钮 + 心 -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div class="j-chapter-tabs" id="j-chapter-tabs"></div>
+        <button class="j-chapter-btn" id="j-chapter-btn" onclick="openChapterPanel()">
+          <span class="j-chapter-btn-label" id="j-chapter-btn-label">第1章</span>
+          <span class="j-chapter-btn-title" id="j-chapter-btn-title">学习之旅</span>
+          <span class="j-chapter-btn-arrow">☰</span>
+        </button>
         <div class="journey-heart-row">
           <span class="journey-heart" id="jh1">❤️</span>
           <span class="journey-heart" id="jh2">❤️</span>
@@ -2120,13 +2156,12 @@ function jRenderMap(){
     jCurrentChapterId = chapters[0]?.id || null;
   }
 
-  // 渲染章节 tab
-  const tabEl = document.getElementById('j-chapter-tabs');
-  if(tabEl){
-    tabEl.innerHTML = chapters.map((ch,i)=>`
-      <button class="j-ch-tab${String(ch.id)===String(jCurrentChapterId)?' active':''}" onclick="jSwitchChapter('${ch.id}')">第${i+1}章</button>
-    `).join('');
-  }
+  // 更新顶部章节按钮
+  const curChapterIdx = chapters.findIndex(c=>String(c.id)===String(jCurrentChapterId));
+  const btnLabel = document.getElementById('j-chapter-btn-label');
+  const btnTitle = document.getElementById('j-chapter-btn-title');
+  if(btnLabel) btnLabel.textContent = `第${curChapterIdx+1}章`;
+  if(btnTitle) btnTitle.textContent = curChapter?.title?.replace(/第.章[·\s·]*/,'') || '学习之旅';
 
   // 渲染关卡列表（只显示当前章节）
   const path=document.getElementById('j-lessons-path');
@@ -2174,7 +2209,36 @@ function jRenderMap(){
 
 function jSwitchChapter(id){
   jCurrentChapterId = id;
+  closeChapterPanel();
   jRenderMap();
+}
+
+function openChapterPanel(){
+  const chapters = getJChapters();
+  const lessons = getJLessons();
+  const list = document.getElementById('j-panel-list');
+  if(!list) return;
+  list.innerHTML = chapters.map((ch,i)=>{
+    const chLessons = ch.lessonIds.map(lid=>lessons.find(x=>String(x.id)===String(lid))).filter(Boolean);
+    const done = chLessons.filter(l=>jProgress[String(l.id)]?.done).length;
+    const total = chLessons.length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    const isActive = String(ch.id)===String(jCurrentChapterId);
+    const shortTitle = ch.title.replace(/第.章[·\s·]*/,'');
+    return `<div class="j-panel-item${isActive?' active':''}" onclick="jSwitchChapter('${ch.id}')">
+      <div class="j-panel-item-top">
+        <span class="j-panel-item-num">第 ${i+1} 章</span>
+        <span class="j-panel-item-pct">${done}/${total} 已完成</span>
+      </div>
+      <div class="j-panel-item-title">${shortTitle}</div>
+      <div class="j-panel-progress"><div class="j-panel-progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('j-chapter-overlay').classList.add('show');
+}
+
+function closeChapterPanel(){
+  document.getElementById('j-chapter-overlay')?.classList.remove('show');
 }
 
 function jStartLesson(id){
