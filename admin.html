@@ -423,6 +423,7 @@ function renderTeachCard(t,i){
             <button class="rte-btn" onclick="rteColor(${i},'red')" title="红色" style="color:var(--red);">●</button>
             <div class="rte-divider"></div>
             <button class="rte-btn" onclick="rteInsertImage(${i})" title="插入图片">🖼</button>
+            <button class="rte-btn" onclick="rteInsertTable(${i})" title="插入表格">⊞</button>
             <div class="rte-divider"></div>
             <button class="rte-btn" onclick="rteCmd(${i},'insertLineBreak')" title="换行">↵</button>
             <div class="rte-divider"></div>
@@ -445,6 +446,47 @@ function removeTeach(i){ const l=getLesson(); if(l){ l.teaches.splice(i,1); rend
 function addTeach(){ const l=getLesson(); if(!l)return; if(!l.teaches)l.teaches=[]; l.teaches.push({icon:'📖',title:'新标题',body:'内容…',showBagua:false}); renderLessonEditor(); setTimeout(()=>document.getElementById(`teach-${l.teaches.length-1}`)?.scrollIntoView({behavior:'smooth',block:'center'}),100); }
 
 /* 富文本 */
+function rteInsertTable(i){
+  showModal('插入表格',`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div class="field"><div class="field-label">行数（含标题行）</div><input class="field-input" id="m-rows" type="number" value="4" min="2" max="20" style="width:100%;"></div>
+      <div class="field"><div class="field-label">列数</div><input class="field-input" id="m-cols" type="number" value="2" min="1" max="8" style="width:100%;"></div>
+    </div>
+    <div class="field"><div class="field-label">第一列内容（每行一个，第一行为标题）</div><textarea class="field-input field-textarea" id="m-col1" style="min-height:80px;" placeholder="八卦&#10;乾&#10;坤&#10;震"></textarea></div>`,
+    ()=>{
+      const rows = parseInt(document.getElementById('m-rows').value) || 4;
+      const cols = parseInt(document.getElementById('m-cols').value) || 2;
+      const col1Lines = document.getElementById('m-col1').value.split('\n').map(s=>s.trim());
+      const el = document.getElementById(`rte-${i}`);
+      if(!el){ closeModal(); return; }
+
+      const tableStyle = 'border-collapse:collapse;width:100%;margin:12px 0;font-size:13px;';
+      const thStyle = 'border:1px solid #d4aa4a;padding:8px 12px;background:rgba(184,145,42,.12);font-family:Noto Serif SC,serif;font-weight:500;text-align:left;color:#3d3328;';
+      const tdStyle = 'border:1px solid #e0d8c8;padding:8px 12px;text-align:left;color:#3d3328;';
+
+      let html = `<table style="${tableStyle}"><thead><tr>`;
+      for(let c=0;c<cols;c++){
+        const txt = c===0 ? (col1Lines[0]||'标题') : `列${c+1}`;
+        html += `<th style="${thStyle}">${txt}</th>`;
+      }
+      html += '</tr></thead><tbody>';
+      for(let r=1;r<rows;r++){
+        html += '<tr>';
+        for(let c=0;c<cols;c++){
+          const txt = c===0 ? (col1Lines[r]||'') : '';
+          html += `<td style="${tdStyle}">${txt}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+
+      el.focus();
+      document.execCommand('insertHTML', false, html);
+      rteUpdate(i);
+      closeModal();
+    });
+}
+
 function rteInsertImage(i){
   showModal('插入图片',`
     <div class="field" style="margin-bottom:10px;">
