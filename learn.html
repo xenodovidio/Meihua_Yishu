@@ -421,6 +421,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fail-icon{font-size:52px;}
 .fail-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--red);}
 .fail-desc{font-size:13px;color:var(--ink3);line-height:2;max-width:280px;}
+.j-chapter-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;margin-right:12px;}
+.j-ch-tab{background:none;border:1px solid var(--paper3);border-radius:20px;padding:5px 12px;font-family:'Noto Serif SC',serif;font-size:11px;color:var(--ink4);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.j-ch-tab:hover{border-color:var(--gold2);color:var(--gold);}
+.j-ch-tab.active{border-color:var(--gold);background:rgba(184,145,42,.08);color:var(--gold);}
 @keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 .heart-beat{animation:heartbeat .3s ease;}
 </style>
@@ -431,7 +435,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.77</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.78</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -649,8 +653,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <!-- ══ 学习之旅 ══ -->
   <div class="view" id="view-journey">
     <div class="journey-wrap">
-      <!-- 心 -->
-      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+      <!-- 章节tab + 心 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="j-chapter-tabs" id="j-chapter-tabs"></div>
         <div class="journey-heart-row">
           <span class="journey-heart" id="jh1">❤️</span>
           <span class="journey-heart" id="jh2">❤️</span>
@@ -778,6 +783,7 @@ async function loadQuestions(){
 let jDataLoaded = false;
 let jProgress = JSON.parse(localStorage.getItem('journey_progress')||'{}');
 let jHearts = 3;
+let jCurrentChapterId = null; // 当前选中章节
 let jCurrentLessonId = 0;
 let jCurrentStep = 0;
 let jCorrectCount = 0;
@@ -829,6 +835,7 @@ function goBack(){
   else if(currentTab==='flashcard'){ quitFlashcards(); }
   else if(currentTab==='test'){ showTestHome(); }
   else if(currentTab==='guide'){ closeReader(); return; }
+  else if(currentTab==='journey'){ jBackToMap(); return; }
   hideBackBtn();
 }
 function showBackBtn(){
@@ -2105,46 +2112,69 @@ function jRenderMap(){
   document.getElementById('j-result-view')?.classList.remove('active');
   document.getElementById('j-fail-view')?.classList.remove('active');
 
+  const chapters = getJChapters();
+  const lessons = getJLessons();
+
+  // 初始化默认章节
+  if(!jCurrentChapterId || !chapters.find(c=>String(c.id)===String(jCurrentChapterId))){
+    jCurrentChapterId = chapters[0]?.id || null;
+  }
+
+  // 渲染章节 tab
+  const tabEl = document.getElementById('j-chapter-tabs');
+  if(tabEl){
+    tabEl.innerHTML = chapters.map((ch,i)=>`
+      <button class="j-ch-tab${String(ch.id)===String(jCurrentChapterId)?' active':''}" onclick="jSwitchChapter('${ch.id}')">第${i+1}章</button>
+    `).join('');
+  }
+
+  // 渲染关卡列表（只显示当前章节）
   const path=document.getElementById('j-lessons-path');
   if(!path)return;
   path.innerHTML='';
 
-  const chapters = getJChapters();
-  const lessons = getJLessons();
+  const curChapter = chapters.find(c=>String(c.id)===String(jCurrentChapterId));
+  if(!curChapter) return;
 
-  chapters.forEach(chapter=>{
-    const chEl=document.createElement('div');
-    chEl.className='map-chapter';
-    chEl.innerHTML=`<div class="chapter-title">${chapter.title}</div><div class="lessons-path-inner"></div>`;
-    path.appendChild(chEl);
-    const inner=chEl.querySelector('.lessons-path-inner');
+  // 章节标题
+  const titleEl=document.createElement('div');
+  titleEl.className='chapter-title';
+  titleEl.textContent=curChapter.title;
+  path.appendChild(titleEl);
 
-    const chLessons = chapter.lessonIds.map(lid=>lessons.find(x=>String(x.id)===String(lid))).filter(Boolean);
+  const chLessons = curChapter.lessonIds.map(lid=>lessons.find(x=>String(x.id)===String(lid))).filter(Boolean);
+  const pathInner = document.createElement('div');
+  pathInner.className='lessons-path-inner';
+  path.appendChild(pathInner);
 
-    chLessons.forEach((l,i)=>{
-      const done=jProgress[String(l.id)]?.done;
-      const stars=jProgress[String(l.id)]?.stars||0;
-      const unlocked = true;
-      const isActive=unlocked&&!done;
-      const cls=done?'done':isActive?'active':'locked';
-      const statusHtml=done?`<div class="lesson-status status-done">✓ 已完成</div>`:isActive?`<div class="lesson-status status-active">▶ 开始</div>`:`<div class="lesson-status status-lock">🔒</div>`;
-      const starsHtml=`<div class="stars-row">${[1,2,3].map(s=>`<span class="j-star${stars>=s?' lit':''}">${stars>=s?'★':'☆'}</span>`).join('')}</div>`;
-      const node=document.createElement('div');
-      node.className='lesson-node';
-      node.innerHTML=`
-        ${i>0?`<div class="path-line${jProgress[String(chLessons[i-1]?.id)]?.done?' done':''}"></div>`:''}
-        <div class="lesson-btn ${cls}" onclick="${unlocked?`jStartLesson('${l.id}')`:''}">
-          <div class="lesson-icon">${l.icon}</div>
-          <div class="lesson-info">
-            <div class="lesson-name">${l.name}</div>
-            <div class="lesson-desc">${l.desc}</div>
-            ${starsHtml}
-          </div>
-          ${statusHtml}
-        </div>`;
-      inner.appendChild(node);
-    });
+  chLessons.forEach((l,i)=>{
+    const done=jProgress[String(l.id)]?.done;
+    const stars=jProgress[String(l.id)]?.stars||0;
+    const unlocked=true;
+    const isActive=unlocked&&!done;
+    const cls=done?'done':isActive?'active':'locked';
+    const statusHtml=done?`<div class="lesson-status status-done">✓ 已完成</div>`:isActive?`<div class="lesson-status status-active">▶ 开始</div>`:`<div class="lesson-status status-lock">🔒</div>`;
+    const starsHtml=`<div class="stars-row">${[1,2,3].map(s=>`<span class="j-star${stars>=s?' lit':''}">${stars>=s?'★':'☆'}</span>`).join('')}</div>`;
+    const node=document.createElement('div');
+    node.className='lesson-node';
+    node.innerHTML=`
+      ${i>0?`<div class="path-line${jProgress[String(chLessons[i-1]?.id)]?.done?' done':''}"></div>`:''}
+      <div class="lesson-btn ${cls}" onclick="${unlocked?`jStartLesson('${l.id}')`:''}">
+        <div class="lesson-icon">${l.icon}</div>
+        <div class="lesson-info">
+          <div class="lesson-name">${l.name}</div>
+          <div class="lesson-desc">${l.desc}</div>
+          ${starsHtml}
+        </div>
+        ${statusHtml}
+      </div>`;
+    pathInner.appendChild(node);
   });
+}
+
+function jSwitchChapter(id){
+  jCurrentChapterId = id;
+  jRenderMap();
 }
 
 function jStartLesson(id){
@@ -2166,7 +2196,16 @@ function jStartLesson(id){
   document.getElementById('j-fail-view').classList.remove('active');
   document.getElementById('j-lp-label').textContent=jCurrentLesson.name;
   document.getElementById('j-lp-total').textContent=jCurrentLesson.teaches.length+jTotalQuizzes;
+  showBackBtn();
   jRenderStep();
+}
+
+function jBackToMap(){
+  document.getElementById('j-lesson-view').style.display='none';
+  document.getElementById('j-result-view').classList.remove('active');
+  document.getElementById('j-fail-view').classList.remove('active');
+  hideBackBtn();
+  jRenderMap();
 }
 
 function jRetryLesson(){jStartLesson(jCurrentLessonId);}
