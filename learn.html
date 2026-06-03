@@ -429,9 +429,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .j-chapter-btn-arrow{font-size:13px;color:var(--ink4);flex-shrink:0;}
 
 /* 章节面板 */
-.j-chapter-panel-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.45);z-index:80;align-items:flex-end;justify-content:center;}
+.j-chapter-panel-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.45);z-index:80;align-items:center;justify-content:center;padding:20px;}
 .j-chapter-panel-overlay.show{display:flex;}
-.j-chapter-panel{background:var(--paper);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:75vh;overflow-y:auto;animation:slideUp .3s ease;padding-bottom:env(safe-area-inset-bottom,0px);}
+.j-chapter-panel{background:var(--paper);border-radius:16px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto;animation:fadeUp .25s ease;}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .j-panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--paper3);position:sticky;top:0;background:var(--paper);z-index:1;}
 .j-panel-title{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);}
@@ -457,7 +457,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.80</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.81</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2210,8 +2210,8 @@ function jRenderMap(){
 
 function jSwitchChapter(id){
   jCurrentChapterId = id;
-  closeChapterPanel();
-  jRenderMap();
+  document.getElementById('j-chapter-overlay')?.classList.remove('show');
+  setTimeout(()=>jRenderMap(), 50);
 }
 
 function openChapterPanel(){
