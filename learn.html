@@ -361,6 +361,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .teach-body table th{border:1px solid var(--gold2);padding:8px 12px;background:rgba(184,145,42,.1);font-family:'Noto Serif SC',serif;font-weight:500;text-align:left;color:var(--ink2);}
 .teach-body table td{border:1px solid var(--paper3);padding:8px 12px;text-align:left;color:var(--ink2);}
 .teach-body table tr:nth-child(even) td{background:rgba(237,231,216,.4);}
+.teach-body .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:12px 0;}
+.teach-body .table-wrap table{margin:0;min-width:280px;}
 .bagua-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
 .bagua-cell{background:rgba(245,240,232,.8);border:1px solid var(--paper3);border-radius:10px;padding:10px 6px;text-align:center;}
 .bc-lines{display:flex;flex-direction:column-reverse;gap:4px;align-items:center;margin-bottom:6px;}
@@ -457,7 +459,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.82</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.83</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2290,7 +2292,7 @@ function jRenderStep(){
       <div class="teach-card">
         <div class="teach-icon">${t.icon}</div>
         <div class="teach-title">${t.title}</div>
-        <div class="teach-body">${t.body}</div>
+        <div class="teach-body">${(t.body||'').replace(/<table/g,'<div class="table-wrap"><table').replace(/<\/table>/g,'</table></div>')}</div>
         ${t.showBagua?jRenderBaguaGrid():''}
       </div>
       <button class="teach-next" onclick="jNextStep()">明白了，继续 →</button>`;
