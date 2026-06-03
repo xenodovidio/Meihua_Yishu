@@ -457,7 +457,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.79</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.80</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -2156,8 +2156,10 @@ function jRenderMap(){
     jCurrentChapterId = chapters[0]?.id || null;
   }
 
-  // 更新顶部章节按钮
+  const curChapter = chapters.find(c=>String(c.id)===String(jCurrentChapterId));
   const curChapterIdx = chapters.findIndex(c=>String(c.id)===String(jCurrentChapterId));
+
+  // 更新顶部章节按钮
   const btnLabel = document.getElementById('j-chapter-btn-label');
   const btnTitle = document.getElementById('j-chapter-btn-title');
   if(btnLabel) btnLabel.textContent = `第${curChapterIdx+1}章`;
@@ -2168,7 +2170,6 @@ function jRenderMap(){
   if(!path)return;
   path.innerHTML='';
 
-  const curChapter = chapters.find(c=>String(c.id)===String(jCurrentChapterId));
   if(!curChapter) return;
 
   // 章节标题
