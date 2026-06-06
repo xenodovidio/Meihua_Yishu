@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.45</title>
+<title>梅花易数 · 习卦 v1.86</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -309,8 +309,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ══════════════════════════════
    学习之旅
 ══════════════════════════════ */
-.journey-wrap{padding:calc(68px + env(safe-area-inset-top,0px)) 20px calc(80px + env(safe-area-inset-bottom,0px));}
-.journey-heart-row{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--red);}
+.journey-wrap{padding:16px 20px calc(80px + env(safe-area-inset-bottom,0px));}
+.journey-heart-row{display:none;}
 .journey-heart{font-size:16px;transition:transform .2s;}
 .journey-heart.lost{opacity:.25;filter:grayscale(1);}
 .map-view{display:block;}
@@ -459,7 +459,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.85</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.86</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
@@ -694,12 +694,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <span class="j-chapter-btn-title" id="j-chapter-btn-title">学习之旅</span>
           <span class="j-chapter-btn-arrow">☰</span>
         </button>
-        <div class="journey-heart-row">
-          <span class="journey-heart" id="jh1">❤️</span>
-          <span class="journey-heart" id="jh2">❤️</span>
-          <span class="journey-heart" id="jh3">❤️</span>
         </div>
-      </div>
       <!-- 地图 -->
       <div class="map-view" id="j-map-view">
         <div id="j-lessons-path"></div>
@@ -2256,8 +2251,6 @@ function jStartLesson(id){
   jCurrentStep=0;
   jCorrectCount=0;
   jTotalQuizzes=jCurrentLesson.quizzes.length;
-  jHearts=3;
-  jUpdateHearts();
   document.getElementById('j-map-view').style.display='none';
   document.getElementById('j-lesson-view').style.display='block';
   document.getElementById('j-result-view').classList.remove('active');
@@ -2404,10 +2397,7 @@ function jSelectOpt(btn){
     jCorrectCount++;
     explainBox.innerHTML=`<div class="explain-result"><span class="er-icon">✓</span><span class="er-text ok">回答正确！</span></div><div class="explain-text">${explain}</div>`;
   } else {
-    jHearts--;
-    jUpdateHearts();
     explainBox.innerHTML=`<div class="explain-result"><span class="er-icon">✗</span><span class="er-text ng">回答错误</span></div><div class="explain-text">${explain}</div>`;
-    if(jHearts<=0){explainBox.classList.add('show');setTimeout(()=>jShowFail(),1200);return;}
   }
   explainBox.classList.add('show');
   document.getElementById('j-next-btn').classList.add('show');
