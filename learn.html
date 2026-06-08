@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css" media="print" onload="this.media='all'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 · 习卦 v1.87</title>
+<title>梅花易数 · 习卦 v1.88</title>
 <style>
 :root{
   --ink:#1a1410;--ink2:#3d3328;--ink3:#7a6e63;--ink4:#b0a89e;
@@ -31,7 +31,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .score-val{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--gold);font-weight:500;}
 
 /* ── 主体 ── */
-.main{max-width:520px;margin:0 auto;padding:calc(68px + env(safe-area-inset-top,0px)) 20px calc(32px + env(safe-area-inset-bottom,0px));}
+.main{max-width:520px;margin:0 auto;padding:calc(68px + env(safe-area-inset-top,0px)) 20px calc(40px + env(safe-area-inset-bottom,0px));}
 .view{display:none;}.view.active{display:block;}
 
 /* ── 智能学习设置弹窗 ── */
@@ -309,7 +309,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ══════════════════════════════
    学习之旅
 ══════════════════════════════ */
-.journey-wrap{padding:16px 20px calc(32px + env(safe-area-inset-bottom,0px));}
+.journey-wrap{padding:16px 20px calc(40px + env(safe-area-inset-bottom,0px));}
 .journey-heart-row{display:none;}
 .journey-heart{font-size:16px;transition:transform .2s;}
 .journey-heart.lost{opacity:.25;filter:grayscale(1);}
@@ -459,7 +459,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="header-left">
     <button class="back-btn show" id="home-btn" onclick="window.location.href='index.html'" style="display:inline-flex;">← 起卦</button>
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
-    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.87</span></div>
+    <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.88</span></div>
   </div>
   <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
