@@ -18,7 +18,7 @@
   --jade2:#3d8a6e;--blue:#2563eb;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding-top:calc(52px + env(safe-area-inset-top,0px));}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 12% 15%,rgba(184,145,42,.07) 0%,transparent 45%),radial-gradient(ellipse at 88% 85%,rgba(139,32,32,.05) 0%,transparent 45%);pointer-events:none;z-index:0;}
 
 /* ── Header ── */
@@ -31,7 +31,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .score-val{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--gold);font-weight:500;}
 
 /* ── 主体 ── */
-.main{max-width:520px;margin:0 auto;padding:56px 12px calc(16px + env(safe-area-inset-bottom,0px));}
+.main{max-width:520px;margin:0 auto;padding:16px 12px calc(16px + env(safe-area-inset-bottom,0px));}
 .view{display:none;}.view.active{display:block;}
 
 /* ── 智能学习设置弹窗 ── */
@@ -53,7 +53,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .settings-count-val{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:500;color:var(--ink);min-width:30px;text-align:center;}
 .settings-start-btn{width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:10px;padding:14px;font-family:'Noto Serif SC',serif;font-size:15px;cursor:pointer;margin-top:4px;letter-spacing:.1em;}
 .study-home{display:flex;flex-direction:column;gap:14px;}
-.study-title{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);margin:8px 0 2px;}
+.study-title{display:none;}
 .study-sub{font-size:13px;color:var(--ink3);line-height:1.8;margin-bottom:4px;}
 .mode-card{background:rgba(237,231,216,.6);border:1px solid var(--paper3);border-radius:12px;padding:18px 20px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:16px;}
 .mode-card:hover{border-color:var(--gold2);background:rgba(184,145,42,.06);transform:translateY(-1px);}
@@ -303,10 +303,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* ── Dock ── */
 /* 顶部 tab 导航 */
-.dock{position:sticky;top:var(--header-h,52px);left:0;right:0;z-index:49;background:rgba(245,240,232,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--paper3);display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;}
+.dock{position:sticky;top:0;left:0;right:0;z-index:49;background:rgba(245,240,232,.97);backdrop-filter:blur(12px);padding:12px 16px 12px;display:flex;align-items:center;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none;}
 .dock::-webkit-scrollbar{display:none;}
-.dock-btn{flex:1;min-width:60px;display:flex;align-items:center;justify-content:center;padding:0 8px;height:40px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:var(--ink4);transition:color .2s,border-color .2s;font-family:'Noto Sans SC',sans-serif;font-size:13px;letter-spacing:.04em;white-space:nowrap;}
-.dock-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.dock-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:6px 20px;height:34px;background:none;border:none;border-radius:20px;cursor:pointer;color:var(--ink3);transition:all .2s;font-family:'Noto Sans SC',sans-serif;font-size:13px;letter-spacing:.06em;white-space:nowrap;}
+.dock-btn:hover{color:var(--ink);}
+.dock-btn.active{background:rgba(184,145,42,.12);color:var(--gold);font-weight:500;}
 .dock-icon{display:none;}
 /* ══════════════════════════════
    学习之旅
@@ -463,7 +464,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <button class="back-btn" id="back-btn" onclick="goBack()" style="display:none;">← 返回</button>
     <div class="header-title">习卦 <span style="font-size:11px;color:var(--ink4);font-weight:400;">v1.90</span></div>
   </div>
-  <div class="header-score">积分 <span class="score-val" id="total-score">0</span></div>
+  <div class="header-score" style="display:none;">积分 <span class="score-val" id="total-score">0</span></div>
 </header>
 <nav class="dock" id="main-dock">
   <button class="dock-btn" id="tab-journey" onclick="switchTab('journey')">
@@ -622,7 +623,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
     <!-- 首页 -->
     <div id="test-home">
-      <div class="study-title" style="margin-bottom:16px;">模拟测试</div>
+      
       <div class="test-config">
         <div class="test-section-title">时间</div>
         <div class="test-row">
@@ -697,7 +698,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="view active" id="view-guide">
     <!-- 文件列表 -->
     <div id="guide-home">
-      <div class="study-title" style="margin-bottom:20px;">学习指南</div>
+      
       <div id="guide-categories"></div>
     </div>
     <!-- 沉浸式阅读 -->
