@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.57</title>
+<title>梅花易数 v1.58</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -955,7 +955,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.57</span>
+      <span class="logo-ver">v1.58</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -1770,13 +1770,24 @@ function showView(v,btn){
       if(!window._xiguaInited){
         window._xiguaInited=true;
         initLearn();
+      } else {
+        // 已初始化，重新激活当前 tab 的 view
+        const activeBtn = document.querySelector('.learn-tab-btn.active');
+        const currentTabName = activeBtn ? activeBtn.id.replace('tab-','') : 'journey';
+        // 强制重新显示对应 view
+        ['study','flashcard','test','guide','journey'].forEach(t=>{
+          const el=document.getElementById('learn-view-'+t);
+          if(el) el.classList.remove('active');
+        });
+        const cur = document.getElementById('learn-view-'+currentTabName);
+        if(cur) cur.classList.add('active');
       }
-      // 默认激活学习之旅
-      const activeTab = document.querySelector('.learn-tab-btn.active');
-      if(!activeTab){ switchTab('journey'); }
     },50);
   }
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  // 只清顶层 view，不影响 view-xigua 内的子 view
+  document.querySelectorAll('#app>.view, .app>.view, body>.view, body>div>.view').forEach(el=>el.classList.remove('active'));
+  // 也直接清 index 的几个已知顶层 view
+  ['view-qigua','view-result','view-guadian','view-records','view-xigua'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   const dockBtn=document.getElementById('dock-'+v);
@@ -1809,7 +1820,10 @@ function showView(v,btn){
 
 function showRecordsFromProfile(){
   // 从个人主页进入记录，不切换dock
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  // 只清顶层 view，不影响 view-xigua 内的子 view
+  document.querySelectorAll('#app>.view, .app>.view, body>.view, body>div>.view').forEach(el=>el.classList.remove('active'));
+  // 也直接清 index 的几个已知顶层 view
+  ['view-qigua','view-result','view-guadian','view-records','view-xigua'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.getElementById('view-records').classList.add('active');
   const logo=document.getElementById('header-logo');
   const result=document.getElementById('header-result');
@@ -2039,7 +2053,10 @@ function doQigua(){
   document.getElementById('header-result').style.display='flex';
 
   // 跳转结果页
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  // 只清顶层 view，不影响 view-xigua 内的子 view
+  document.querySelectorAll('#app>.view, .app>.view, body>.view, body>div>.view').forEach(el=>el.classList.remove('active'));
+  // 也直接清 index 的几个已知顶层 view
+  ['view-qigua','view-result','view-guadian','view-records','view-xigua'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.getElementById('view-result').classList.add('active');
   document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('active'));
   document.documentElement.scrollTop=0;
