@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.60</title>
+<title>梅花易数 v1.64</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -50,8 +50,43 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .header-result-meta{margin-left:auto;font-size:11px;color:var(--ink4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
 
 /* ── 底部 Dock ── */
-.dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 8px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
-.dock-btn.active{color:var(--gold);}
+.dock-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:9px 8px;
+  background:none;
+  border:none;
+  border-radius:32px;
+  cursor:pointer;
+  color:var(--ink4);
+  transition:color .3s ease;
+  font-family:'Noto Sans SC',sans-serif;
+  font-size:11px;
+  letter-spacing:.04em;
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+  z-index:1;
+}
+.dock-btn.active{
+  color:var(--gold);
+}
+.dock-slider{
+  position:absolute;
+  top:5px;
+  height:calc(100% - 10px);
+  width:0;
+  background:rgba(245,240,232,.95);
+  border-radius:32px;
+  box-shadow:0 1px 6px rgba(26,20,16,.1);
+  transition:left .3s cubic-bezier(.4,0,.2,1), width .3s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  z-index:0;
+}
 .dock-btn:hover{color:var(--ink2);}
 .dock-icon{width:22px;height:22px;flex-shrink:0;}
 
@@ -61,8 +96,48 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .guadian-wrap,.records-wrap{padding-top:16px;}
 
 /* Dock 安全区域 */
-.dock{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(245,240,232,.96);backdrop-filter:blur(12px);border-top:1px solid var(--paper3);display:flex;align-items:stretch;padding-bottom:calc(env(safe-area-inset-bottom,0px) * 0.5);}
-.dock-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 0 8px;background:none;border:none;cursor:pointer;color:var(--ink4);transition:color .2s;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.04em;}
+.dock{
+  position:fixed;
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  left:50%;
+  transform:translateX(-50%);
+  z-index:50;
+  background:rgba(237,231,216,.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(224,216,200,.7);
+  border-radius:40px;
+  display:flex;
+  align-items:center;
+  padding:5px;
+  gap:0;
+  box-shadow:0 4px 20px rgba(26,20,16,.12),0 1px 4px rgba(26,20,16,.06);
+  width:calc(100% - 64px);
+  max-width:360px;
+  position:fixed;
+}
+.dock-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:9px 8px;
+  background:none;
+  border:none;
+  border-radius:32px;
+  cursor:pointer;
+  color:var(--ink4);
+  transition:color .3s ease;
+  font-family:'Noto Sans SC',sans-serif;
+  font-size:11px;
+  letter-spacing:.04em;
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+  z-index:1;
+}
 /* ══════════════════════════════
    起卦视图
 ══════════════════════════════ */
@@ -1011,7 +1086,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.60</span>
+      <span class="logo-ver">v1.64</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -1028,7 +1103,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="app">
 
   <!-- 底部 Dock 导航 -->
-  <nav class="dock">
+  <nav class="dock" style="position:fixed;">
+  <div class="dock-slider" id="dock-slider"></div>
     <button class="dock-btn active" id="dock-qigua" onclick="showView('qigua',this)">
       <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
         <line x1="4" y1="7" x2="20" y2="7"/>
@@ -1821,6 +1897,12 @@ function closeProfileDrawer(){
 }
 function showView(v,btn){
   if(navigator.vibrate) navigator.vibrate(10);
+  // 移动滑块到选中项（按按钮实际位置）
+  const slider = document.getElementById('dock-slider');
+  if(slider && btn){
+    slider.style.left = btn.offsetLeft + 'px';
+    slider.style.width = btn.offsetWidth + 'px';
+  }
   // 进入习卦时初始化
   if(v==='xigua'){
     setTimeout(()=>{
@@ -4811,6 +4893,15 @@ function checkAutoLogin(){
 
 // 页面初始化
 checkAutoLogin();
+// 初始化滑块位置
+setTimeout(()=>{
+  const slider = document.getElementById('dock-slider');
+  const firstBtn = document.getElementById('dock-qigua');
+  if(slider && firstBtn){
+    slider.style.width = firstBtn.offsetWidth + 'px';
+    slider.style.left = firstBtn.offsetLeft + 'px';
+  }
+},100);
 </script>
 </body>
 </html>
