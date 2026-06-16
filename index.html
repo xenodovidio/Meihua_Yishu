@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.66</title>
+<title>梅花易数 v1.68</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -56,8 +56,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:4px;
-  padding:12px 8px;
+  gap:3px;
+  padding:7px 8px;
   background:none;
   border:none;
   border-radius:32px;
@@ -77,13 +77,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 }
 .dock-slider{
   position:absolute;
-  top:5px;
-  height:calc(100% - 10px);
-  width:0;
+  top:50%;
+  transform:translateY(-50%);
+  height:50px;
   background:rgba(245,240,232,.95);
-  border-radius:32px;
+  border-radius:50px;
   box-shadow:0 1px 6px rgba(26,20,16,.1);
-  transition:left .45s cubic-bezier(.34,1.4,.64,1), width .35s cubic-bezier(.34,1.2,.64,1);
+  transition:left .45s cubic-bezier(.34,1.4,.64,1),width .45s cubic-bezier(.34,1.4,.64,1);
   pointer-events:none;
   z-index:0;
 }
@@ -109,12 +109,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   border-radius:40px;
   display:flex;
   align-items:center;
-  padding:6px;
+  padding:4px;
   gap:0;
   box-shadow:0 4px 20px rgba(26,20,16,.12),0 1px 4px rgba(26,20,16,.06);
   width:calc(100% - 40px);
   max-width:420px;
-  position:fixed;
 }
 .dock-btn{
   flex:1;
@@ -122,8 +121,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:4px;
-  padding:12px 8px;
+  gap:3px;
+  padding:7px 8px;
   background:none;
   border:none;
   border-radius:32px;
@@ -4102,8 +4101,8 @@ setTimeout(()=>{
   const slider = document.getElementById('dock-slider');
   const firstBtn = document.getElementById('dock-qigua');
   if(slider && firstBtn){
-    slider.style.width = firstBtn.offsetWidth + 'px';
     slider.style.left = firstBtn.offsetLeft + 'px';
+    slider.style.width = firstBtn.offsetWidth + 'px';
   }
 },100);
 </script>
