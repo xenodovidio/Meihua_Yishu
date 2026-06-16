@@ -37,7 +37,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .app{max-width:780px;margin:0 auto;z-index:1;padding-top:calc(53px + env(safe-area-inset-top,0px));padding-bottom:0;}
 
 /* ── 顶部导航 ── */
-.header{padding:16px 24px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:flex-start;background:rgba(245,240,232,.96);position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(8px);width:100%;}
+.header{padding:16px 24px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.96);position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(8px);width:100%;}
+.header-avatar-btn{width:34px;height:34px;background:rgba(184,145,42,.1);border:1.5px solid rgba(184,145,42,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:14px;font-weight:700;color:var(--gold);cursor:pointer;flex-shrink:0;transition:background .2s;border-style:solid;outline:none;}
+.header-avatar-btn:hover{background:rgba(184,145,42,.18);}
 .logo{display:flex;align-items:baseline;gap:10px;}
 .logo-zh{font-family:'Noto Serif SC',serif;font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.12em;}
 .logo-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;margin:0 4px;display:inline-block;}
@@ -426,6 +428,29 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
    个人主页
 ══════════════════════════════ */
 .profile-wrap{padding:20px;display:flex;flex-direction:column;gap:16px;}
+/* 个人抽屉 */
+.profile-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,16,.45);z-index:200;backdrop-filter:blur(2px);}
+.profile-drawer-overlay.show{display:block;}
+.profile-drawer{position:fixed;top:0;right:0;bottom:0;width:min(320px,88vw);background:var(--paper);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,.12);}
+.profile-drawer.show{transform:translateX(0);}
+.profile-drawer-header{padding:calc(20px + env(safe-area-inset-top,0px)) 20px 16px;border-bottom:1px solid var(--paper3);display:flex;align-items:center;justify-content:space-between;}
+.profile-drawer-title{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:700;color:var(--ink);}
+.profile-drawer-close{background:none;border:1px solid var(--paper3);border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:var(--ink3);display:flex;align-items:center;justify-content:center;}
+.profile-drawer-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.drawer-hero{display:flex;align-items:center;gap:14px;padding:16px;background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:12px;}
+.drawer-avatar{width:52px;height:52px;background:rgba(184,145,42,.1);border:1.5px solid rgba(184,145,42,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.drawer-name{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink);}
+.drawer-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.drawer-stat{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:12px 6px;text-align:center;}
+.drawer-stat-num{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.drawer-stat-label{font-size:10px;color:var(--ink4);}
+.drawer-entry{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s;}
+.drawer-entry:hover{border-color:var(--gold2);}
+.drawer-entry-left{display:flex;align-items:center;gap:10px;}
+.drawer-entry-icon{font-size:18px;}
+.drawer-entry-name{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--ink);}
+.drawer-entry-sub{font-size:11px;color:var(--ink4);margin-top:2px;}
+.drawer-entry-arr{font-size:16px;color:var(--ink4);}
 .profile-hero{background:rgba(237,231,216,.5);border:1px solid var(--paper3);border-radius:14px;padding:24px 20px;display:flex;align-items:center;gap:18px;}
 .profile-avatar{width:60px;height:60px;background:rgba(184,145,42,.1);border:1.5px solid rgba(184,145,42,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--gold);flex-shrink:0;}
 .profile-info{flex:1;}
@@ -487,7 +512,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.49</span>
+      <span class="logo-ver">v1.50</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -497,6 +522,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     </div>
     <!-- 卦典/记录页标题 -->
     <div class="header-page-title" id="header-page-title" style="display:none"></div>
+    <!-- 右上角头像按钮（常驻） -->
+    <button class="header-avatar-btn" id="header-avatar-btn" onclick="openProfileDrawer()">易</button>
   </header>
 
 <div class="app">
@@ -521,13 +548,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </svg>
       <span>卦典</span>
     </button>
-    <button class="dock-btn" id="dock-profile" onclick="showView('profile',this)">
-      <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="4"/>
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-      </svg>
-      <span>我的</span>
-    </button>
+
     <button class="dock-btn" onclick="window.location.href='learn.html'">
       <svg class="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -743,50 +764,56 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <!-- ══════════════════ 个人主页 ══════════════════ -->
-  <div class="view" id="view-profile">
-    <div class="profile-wrap">
-      <div class="profile-hero">
-        <div class="profile-avatar" id="profile-avatar">易</div>
-        <div class="profile-info">
-          <div class="profile-name" id="profile-name">访客</div>
-        </div>
-      </div>
-      <div class="profile-stats">
-        <div class="profile-stat">
-          <div class="profile-stat-num" id="stat-total">0</div>
-          <div class="profile-stat-label">起卦总数</div>
-        </div>
-        <div class="profile-stat">
-          <div class="profile-stat-num" id="stat-this-month">0</div>
-          <div class="profile-stat-label">本月起卦</div>
-        </div>
-        <div class="profile-stat">
-          <div class="profile-stat-num" id="stat-days">0</div>
-          <div class="profile-stat-label">使用天数</div>
-        </div>
-      </div>
-      <div class="profile-section-title">功能</div>
-      <div class="profile-entry" onclick="showRecordsFromProfile()">
-        <div class="profile-entry-left">
-          <div class="profile-entry-icon">📜</div>
-          <div>
-            <div class="profile-entry-name">起卦记录</div>
-            <div class="profile-entry-sub" id="entry-record-sub">共 0 条记录</div>
-          </div>
-        </div>
-        <div class="profile-entry-arr">›</div>
-      </div>
-      <div class="profile-entry" onclick="logout()" style="margin-top:8px;">
-        <div class="profile-entry-left">
-          <div class="profile-entry-icon">🚪</div>
-          <div>
-            <div class="profile-entry-name" style="color:var(--red);">退出账号</div>
-          </div>
-        </div>
-        <div class="profile-entry-arr">›</div>
+<!-- 个人抽屉遮罩 -->
+<div class="profile-drawer-overlay" id="profile-drawer-overlay" onclick="closeProfileDrawer()"></div>
+<!-- 个人抽屉 -->
+<div class="profile-drawer" id="profile-drawer">
+  <div class="profile-drawer-header">
+    <div class="profile-drawer-title">我的</div>
+    <button class="profile-drawer-close" onclick="closeProfileDrawer()">✕</button>
+  </div>
+  <div class="profile-drawer-body">
+    <div class="drawer-hero">
+      <div class="drawer-avatar" id="profile-avatar">易</div>
+      <div>
+        <div class="drawer-name" id="profile-name">访客</div>
       </div>
     </div>
+    <div class="drawer-stats">
+      <div class="drawer-stat">
+        <div class="drawer-stat-num" id="stat-total">0</div>
+        <div class="drawer-stat-label">起卦总数</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-num" id="stat-this-month">0</div>
+        <div class="drawer-stat-label">本月起卦</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-num" id="stat-days">0</div>
+        <div class="drawer-stat-label">使用天数</div>
+      </div>
+    </div>
+    <div class="drawer-entry" onclick="closeProfileDrawer();showView('records',null);">
+      <div class="drawer-entry-left">
+        <div class="drawer-entry-icon">📜</div>
+        <div>
+          <div class="drawer-entry-name">起卦记录</div>
+          <div class="drawer-entry-sub" id="entry-record-sub">共 0 条记录</div>
+        </div>
+      </div>
+      <div class="drawer-entry-arr">›</div>
+    </div>
+    <div class="drawer-entry" onclick="logout()">
+      <div class="drawer-entry-left">
+        <div class="drawer-entry-icon">🚪</div>
+        <div>
+          <div class="drawer-entry-name" style="color:var(--red);">退出账号</div>
+        </div>
+      </div>
+      <div class="drawer-entry-arr">›</div>
+    </div>
   </div>
+</div>
 
   <!-- ══════════════════ 记录视图 ══════════════════ -->
   <div class="view" id="view-records">
@@ -954,6 +981,23 @@ function initNumHourSelects(){
     sel.value=getShichen(new Date().getHours());
   });
 }
+function openProfileDrawer(){
+  // 同步头像和用户名
+  const nameEl = document.getElementById('profile-name');
+  const avatarEl = document.getElementById('profile-avatar');
+  const btnEl = document.getElementById('header-avatar-btn');
+  if(nameEl && currentUser){
+    nameEl.textContent = currentUser.username || '访客';
+    if(avatarEl) avatarEl.textContent = (currentUser.username||'易')[0].toUpperCase();
+    if(btnEl) btnEl.textContent = (currentUser.username||'易')[0].toUpperCase();
+  }
+  document.getElementById('profile-drawer-overlay').classList.add('show');
+  document.getElementById('profile-drawer').classList.add('show');
+}
+function closeProfileDrawer(){
+  document.getElementById('profile-drawer-overlay').classList.remove('show');
+  document.getElementById('profile-drawer').classList.remove('show');
+}
 function showView(v,btn){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('active'));
@@ -963,7 +1007,7 @@ function showView(v,btn){
   document.documentElement.scrollTop=0;
   document.body.scrollTop=0;
 
-  const pageTitles={guadian:'六十四卦典',records:'起卦记录',profile:'我的'};
+  const pageTitles={guadian:'六十四卦典',records:'起卦记录'};
   const logo=document.getElementById('header-logo');
   const result=document.getElementById('header-result');
   const pageTitle=document.getElementById('header-page-title');
@@ -1024,7 +1068,7 @@ function renderProfile(){
     const user=JSON.parse(stored);
     const name=user.nickname||user.username;
     document.getElementById('profile-name').textContent=name;
-    document.getElementById('profile-avatar').textContent=name.slice(-1);
+    document.getElementById('header-avatar-btn').textContent=txt; document.getElementById('profile-avatar').textContent=name.slice(-1);
   }
 }
 

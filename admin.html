@@ -158,6 +158,22 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--paper);color:var(--i
 .modal-btn.secondary{background:none;border:1px solid var(--paper3);color:var(--ink3);}
 .modal-btn.secondary:hover{border-color:var(--ink3);}
 
+/* 模块层 */
+.module-group{margin-bottom:2px;}
+.module-header{display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer;background:rgba(184,145,42,.07);border-bottom:1px solid var(--paper3);transition:background .2s;user-select:none;}
+.module-header:hover{background:rgba(184,145,42,.13);}
+.module-arrow{font-size:10px;color:var(--gold);transition:transform .2s;flex-shrink:0;}
+.module-arrow.open{transform:rotate(90deg);}
+.module-name{font-family:'Noto Serif SC',serif;font-size:12px;font-weight:500;color:var(--gold);flex:1;letter-spacing:.06em;}
+.module-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s;}
+.module-header:hover .module-actions{opacity:1;}
+.module-body{border-bottom:1px solid var(--paper3);}
+/* 拖拽 */
+.chapter-header[draggable]{cursor:grab;}
+.chapter-header[draggable]:active{cursor:grabbing;}
+.drag-over{background:rgba(184,145,42,.18)!important;outline:2px dashed var(--gold2);}
+.drag-ghost{opacity:.4;}
+
 /* Toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:200;white-space:nowrap;}
 .toast.show{opacity:1;}
@@ -251,6 +267,7 @@ let flashcardData = [];
 let currentItemId = null;
 let expandedChapters = new Set();
 let expandedFcCats = new Set();
+let expandedModules = new Set();
 
 /* ════════════════════════════
    工具
@@ -268,6 +285,7 @@ async function init(){
   showToast('正在加载数据…');
   const [jd, fd] = await Promise.all([cosGet('journey_data.json'), cosGet('flashcards.json')]);
   if(jd) journeyData = jd;
+  if(!journeyData.modules) journeyData.modules = [];
   if(fd) flashcardData = fd;
   showToast('数据加载成功');
   renderSidebar();
@@ -297,34 +315,80 @@ function renderSidebar(){
 /* ── 学习之旅侧边栏 ── */
 function renderJourneySidebar(){
   const el = document.getElementById('sidebar-content');
-  let html = '<div class="sidebar-section">章节与关卡</div>';
-  if(!journeyData.chapters.length){
-    html += '<div style="padding:10px 16px;font-size:12px;color:var(--ink4);">暂无章节</div>';
-  } else {
-    html += journeyData.chapters.map(ch=>{
-      const isOpen = expandedChapters.has(ch.id);
-      const lessons = journeyData.lessons.filter(l=>l.chapterId===ch.id);
-      return `<div class="chapter-item">
-        <div class="chapter-header${isOpen?' active':''}" onclick="toggleChapter('${ch.id}')">
-          <span class="chapter-arrow${isOpen?' open':''}">›</span>
-          <span class="chapter-name">${ch.title}</span>
-          <div class="chapter-actions">
-            <button class="icon-btn" onclick="editChapter(event,'${ch.id}')">✎</button>
-            <button class="icon-btn danger" onclick="deleteChapter(event,'${ch.id}')">✕</button>
-          </div>
+  let html = '<div class="sidebar-section">模块 · 章节 · 关卡</div>';
+
+  // 收集已分配章节
+  const assignedChIds = new Set((journeyData.modules||[]).flatMap(m=>m.chapterIds||[]));
+
+  // 渲染章节块（复用）
+  function renderChapterBlock(ch){
+    const isOpen = expandedChapters.has(ch.id);
+    const lessons = journeyData.lessons.filter(l=>l.chapterId===ch.id);
+    return `<div class="chapter-item" id="chi-${ch.id}">
+      <div class="chapter-header${isOpen?' active':''}" draggable="true"
+        ondragstart="dragChapter(event,'${ch.id}')"
+        onclick="toggleChapter('${ch.id}')">
+        <span class="chapter-arrow${isOpen?' open':''}">›</span>
+        <span class="chapter-name">${ch.title}</span>
+        <div class="chapter-actions">
+          <button class="icon-btn" onclick="editChapter(event,'${ch.id}')">✎</button>
+          <button class="icon-btn danger" onclick="deleteChapter(event,'${ch.id}')">✕</button>
         </div>
-        ${isOpen?`<div class="lesson-list">
-          ${lessons.map(l=>`<div class="lesson-item${currentItemId===l.id?' active':''}" onclick="selectItem('${l.id}','lesson')">
-            <div class="lesson-dot"></div>
-            <span class="lesson-item-name">${l.icon||'📖'} ${l.name||'未命名'}</span>
-            <div class="lesson-item-actions"><button class="icon-btn danger" onclick="deleteLesson(event,'${l.id}')">✕</button></div>
-          </div>`).join('')}
-          <button class="add-btn" onclick="addLesson('${ch.id}')">＋ 新增关卡</button>
-        </div>`:''}
-      </div>`;
-    }).join('');
+      </div>
+      ${isOpen?`<div class="lesson-list">
+        ${lessons.map(l=>`<div class="lesson-item${currentItemId===l.id?' active':''}" onclick="selectItem('${l.id}','lesson')">
+          <div class="lesson-dot"></div>
+          <span class="lesson-item-name">${l.icon||'📖'} ${l.name||'未命名'}</span>
+          <div class="lesson-item-actions"><button class="icon-btn danger" onclick="deleteLesson(event,'${l.id}')">✕</button></div>
+        </div>`).join('')}
+        <button class="add-btn" onclick="addLesson('${ch.id}')">＋ 新增关卡</button>
+      </div>`:''}
+    </div>`;
   }
-  html += `<button class="add-btn" style="margin:8px 16px;" onclick="addChapter()">＋ 新增章节</button>`;
+
+  // 渲染模块
+  (journeyData.modules||[]).forEach(mod=>{
+    const isOpen = expandedModules.has(mod.id);
+    const modChapters = (mod.chapterIds||[]).map(id=>journeyData.chapters.find(c=>c.id===id)).filter(Boolean);
+    html += `<div class="module-group">
+      <div class="module-header" onclick="toggleModule('${mod.id}')"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="dropToModule(event,'${mod.id}')">
+        <span class="module-arrow${isOpen?' open':''}">›</span>
+        <span class="module-name">📦 ${mod.title}</span>
+        <div class="module-actions">
+          <button class="icon-btn" onclick="editModule(event,'${mod.id}')">✎</button>
+          <button class="icon-btn danger" onclick="deleteModule(event,'${mod.id}')">✕</button>
+        </div>
+      </div>
+      ${isOpen?`<div class="module-body">
+        ${modChapters.map(ch=>renderChapterBlock(ch)).join('')}
+        <button class="add-btn" onclick="addChapterToModule('${mod.id}')">＋ 新增章节到此模块</button>
+      </div>`:''}
+    </div>`;
+  });
+
+  // 未分类章节
+  const unassigned = journeyData.chapters.filter(ch=>!assignedChIds.has(ch.id));
+  const ucOpen = expandedModules.has('__unassigned__');
+  html += `<div class="module-group">
+    <div class="module-header" onclick="toggleModule('__unassigned__')"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="dropToModule(event,'__unassigned__')">
+      <span class="module-arrow${ucOpen?' open':''}">›</span>
+      <span class="module-name" style="color:var(--ink4);">📂 未分类（${unassigned.length}）</span>
+    </div>
+    ${ucOpen?`<div class="module-body">
+      ${unassigned.map(ch=>renderChapterBlock(ch)).join('')}
+      <button class="add-btn" onclick="addChapter()">＋ 新增章节</button>
+    </div>`:''}
+  </div>`;
+
+  html += `<div style="padding:8px 16px;display:flex;gap:8px;">
+    <button class="add-btn" style="margin:0;flex:1;" onclick="addModule()">＋ 新增模块</button>
+  </div>`;
   el.innerHTML = html;
 }
 
@@ -363,6 +427,70 @@ function renderFcSidebar(){
 }
 
 function toggleChapter(id){ expandedChapters.has(id)?expandedChapters.delete(id):expandedChapters.add(id); renderSidebar(); }
+function toggleModule(id){ expandedModules.has(id)?expandedModules.delete(id):expandedModules.add(id); renderSidebar(); }
+
+/* 模块管理 */
+function addModule(){
+  showModal('新增模块',`<div class="field"><div class="field-label">模块名称</div><input class="field-input" id="m-input" value="新模块" style="width:100%;"></div>`,()=>{
+    const t=document.getElementById('m-input').value.trim(); if(!t)return;
+    const id='mod_'+Date.now();
+    if(!journeyData.modules) journeyData.modules=[];
+    journeyData.modules.push({id,title:t,chapterIds:[]});
+    expandedModules.add(id); renderSidebar(); closeModal();
+  });
+}
+function editModule(e,id){
+  e.stopPropagation();
+  const mod=(journeyData.modules||[]).find(m=>m.id===id); if(!mod)return;
+  showModal('重命名模块',`<div class="field"><div class="field-label">模块名称</div><input class="field-input" id="m-input" value="${esc(mod.title)}" style="width:100%;"></div>`,()=>{
+    const v=document.getElementById('m-input').value.trim(); if(v){mod.title=v;renderSidebar();} closeModal();
+  });
+}
+function deleteModule(e,id){
+  e.stopPropagation();
+  const mod=(journeyData.modules||[]).find(m=>m.id===id);
+  showModal('删除模块',`<div style="font-size:13px;color:var(--ink3);line-height:1.8;">确定删除模块「${mod?.title}」？<br>模块下的章节不会被删除，会移至未分类。</div>`,()=>{
+    journeyData.modules=(journeyData.modules||[]).filter(m=>m.id!==id);
+    renderSidebar(); closeModal();
+  });
+}
+function addChapterToModule(modId){
+  showModal('新增章节',`<div class="field"><div class="field-label">章节名称</div><input class="field-input" id="m-input" value="第${journeyData.chapters.length+1}章 · 新章节" style="width:100%;"></div>`,()=>{
+    const t=document.getElementById('m-input').value.trim(); if(!t)return;
+    const id='ch_'+Date.now();
+    journeyData.chapters.push({id,title:t});
+    const mod=(journeyData.modules||[]).find(m=>m.id===modId);
+    if(mod){ if(!mod.chapterIds)mod.chapterIds=[]; mod.chapterIds.push(id); }
+    expandedChapters.add(id); renderSidebar(); closeModal();
+  });
+}
+
+/* 拖拽 */
+let dragChapterId = null;
+function dragChapter(e, chId){
+  dragChapterId = chId;
+  e.dataTransfer.effectAllowed = 'move';
+  // 延迟加 ghost 样式
+  setTimeout(()=>{ const el=document.getElementById('chi-'+chId); if(el)el.classList.add('drag-ghost'); }, 0);
+}
+function dropToModule(e, modId){
+  e.preventDefault();
+  e.stopPropagation();
+  // 清除所有高亮
+  document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  document.querySelectorAll('.drag-ghost').forEach(el=>el.classList.remove('drag-ghost'));
+  if(!dragChapterId) return;
+  // 先从所有模块移除
+  (journeyData.modules||[]).forEach(m=>{ m.chapterIds=(m.chapterIds||[]).filter(id=>id!==dragChapterId); });
+  // 加入目标模块（未分类则不加）
+  if(modId !== '__unassigned__'){
+    const mod=(journeyData.modules||[]).find(m=>m.id===modId);
+    if(mod){ if(!mod.chapterIds)mod.chapterIds=[]; mod.chapterIds.push(dragChapterId); }
+  }
+  dragChapterId = null;
+  renderSidebar();
+  showToast('章节已移动');
+}
 function toggleFcCat(cat){ expandedFcCats.has(cat)?expandedFcCats.delete(cat):expandedFcCats.add(cat); renderSidebar(); }
 
 /* ════════════════════════════
@@ -425,7 +553,9 @@ function renderTeachCard(t,i){
             <button class="rte-btn" onclick="rteInsertImage(${i})" title="插入图片">🖼</button>
             <button class="rte-btn" onclick="rteInsertTable(${i})" title="插入表格">⊞</button>
             <div class="rte-divider"></div>
-            <button class="rte-btn" onclick="rteCmd(${i},'insertLineBreak')" title="换行">↵</button>
+            <div class="rte-divider"></div>
+            <button class="rte-btn" onclick="rteFontSize(${i},-1)" title="缩小字号" style="font-size:12px;font-weight:600;">A−</button>
+            <button class="rte-btn" onclick="rteFontSize(${i},+1)" title="放大字号" style="font-size:12px;font-weight:600;">A+</button>
             <div class="rte-divider"></div>
             <button class="rte-btn" onclick="rteClear(${i})" style="font-size:11px;">清除</button>
           </div>
@@ -523,8 +653,35 @@ function rteInsertImage(i){
 function rteCmd(i,cmd){ const el=document.getElementById(`rte-${i}`); if(!el)return; el.focus(); document.execCommand(cmd,false,null); rteUpdate(i); }
 function rteColor(i,color){ const el=document.getElementById(`rte-${i}`); if(!el)return; el.focus(); const sel=window.getSelection(); if(!sel.rangeCount||sel.isCollapsed)return; const range=sel.getRangeAt(0); const txt=range.toString(); if(!txt)return; const span=document.createElement('span'); span.className=color==='gold'?'':color; if(color==='gold')span.innerHTML=`<strong>${txt}</strong>`; else span.textContent=txt; range.deleteContents(); range.insertNode(span); sel.removeAllRanges(); rteUpdate(i); }
 function rteClear(i){ const el=document.getElementById(`rte-${i}`); if(!el)return; el.focus(); document.execCommand('removeFormat',false,null); el.querySelectorAll('span.jade,span.red').forEach(s=>s.replaceWith(document.createTextNode(s.textContent))); rteUpdate(i); }
-function rteKeydown(e,i){ if(e.key==='Enter'){e.preventDefault();document.execCommand('insertHTML',false,'<br>');rteUpdate(i);} }
+function rteKeydown(e,i){ if(e.key==='Enter'){ e.preventDefault(); document.execCommand('insertLineBreak',false,null); rteUpdate(i); } }
 function rteUpdate(i){ const el=document.getElementById(`rte-${i}`); if(!el)return; const l=getLesson(); if(l&&l.teaches[i]) l.teaches[i].body=el.innerHTML; }
+function rteFontSize(i,delta){
+  const el=document.getElementById(`rte-${i}`);
+  if(!el)return;
+  el.focus();
+  const selection=window.getSelection();
+  if(!selection.rangeCount||selection.isCollapsed){ showToast('请先选中文字再调整字号'); return; }
+  const range=selection.getRangeAt(0);
+  if(range.toString()==''){ showToast('请先选中文字再调整字号'); return; }
+  const anchor=selection.anchorNode;
+  const parentEl=anchor.nodeType===3?anchor.parentElement:anchor;
+  const curSize=parseFloat(window.getComputedStyle(parentEl).fontSize)||13;
+  const newSize=Math.min(32,Math.max(10,Math.round(curSize+delta)));
+  const span=document.createElement('span');
+  span.style.fontSize=newSize+'px';
+  try{ range.surroundContents(span); }
+  catch(e){
+    const frag=range.extractContents();
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+  const newRange=document.createRange();
+  newRange.selectNodeContents(span);
+  selection.removeAllRanges();
+  selection.addRange(newRange);
+  rteUpdate(i);
+  showToast('字号 '+newSize+'px');
+}
 
 /* 题目 */
 const QUIZ_TYPE_LABELS = {'simple':'普通文字题','name2lines':'卦名→爻线','lines2name':'爻线→卦名','attr':'卦名→属性','wx':'卦名→五行','xiang':'卦名→类象','attr2gua':'属性→卦名','xiang2gua':'类象→卦名','tiyong_basic':'体用基础','tiyong_judge':'体用判断','tiyong_rel':'体用生克','jixiong':'吉凶判断','jixiong_full':'综合判断','hugua_simple':'互卦知识','biangua_simple':'变卦知识','biangua_calc':'变卦推算'};
