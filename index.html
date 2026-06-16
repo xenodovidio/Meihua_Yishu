@@ -982,15 +982,16 @@ function initNumHourSelects(){
   });
 }
 function openProfileDrawer(){
-  // 同步头像和用户名
+  // 同步头像和用户名（currentUser 可能未定义，做兼容）
+  const user = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : null;
   const nameEl = document.getElementById('profile-name');
   const avatarEl = document.getElementById('profile-avatar');
   const btnEl = document.getElementById('header-avatar-btn');
-  if(nameEl && currentUser){
-    nameEl.textContent = currentUser.username || '访客';
-    if(avatarEl) avatarEl.textContent = (currentUser.username||'易')[0].toUpperCase();
-    if(btnEl) btnEl.textContent = (currentUser.username||'易')[0].toUpperCase();
-  }
+  const displayName = user ? (user.username || '访客') : '访客';
+  const avatarChar = displayName[0].toUpperCase();
+  if(nameEl) nameEl.textContent = displayName;
+  if(avatarEl) avatarEl.textContent = avatarChar;
+  if(btnEl) btnEl.textContent = avatarChar;
   document.getElementById('profile-drawer-overlay').classList.add('show');
   document.getElementById('profile-drawer').classList.add('show');
 }
