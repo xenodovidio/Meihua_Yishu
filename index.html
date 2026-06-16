@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.55</title>
+<title>梅花易数 v1.56</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -954,7 +954,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.55</span>
+      <span class="logo-ver">v1.56</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -1278,7 +1278,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <!-- ══ 智能学习 ══ -->
-  <div class="view" id="view-study">
+  <div class="view" id="learn-view-study">
     <!-- 题目区 -->
     <div class="quiz-wrap" id="quiz-wrap">
       <div class="progress-bar-wrap">
@@ -1313,7 +1313,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <!-- ══ 闪卡 ══ -->
-  <div class="view" id="view-flashcard">
+  <div class="view" id="learn-view-flashcard">
 
     <!-- 内部 Tab -->
     <div class="fc-tabs" id="fc-tabs">
@@ -1364,7 +1364,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <!-- ══ 测试 ══ -->
-  <div class="view" id="view-test">
+  <div class="view" id="learn-view-test">
 
     <!-- 首页 -->
     <div id="test-home">
@@ -1440,7 +1440,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <!-- ══ 学习指南 ══ -->
-  <div class="view active" id="view-guide">
+  <div class="view active" id="learn-view-guide">
     <!-- 文件列表 -->
     <div id="guide-home">
       
@@ -1457,7 +1457,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
 
   <!-- ══ 学习之旅 ══ -->
-  <div class="view" id="view-journey">
+  <div class="view" id="learn-view-journey">
     <!-- 章节选择面板（遮罩） -->
     <div class="j-chapter-panel-overlay" id="j-chapter-overlay" onclick="closeChapterPanel()">
       <div class="j-chapter-panel" id="j-chapter-panel" onclick="event.stopPropagation()">
@@ -3031,9 +3031,11 @@ function switchTab(tab){
   document.querySelectorAll('.learn-tab-btn').forEach(b=>b.classList.remove('active'));
   const tabBtn = document.getElementById('tab-'+tab);
   if(tabBtn) tabBtn.classList.add('active');
-  const learnMain = document.querySelector('.learn-main');
-  if(learnMain) learnMain.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  const tabView = document.getElementById('view-'+tab);
+  ['study','flashcard','test','guide','journey'].forEach(v=>{
+    const el=document.getElementById('learn-view-'+v);
+    if(el) el.classList.remove('active');
+  });
+  const tabView = document.getElementById('learn-view-'+tab);
   if(tabView) tabView.classList.add('active');
   hideBackBtn();
   if(tab==='flashcard'){ updateFcStats(); switchFcTab('session'); }
