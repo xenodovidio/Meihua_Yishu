@@ -2928,12 +2928,16 @@ document.getElementById('question').addEventListener('input',function(){
 
 /* ══ 习卦模块 JS ══ */
 function initLearn(){
-  // 初始化 learn 模块
-  if(typeof totalScore !== 'undefined'){
-    const el = document.getElementById('total-score');
-    if(el) el.textContent = totalScore;
+  // 初始化 learn 模块（只在第一次进入习卦时执行）
+  loadQuestions();
+  renderTestHistory();
+  renderGuide();
+  loadFlashcards();
+  switchTab('journey');
+  if(checkLogin && checkLogin()){
+    loadUserData();
   }
-  loadJourneyData();
+  jLoadData();
 }
 
 let currentTab = 'study';
@@ -2944,7 +2948,7 @@ let correctCount = 0;
 let combo = 0;
 let comboTimer = null;
 let totalScore = parseInt(localStorage.getItem('learn_score')||'0');
-document.getElementById('total-score').textContent = totalScore;
+const _scoreEl=document.getElementById('total-score'); if(_scoreEl) _scoreEl.textContent = totalScore;
 
 /* ══════════ 题库 ══════════ */
 let TIYONG_BANK=[], BAGUA_XIANG={}, XIANG_FROM_GUA=[], GUA_FROM_XIANG=[];
@@ -4008,7 +4012,7 @@ async function loadUserData(){
       // 恢复积分
       if(data.score !== undefined){
         totalScore = data.score;
-        document.getElementById('total-score').textContent = totalScore;
+        const _scoreEl=document.getElementById('total-score'); if(_scoreEl) _scoreEl.textContent = totalScore;
         localStorage.setItem('meihua_score', totalScore);
       }
       // 恢复闪卡进度
@@ -4081,17 +4085,9 @@ function addScore(pts, reason){
   scheduleSync();
 }
 
-/* ── 初始化 ── */
-loadQuestions();
-renderTestHistory();
-renderGuide();
-loadFlashcards();
-switchTab('journey');
+/* ── 初始化已移至 initLearn() ── */
 
-// 登录检查 + 加载云端数据
-if(checkLogin()){
-  loadUserData();
-}
+// 登录检查已移至 initLearn()
 
 
 /* ══════════════════════════════════════
