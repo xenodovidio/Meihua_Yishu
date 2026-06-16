@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5/400.css">
 </noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>梅花易数 v1.53</title>
+<title>梅花易数 v1.55</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1410">
@@ -954,7 +954,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="logo" id="header-logo">
       <span class="logo-zh">梅花易数</span>
       <span class="logo-dot"></span>
-      <span class="logo-ver">v1.53</span>
+      <span class="logo-ver">v1.55</span>
     </div>
     <!-- 结果页状态：返回+卦名 -->
     <div class="header-result" id="header-result" style="display:none">
@@ -1213,6 +1213,42 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button id="home-btn"></button>
       <button id="back-btn"></button>
     </div>
+    <!-- 习卦子Tab栏 -->
+    <nav class="learn-tabs" id="learn-main-dock">
+  <button class="learn-tab-btn" id="tab-journey" onclick="switchTab('journey')">
+    <svg class="learn-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+      <path d="M2 17l10 5 10-5"/>
+      <path d="M2 12l10 5 10-5"/>
+    </svg>
+    <span>学习之旅</span>
+  </button>
+  <button class="learn-tab-btn" id="tab-guide" onclick="switchTab('guide')">
+    <svg class="learn-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+    </svg>
+    <span>学习指南</span>
+  </button>
+  <button class="learn-tab-btn" id="tab-study" onclick="switchTab('study')">
+    <svg class="learn-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+    <span>智能学习</span>
+  </button>
+  <button class="learn-tab-btn" id="tab-flashcard" onclick="switchTab('flashcard')">
+    <svg class="learn-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2"/>
+      <line x1="2" y1="10" x2="22" y2="10"/>
+    </svg>
+    <span>闪卡</span>
+  </button>
+  <button class="learn-tab-btn" id="tab-test" onclick="switchTab('test')">
+    <svg class="learn-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
+    <span>测试</span>
+  </button>
+</nav>
     <!-- 设置弹窗 -->
   <div class="settings-overlay" id="settings-overlay" onclick="closeSettingsOutside(event)">
     <div class="settings-panel">
@@ -2992,11 +3028,13 @@ let jCurrentLesson = null;
 function switchTab(tab){
   if(currentTab === tab) return;
   currentTab = tab;
-  document.querySelectorAll('.dock-btn[id^="tab-"]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.learn-tab-btn').forEach(b=>b.classList.remove('active'));
   const tabBtn = document.getElementById('tab-'+tab);
   if(tabBtn) tabBtn.classList.add('active');
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+tab).classList.add('active');
+  const learnMain = document.querySelector('.learn-main');
+  if(learnMain) learnMain.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const tabView = document.getElementById('view-'+tab);
+  if(tabView) tabView.classList.add('active');
   hideBackBtn();
   if(tab==='flashcard'){ updateFcStats(); switchFcTab('session'); }
   if(tab==='journey'){ 
